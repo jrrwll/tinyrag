@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from app.models.enums import WorkflowType
-from app.models.workflow import Edge, Node
+from app.core.workflow.enums import WorkflowType
+from app.entities.workflow import Edge, Node
 
 
 class WorkflowPublic(BaseModel):

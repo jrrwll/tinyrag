@@ -1,7 +1,7 @@
 from sqlmodel import Field
 
-from app.models import TableBase
-from app.models.enums import ModelType
+from app.entities import TableBase
+from app.entities.enums import ModelType
 
 
 class Model(TableBase, table=True):

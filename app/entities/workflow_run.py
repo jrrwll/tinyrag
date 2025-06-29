@@ -2,11 +2,11 @@ import uuid
 
 from sqlmodel import Field, Relationship
 
-from app.models import TableBase
-from app.models.workflow import Workflow
+from app.entities import TableBase
+from app.entities.workflow import Workflow
 
 
-class Task(TableBase, table=True):
+class WorkflowRun(TableBase, table=True):
     workflow: Workflow = Relationship()
     started_at: str | None = Field(default=None)
     stopped_at: str | None = Field(default=None)

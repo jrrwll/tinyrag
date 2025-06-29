@@ -2,8 +2,8 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
-from app.core.deps import SessionDep
-from app.models.workflow import Workflow
+from app.common.deps import SessionDep
+from app.entities.workflow import Workflow
 from app.schemas.workflow import WorkflowCreate, WorkflowPublic
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
