@@ -14,7 +14,7 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
-uv add fastapi sqlmodel pydantic pydantic-settings
+uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings
 
 # mypy: static type check
 # ruff: code smell check
@@ -48,3 +48,10 @@ coverage report --show-missing
 coverage html --title "${@-coverage}"
 ```
 
+```shell
+# on local machine
+./scripts/run.sh
+
+# on production machine
+./scripts/run.sh
+```

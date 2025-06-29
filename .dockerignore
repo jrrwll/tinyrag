@@ -1,0 +1,22 @@
+.dockerignore
+.env
+
+# Logs
+logs
+*.log*
+# jetbrains
+.idea
+.mypy_cache
+.ruff_cache
+.pytest_cache
+
+# venv
+.venv
+
+# git
+.git
+.gitignore
+.gitattributes
+.github
+
+*.md
