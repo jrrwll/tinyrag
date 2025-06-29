@@ -65,5 +65,5 @@ class Settings(BaseSettings):
         return self
 
 
-
 settings = Settings()  # type: ignore
+
