@@ -53,5 +53,5 @@ coverage html --title "${@-coverage}"
 ./scripts/run.sh
 
 # on production machine
-./scripts/run.sh
+./scripts/build_docker.sh
 ```
