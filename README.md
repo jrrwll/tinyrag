@@ -54,4 +54,6 @@ coverage html --title "${@-coverage}"
 
 # on production machine
 ./scripts/build_docker.sh
+
+curl http://localhost:8000/api/v1/openapi.json
 ```

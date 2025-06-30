@@ -6,3 +6,8 @@ class ModelType(StrEnum):
     TextEmbedding = "text-embedding"
     TTS = "tts"
     STT = "stt"
+
+
+class ModelProviderType(StrEnum):
+    OpenAI = "openai"
+    Ollama = "ollama"

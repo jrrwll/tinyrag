@@ -24,10 +24,12 @@ class Node(TableUUidBase, table=True):
 
 
 class Edge(TableUUidBase, table=True):
-    source: uuid.UUID | str = Field()
-    target: uuid.UUID | str = Field()
+    source: uuid.UUID | None = Field()
+    target: uuid.UUID | None = Field()
     front_info: str | None = Field(default=None)
 
     workflow_id: int = Field()
     predicate: str | None = Field(default=None)
+
+
 

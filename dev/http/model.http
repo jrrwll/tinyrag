@@ -1,0 +1,10 @@
+GET http://{{origin}}{{api_prefix}}/model?id=1
+
+###
+# python -c "import uuid; print(uuid.uuid4())"
+POST http://{{origin}}{{api_prefix}}/model
+Content-Type: application/json
+
+{
+
+}

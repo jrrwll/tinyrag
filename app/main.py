@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi.exceptions import RequestValidationError
 
-from app.api import api_router
+from app.api import api_router, biz_exception_handler, exception_handler, validation_exception_handler
 from app.common.config import settings
+from app.common.error_code import BizException
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -16,8 +18,11 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(BizException, biz_exception_handler)
+app.add_exception_handler(Exception, exception_handler)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app="app.main:app", host="0.0.0.0", port=8000,
+    uvicorn.run(app="app.main:app", host="0.0.0.0",
                 reload=True, log_level="debug")

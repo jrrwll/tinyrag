@@ -9,6 +9,6 @@ class NodeType(StrEnum):
     End = "end"
     LLM = "llm"
     Agent = "agent"
-    # Answer = "answer"
+    Answer = "answer"
     HTTP = "http"
     TOOL = "tool"
