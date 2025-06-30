@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Request, Response
 from fastapi.exceptions import RequestValidationError
 
-from app.api import private, workflow
+from app.api import private, model, workflow
 from app.common.config import settings
 from app.common.error_code import BizException, ErrorCode
 
 api_router = APIRouter()
+api_router.include_router(model.router)
 api_router.include_router(workflow.router)
 
 

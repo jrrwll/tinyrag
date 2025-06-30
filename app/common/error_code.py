@@ -38,7 +38,7 @@ class ErrorCode(Enum):
         for status_code, kv in _config.items():
             message = kv.get(self.name)
             if message:
-                return status_code, message
+                return int(status_code), message
         return _unknown_status_code, _unknown_message
 
 

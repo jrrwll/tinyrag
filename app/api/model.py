@@ -17,16 +17,24 @@ def get(session: SessionDep, id: int) -> Any:
     if not item:
         raise BizException.new(ErrorCode.model_not_found)
 
-    resp = ModelPublic(**item.model_dump(exclude_unset=True))
-    if item.settings:
-        resp.settings = json.loads(item.settings)
-    return resp
+    item_dict = item.model_dump(exclude_none=True)
+    item_dict['settings'] = json.loads(item.settings)
+    return ModelPublic(**item_dict)
+
+
 
 
 @router.post("/", response_model=ModelPublic)
 def create(session: SessionDep, model_in: ModelCreate) -> Any:
-    item = Model.model_validate(model_in)
+    item = Model.model_validate(model_in, update={
+        "base_url": model_in.settings.get("base_url"),
+        "api_key": model_in.settings.get("api_key"),
+        "settings": json.dumps(model_in.settings),
+    })
     session.add(item)
     session.commit()
     session.refresh(item)
-    return item
+
+    item_dict = item.model_dump()
+    item_dict["settings"] = json.loads(item_dict["settings"])
+    return ModelPublic(**item_dict).model_dump()

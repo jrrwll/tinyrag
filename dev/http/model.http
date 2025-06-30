@@ -1,10 +1,15 @@
 GET http://{{origin}}{{api_prefix}}/model?id=1
 
 ###
-# python -c "import uuid; print(uuid.uuid4())"
 POST http://{{origin}}{{api_prefix}}/model
 Content-Type: application/json
 
 {
-
+  "type": "llm",
+  "provider_name": "ollama",
+  "model_name": "qwen3:4b",
+  "settings": {
+    "base_url": "http://{{OLLAMA_HOST}:11434",
+    "function_calling": true
+  }
 }

@@ -24,5 +24,7 @@ app.add_exception_handler(Exception, exception_handler)
 
 if __name__ == "__main__":
     import uvicorn
+
+    # uvicorn.run(app, host="0.0.0.0")
     uvicorn.run(app="app.main:app", host="0.0.0.0",
                 reload=True, log_level="debug")

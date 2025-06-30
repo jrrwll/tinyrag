@@ -4,6 +4,7 @@ from app.core.model.enums import ModelType
 
 
 class ModelPublic(BaseModel):
+    id: int
     type: ModelType
     enable: bool
     provider_name: str
