@@ -2,8 +2,8 @@ import uuid
 
 from sqlmodel import Field
 
-from app.entities import TableBase, TableUUidBase
 from app.core.workflow.enums import NodeType, WorkflowType
+from app.entities.base import TableBase, TableUUidBase
 
 
 class Workflow(TableBase, table=True):
@@ -30,6 +30,3 @@ class Edge(TableUUidBase, table=True):
 
     workflow_id: int = Field()
     predicate: str | None = Field(default=None)
-
-
-

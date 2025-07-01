@@ -14,13 +14,15 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
-uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings
+uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings pymysql
 
 # mypy: static type check
 # ruff: code smell check
 uv add --dev pytest mypy ruff coverage
 
-uv add pymysql
+uv add langchain langgraph langchain_ollama langchain_openai
+
+uv add cachetools types-cachetools
 ```
 
 ### run the project

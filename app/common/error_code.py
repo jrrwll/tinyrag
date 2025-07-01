@@ -1,11 +1,12 @@
+import configparser
+import os.path
 from enum import Enum, auto
 from pathlib import Path
 
-import configparser
-from app.common.config import settings
-from fastapi.responses import JSONResponse
 from fastapi import Response
-import os.path
+from fastapi.responses import JSONResponse
+
+from app.common.config import settings
 
 _common_dir = Path(__file__).resolve().parent
 _error_code_file = str(_common_dir / "error_code.ini")
@@ -31,10 +32,13 @@ except KeyError:
 class ErrorCode(Enum):
     unknown_error = auto()
     request_validation_error = auto()
+
     model_not_found = auto()
+    model_provider_not_supported = auto()
+
     workflow_not_found = auto()
 
-    def get_status_code_and_message(self) -> (int, str):
+    def get_status_code_and_message(self) -> tuple[int, str]:
         for status_code, kv in _config.items():
             message = kv.get(self.name)
             if message:
@@ -53,7 +57,7 @@ class BizException(Exception):
         self.status_code = status_code
 
     @staticmethod
-    def new(error_code: ErrorCode, *args):
+    def new(error_code: ErrorCode, *args) -> "BizException":  # type: ignore[no-untyped-def]
         status_code, message = error_code.get_status_code_and_message()
         try:
             message = message.format(*args)
@@ -61,9 +65,8 @@ class BizException(Exception):
             pass
 
         return BizException(
-            error_code=error_code.name,
-            message=message,
-            status_code=status_code)
+            error_code=error_code.name, message=message, status_code=status_code
+        )
 
     @staticmethod
     def unknown(exc: Exception) -> "BizException":
@@ -74,7 +77,8 @@ class BizException(Exception):
         return BizException(
             error_code=ErrorCode.unknown_error.name,
             message=message,
-            status_code=_unknown_status_code)
+            status_code=_unknown_status_code,
+        )
 
     def to_response(self) -> Response:
         return JSONResponse(
@@ -82,5 +86,5 @@ class BizException(Exception):
                 "error_code": self.error_code,
                 "message": self.message,
             },
-            status_code=self.status_code
+            status_code=self.status_code,
         )

@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import Engine
 from sqlmodel import Session, select
 
-from app.core.db import engine
+from app.common.db import engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

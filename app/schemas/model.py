@@ -1,6 +1,9 @@
+import json
+
 from pydantic import BaseModel
 
 from app.core.model.enums import ModelType
+from app.entities.model import Model
 
 
 class ModelPublic(BaseModel):
@@ -9,11 +12,56 @@ class ModelPublic(BaseModel):
     enable: bool
     provider_name: str
     model_name: str
-    settings: dict | None
+    base_url: str | None = None
+    api_key: str | None = None
+    settings: dict | None = None  # type: ignore[type-arg]
+
+    @staticmethod
+    def new(item: Model) -> "ModelPublic":
+        item_dict = item.model_dump(exclude_none=True)
+        if item.settings:
+            item_dict["settings"] = json.loads(item.settings)
+        return ModelPublic(**item_dict)
 
 
 class ModelCreate(BaseModel):
     type: ModelType
     provider_name: str
     model_name: str
-    settings: dict
+    base_url: str | None = None
+    api_key: str | None = None
+    settings: dict  # type: ignore[type-arg]
+
+    def to_entity(self) -> Model:
+        return Model.model_validate(
+            self,
+            update={
+                "settings": json.dumps(self.settings),
+            },
+        )
+
+
+class ModelUpdate(BaseModel):
+    id: int
+    model_name: str
+    base_url: str | None = None
+    api_key: str | None = None
+    settings: dict  # type: ignore[type-arg]
+
+    def update_entity(self, entity: Model) -> None:
+        update_dict = self.model_dump(exclude_none=True)
+        update_dict.update(
+            {
+                "settings": json.dumps(self.settings),
+            }
+        )
+        entity.sqlmodel_update(update_dict)
+
+
+class ModelTestRun(BaseModel):
+    id: int
+    prompt: str | None = None
+
+
+class ModelTestRunPublic(BaseModel):
+    test_result: dict  # type: ignore[type-arg]

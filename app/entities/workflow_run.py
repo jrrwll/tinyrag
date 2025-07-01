@@ -2,7 +2,7 @@ import uuid
 
 from sqlmodel import Field, Relationship
 
-from app.entities import TableBase
+from app.entities.base import TableBase
 from app.entities.workflow import Workflow
 
 

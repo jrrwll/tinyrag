@@ -1,4 +1,3 @@
-import json
 from typing import Any
 
 from fastapi import APIRouter
@@ -6,35 +5,82 @@ from fastapi import APIRouter
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.entities.model import Model
-from app.schemas.model import ModelCreate, ModelPublic
+from app.schemas.model import (
+    ModelCreate,
+    ModelPublic,
+    ModelTestRun,
+    ModelTestRunPublic,
+    ModelUpdate,
+)
+from app.services.model_service import test_run_model
 
 router = APIRouter(prefix="/model", tags=["model"])
 
 
-@router.get("/", response_model=ModelPublic)
+@router.get("", response_model=ModelPublic)
 def get(session: SessionDep, id: int) -> Any:
-    item = session.get(Model, id)
-    if not item:
-        raise BizException.new(ErrorCode.model_not_found)
+    entity = session.get(Model, id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
 
-    item_dict = item.model_dump(exclude_none=True)
-    item_dict['settings'] = json.loads(item.settings)
-    return ModelPublic(**item_dict)
+    return ModelPublic.new(entity)
 
 
+@router.post("", response_model=ModelPublic)
+def create(session: SessionDep, params: ModelCreate) -> Any:
+    entity = params.to_entity()
 
-
-@router.post("/", response_model=ModelPublic)
-def create(session: SessionDep, model_in: ModelCreate) -> Any:
-    item = Model.model_validate(model_in, update={
-        "base_url": model_in.settings.get("base_url"),
-        "api_key": model_in.settings.get("api_key"),
-        "settings": json.dumps(model_in.settings),
-    })
-    session.add(item)
+    session.add(entity)
     session.commit()
-    session.refresh(item)
+    session.refresh(entity)
 
-    item_dict = item.model_dump()
-    item_dict["settings"] = json.loads(item_dict["settings"])
-    return ModelPublic(**item_dict).model_dump()
+    return ModelPublic.new(entity)
+
+
+@router.put("", response_model=ModelPublic)
+def update(session: SessionDep, params: ModelUpdate) -> Any:
+    entity = session.get(Model, params.id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
+
+    params.update_entity(entity)
+
+    session.add(entity)
+    session.commit()
+    session.refresh(entity)
+
+    return ModelPublic.new(entity)
+
+
+@router.delete("")
+def delete(session: SessionDep, id: int) -> Any:
+    entity = session.get(Model, id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
+
+    session.delete(entity)
+    session.commit()
+    return {"id": id}
+
+
+@router.post("/update_enable", response_model=dict)
+def update_enable(session: SessionDep, id: int) -> Any:
+    entity = session.get(Model, id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
+
+    entity.enable = not entity.enable
+    session.add(entity)
+    session.commit()
+    session.refresh(entity)
+
+    return {"id": id, "enable": entity.enable}
+
+
+@router.post("/test_run", response_model=ModelTestRunPublic)
+def test_run(session: SessionDep, params: ModelTestRun) -> Any:
+    entity = session.get(Model, params.id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
+
+    return test_run_model(session, params, entity)
