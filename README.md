@@ -45,9 +45,7 @@ uv sync
 source .venv/bin/activate
 
 # or just run: pytest
-coverage run --source=app -m pytest
-coverage report --show-missing
-coverage html --title "${@-coverage}"
+./scripts/test.sh
 ```
 
 ```shell
