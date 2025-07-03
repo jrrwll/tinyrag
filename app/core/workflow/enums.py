@@ -5,7 +5,7 @@ class WorkflowType(StrEnum):
     Graph = "graph"
 
 
-class WorkflowVersionType(StrEnum):
+class WorkflowStatus(StrEnum):
     Draft = "draft"
 
 

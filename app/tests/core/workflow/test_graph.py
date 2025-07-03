@@ -17,3 +17,4 @@ def test_graph():
         d = WorkflowGraphDisplay(w.graph)
         print(d.digraph)
         print(d.quickchart_url)
+        print(w.graph.model_dump_json())

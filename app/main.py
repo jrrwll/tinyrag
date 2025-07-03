@@ -21,6 +21,7 @@ app = FastAPI(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_exception_handler(Exception, exception_handler)
 
+# debug in IDE
 if __name__ == "__main__":
     import uvicorn
 

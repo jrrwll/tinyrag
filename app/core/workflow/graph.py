@@ -1,6 +1,6 @@
 from urllib.parse import quote_plus
 
-from app.core.workflow.api import Edge, Node, WorkflowGraph
+from app.core.workflow.base import Edge, Node, WorkflowGraph
 from app.util.graph import MutableGraph
 
 

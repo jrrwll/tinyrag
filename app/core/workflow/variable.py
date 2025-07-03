@@ -26,7 +26,7 @@ class InputVariableType(StrEnum):
 
 
 class InputVariable(BaseModel):
-    type: InputVariableType
+    type: InputVariableType = InputVariableType.Text
     name: str = Field(max_length=32)
     display_name: str | None = Field(max_length=32, default=None)
     required: bool = Field(default=True)

@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from sqlmodel import Field, SQLModel
 
 
 class TableBase(SQLModel):
     id: int = Field(default=None, primary_key=True)
-    created_at: str = Field(default=None)
-    updated_at: str = Field(default=None)
+    created_at: datetime = Field(default=None)
+    updated_at: datetime = Field(default=None)
     deleted: bool = Field(default=False)
 
 

@@ -1,7 +1,9 @@
 GET http://{{origin}}{{api_prefix}}/workflow?id=1
 
 ###
-# python -c "import uuid; print(uuid.uuid4())"
+GET http://{{origin}}{{api_prefix}}/workflow?id=2
+
+###
 POST http://{{origin}}{{api_prefix}}/workflow
 Content-Type: application/json
 
