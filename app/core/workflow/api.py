@@ -49,3 +49,14 @@ class WorkflowPublic(WorkflowCreate):
         if item.graph:
             item_dict["graph"] = json.loads(item.graph)
         return WorkflowPublic(**item_dict)
+
+
+class WorkflowCheckListPublic(BaseModel):
+    id: int
+    nodes: list["NodeCheckListPublic"] | None = None
+
+
+class NodeCheckListPublic(BaseModel):
+    id: int
+    name: str
+    missing_params: list[str] | None = None

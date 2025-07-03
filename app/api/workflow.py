@@ -4,7 +4,12 @@ from fastapi import APIRouter
 
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
-from app.core.workflow.api import WorkflowCreate, WorkflowPublic, WorkflowUpdate
+from app.core.workflow.api import (
+    WorkflowCheckListPublic,
+    WorkflowCreate,
+    WorkflowPublic,
+    WorkflowUpdate,
+)
 from app.entities.workflow import Workflow
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
@@ -43,3 +48,12 @@ def update(session: SessionDep, params: WorkflowUpdate) -> Any:
     session.refresh(entity)
 
     return WorkflowPublic.new(entity)
+
+
+@router.api_route("/check_list", methods=["GET", "POST"],
+                  response_model=WorkflowCheckListPublic)
+def check_list(session: SessionDep, id: int) -> Any:
+    entity = session.get(Workflow, id)
+    if not entity:
+        raise BizException.new(ErrorCode.workflow_not_found, id)
+

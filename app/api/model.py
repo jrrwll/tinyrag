@@ -11,8 +11,8 @@ from app.core.model.api import (
     ModelTestRunPublic,
     ModelUpdate,
 )
+from app.core.model.service import get_model_provider
 from app.entities.model import Model
-from app.services.model_service import test_run_model
 
 router = APIRouter(prefix="/model", tags=["model"])
 
@@ -83,4 +83,5 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.model_not_found, id)
 
-    return test_run_model(session, params, entity)
+    provider = get_model_provider(entity.provider_name)
+    return provider.test_run(params, entity)

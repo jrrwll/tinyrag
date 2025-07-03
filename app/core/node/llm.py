@@ -1,5 +1,5 @@
+from app.core.node.base import NodeRunner
 from app.core.workflow.enums import NodeType
-from app.services.node.base import NodeRunner
 
 
 class LLMNodeRunner(NodeRunner):
