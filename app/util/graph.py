@@ -18,7 +18,7 @@ class MutableGraph[Node, Edge]:
         directed: bool = True,
     ) -> None:
         self.directed = directed
-        self.nodes = dict()
+        self.nodes = {}
         self.edges = set()
 
         self.edge_nodes = edge_nodes

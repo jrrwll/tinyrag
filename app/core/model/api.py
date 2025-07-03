@@ -30,7 +30,7 @@ class ModelCreate(BaseModel):
     model_name: str
     base_url: str | None = None
     api_key: str | None = None
-    settings: dict = dict()  # type: ignore[type-arg]
+    settings: dict = {}  # type: ignore[type-arg]
 
     def to_entity(self) -> Model:
         return Model.model_validate(
