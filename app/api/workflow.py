@@ -1,26 +1,45 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from app.common.deps import SessionDep
+from app.common.error_code import BizException, ErrorCode
+from app.core.workflow.api import WorkflowCreate, WorkflowPublic, WorkflowUpdate
 from app.entities.workflow import Workflow
-from app.schemas.workflow import WorkflowCreate, WorkflowPublic
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
 
 
-@router.get("/", response_model=WorkflowPublic)
-def get_workflow(session: SessionDep, id: int) -> Any:
-    item = session.get(Workflow, id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Workflow not found")
-    return item
+@router.get("", response_model=WorkflowPublic)
+def get(session: SessionDep, id: int) -> Any:
+    entity = session.get(Workflow, id)
+    if not entity:
+        raise BizException.new(ErrorCode.workflow_not_found, id)
+
+    return WorkflowPublic.new(entity)
 
 
-@router.post("/", response_model=WorkflowPublic)
-def create_workflow(session: SessionDep, workflow_in: WorkflowCreate) -> Any:
-    item = Workflow.model_validate(workflow_in)
-    session.add(item)
+@router.post("", response_model=WorkflowPublic)
+def create(session: SessionDep, params: WorkflowCreate) -> Any:
+    entity = params.to_entity()
+
+    session.add(entity)
     session.commit()
-    session.refresh(item)
-    return item
+    session.refresh(entity)
+
+    return WorkflowPublic.new(entity)
+
+
+@router.put("", response_model=WorkflowPublic)
+def update(session: SessionDep, params: WorkflowUpdate) -> Any:
+    entity = session.get(Workflow, params.id)
+    if not entity:
+        raise BizException.new(ErrorCode.workflow_not_found, params.id)
+
+    params.update_entity(entity)
+
+    session.add(entity)
+    session.commit()
+    session.refresh(entity)
+
+    return WorkflowPublic.new(entity)

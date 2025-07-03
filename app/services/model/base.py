@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from cachetools import TTLCache
 from langchain_core.language_models import BaseChatModel
 
+from app.core.model.api import ModelTestRun, ModelTestRunPublic
 from app.entities.model import Model
-from app.schemas.model import ModelTestRun, ModelTestRunPublic
 
 
 class ModelProvider(ABC):

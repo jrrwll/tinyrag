@@ -5,6 +5,10 @@ class WorkflowType(StrEnum):
     Graph = "graph"
 
 
+class WorkflowVersionType(StrEnum):
+    Draft = "draft"
+
+
 class NodeType(StrEnum):
     Start = "start"
     End = "end"
@@ -12,4 +16,8 @@ class NodeType(StrEnum):
     Agent = "agent"
     Answer = "answer"
     HTTP = "http"
-    TOOL = "tool"
+    Code = "code"
+    Condition = "condition"
+    DocExtract = "doc_extract"
+    Classify = "classify"
+    Template = "template"

@@ -1,7 +1,7 @@
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
+from app.core.model.api import ModelTestRun, ModelTestRunPublic
 from app.entities.model import Model
-from app.schemas.model import ModelTestRun, ModelTestRunPublic
 from app.services.model.base import ModelProvider
 from app.services.model.ollama import OllamaModelProvider
 from app.services.model.opanai import OpenAIModelProvider

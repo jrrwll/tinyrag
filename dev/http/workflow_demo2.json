@@ -1,0 +1,260 @@
+{
+  "name": "Workflow 2",
+  "description": "complex demo",
+  "type": "graph",
+  "graph": {
+    "nodes": [
+      {
+        "id": "1",
+        "name": "Start Node",
+        "type": "start",
+        "settings": {
+          "input_variables": [
+            {
+              "name": "my_text",
+              "type": "text",
+              "description": "输入文本",
+              "required": true
+            },
+            {
+              "name": "my_number",
+              "type": "number",
+              "description": "输入数字"
+            },
+            {
+              "name": "my_option",
+              "type": "option",
+              "options": [
+                "电影院",
+                "摩天轮",
+                "水族馆"
+              ],
+              "default_value": "电影院"
+            },
+            {
+              "name": "my_files",
+              "type": "files",
+              "file_types": [
+                "picture",
+                "video"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "name": "LLM Node",
+        "description": "some description",
+        "type": "llm",
+        "settings": {
+          "model_id": 1,
+          "model_params": {
+            "temperature": 0.5,
+            "top_p": 0.9,
+            "top_k": 1
+          },
+          "prompts": [
+            {
+              "role": "system",
+              "content": "用户会给定一系列商品的评价给你，你只需要评判这些评价即可。不要做其他任何多余的事"
+            },
+            {
+              "role": "user",
+              "content": "{my_text} 是好评还是差评"
+            }
+          ],
+          "structured_output": [
+            {
+              "name": "good",
+              "type": "string",
+              "description": "好评输出Y，差评输出N"
+            }
+          ],
+          "exception_strategy": "node",
+          "exception_node_id": "3"
+        }
+      },
+      {
+        "id": "3",
+        "name": "Exception Node",
+        "type": "http",
+        "settings": {
+          "http_config": {
+            "url": "http://{{OLLAMA_HOST}}:11434/api/tags",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "json_body": "{\n              \"message\": \"{my_text}\"\n            }"
+          },
+          "exception_strategy": "default_value",
+          "exception_default_values": [
+            {
+              "name": "body",
+              "value": "[\n  \"qwen3:4b\",\n  \"llama3.2:latest\",\n  \"nomic-embed-text:latest\",\n  \"phi4:latest\",\n  \"qwen2.5:7b\",\n  \"qwq:latest\",\n  \"qwen2.5-coder:7b\",\n  \"deepseek-r1:7b\"\n]"
+            }
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "name": "Code Node",
+        "type": "code",
+        "settings": {
+          "code": "def main(arg1: str) -> list[str]:\n    body_obj = json.loads(arg1)\n    if isinstance(body_obj, dict):\n        return [model['name'] for model in body_obj['models']]\n    else:\n        return body_obj",
+          "code_args": [
+            "body"
+          ],
+          "output_variable": "result",
+          "end_variables": [
+            {
+              "name": "code_result",
+              "value": "result"
+            }
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "name": "Condition Node",
+        "type": "condition",
+        "settings": {
+          "condition": "{good} == 'Y'",
+          "true_node_id": "6",
+          "false_node_id": "10"
+        }
+      },
+      {
+        "id": "6",
+        "name": "Doc Extract Node",
+        "type": "doc_extract",
+        "settings": {
+          "extract_file": "my_file",
+          "output_variable": "text"
+        }
+      },
+      {
+        "id": "7",
+        "name": "Classify Node",
+        "type": "classify",
+        "settings": {
+          "classify_variable": {
+            "name": "text",
+            "node_id": "6"
+          },
+          "classify_prompt": "",
+          "classify_topics": [
+            {
+              "value": "code",
+              "topic": "这是一段代码",
+              "node_id": "8"
+            },
+            {
+              "value": "other",
+              "other_topic": true,
+              "node_id": "9"
+            }
+          ],
+          "output_variable": "class_name"
+        }
+      },
+      {
+        "id": "8",
+        "name": "Template Node",
+        "type": "template",
+        "settings": {
+          "template": "The result is {{class_name}}",
+          "template_args": [
+            {
+              "name": "class_name",
+              "value": "class_name",
+              "node_id": "7"
+            }
+          ],
+          "output_variable": "output",
+          "end_variables": [
+            {
+              "name": "template_output",
+              "value": "output"
+            }
+          ]
+        }
+      },
+      {
+        "id": "9",
+        "name": "Template Node2",
+        "type": "template",
+        "settings": {
+          "template": "No more news for {{class_name}}",
+          "output_variable": "output",
+          "end_variables": [
+            {
+              "name": "template_output",
+              "value": "output"
+            }
+          ]
+        }
+      },
+      {
+        "id": "10",
+        "name": "LLM Node2",
+        "type": "llm",
+        "settings": {
+          "model_id": 1,
+          "prompts": [
+            {
+              "role": "user",
+              "content": "{my_number} ** 3 等于多少"
+            }
+          ],
+          "output_variable": "text",
+          "end_variables": [
+            {
+              "name": "text_output",
+              "value": "text"
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "1",
+        "target": "2"
+      },
+      {
+        "source": "2",
+        "target": "3"
+      },
+      {
+        "source": "3",
+        "target": "4"
+      },
+      {
+        "source": "2",
+        "target": "5"
+      },
+      {
+        "source": "5",
+        "target": "6"
+      },
+      {
+        "source": "6",
+        "target": "7"
+      },
+      {
+        "source": "7",
+        "target": "8"
+      },
+      {
+        "source": "7",
+        "target": "9"
+      },
+      {
+        "source": "5",
+        "target": "10"
+      }
+    ]
+  }
+}

@@ -37,6 +37,10 @@ class ErrorCode(Enum):
     model_provider_not_supported = auto()
 
     workflow_not_found = auto()
+    workflow_run_not_found = auto()
+
+    code_main_func_undefined = auto()
+    code_eval_error = auto()
 
     def get_status_code_and_message(self) -> tuple[int, str]:
         for status_code, kv in _config.items():

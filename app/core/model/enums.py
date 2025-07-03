@@ -6,3 +6,9 @@ class ModelType(StrEnum):
     TextEmbedding = "text-embedding"
     TTS = "tts"
     STT = "stt"
+
+
+class PromptRoleType(StrEnum):
+    System = "system"
+    Assistant = "assistant"
+    User = "user"

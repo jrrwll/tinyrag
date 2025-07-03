@@ -4,14 +4,14 @@ from fastapi import APIRouter
 
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
-from app.entities.model import Model
-from app.schemas.model import (
+from app.core.model.api import (
     ModelCreate,
     ModelPublic,
     ModelTestRun,
     ModelTestRunPublic,
     ModelUpdate,
 )
+from app.entities.model import Model
 from app.services.model_service import test_run_model
 
 router = APIRouter(prefix="/model", tags=["model"])
@@ -41,7 +41,7 @@ def create(session: SessionDep, params: ModelCreate) -> Any:
 def update(session: SessionDep, params: ModelUpdate) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, id)
+        raise BizException.new(ErrorCode.model_not_found, params.id)
 
     params.update_entity(entity)
 

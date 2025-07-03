@@ -1,0 +1,104 @@
+{
+  "name": "Workflow 1",
+  "description": "simple demo",
+  "type": "graph",
+  "graph": {
+    "nodes": [
+      {
+        "id": "1",
+        "name": "Start Node",
+        "type": "start",
+        "settings": {
+          "input_variables": [
+            {
+              "name": "query",
+              "type": "text",
+              "description": "输入文本",
+              "required": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "name": "LLM Node",
+        "type": "llm",
+        "settings": {
+          "model_id": 1,
+          "model_params": {
+            "temperature": 1
+          },
+          "prompts": [
+            {
+              "role": "system",
+              "content": "你是一个AI助手，你性格古怪，对于用户的提问，你再回答完成之后，还会反问用户一个相关的问题"
+            }
+          ],
+          "structured_output": [
+            {
+              "name": "question",
+              "type": "string",
+              "description": "你需要反问的问题"
+            }
+          ],
+          "output_variable": "answer"
+        }
+      },
+      {
+        "id": "3",
+        "name": "LLM Node2",
+        "type": "llm",
+        "settings": {
+          "model_id": 1,
+          "model_params": {
+            "temperature": 0.5
+          },
+          "prompts": [
+            {
+              "role": "user",
+              "content": "用户提问：{query}\n\nAI助手的回答：{answer}\n\n请评估该AI助手的回答是否准确，和回答该助手反问的问题：{answer}"
+            }
+          ],
+          "structured_output": [
+            {
+              "name": "score",
+              "type": "integer",
+              "description": "回答是否准确，评分从1-10，10表示非常准确"
+            },
+            {
+              "name": "answer",
+              "type": "string",
+              "description": "你给出的答案，回答AI助手反问的问题"
+            }
+          ],
+          "output_variable": "text",
+          "end_variables": [
+            {
+              "name": "query_answer",
+              "value": "answer"
+            },
+            {
+              "name": "query_answer_score",
+              "value": "score"
+            },
+            {
+              "name": "ai_query_answer",
+              "value": "answer",
+              "node_id": 2
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "1",
+        "target": "2"
+      },
+      {
+        "source": "2",
+        "target": "3"
+      }
+    ]
+  }
+}

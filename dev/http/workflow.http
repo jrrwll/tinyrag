@@ -5,49 +5,11 @@ GET http://{{origin}}{{api_prefix}}/workflow?id=1
 POST http://{{origin}}{{api_prefix}}/workflow
 Content-Type: application/json
 
-{
-  "name": "Workflow 1",
-  "description": "Workflow 1 description",
-  "type": 1,
-  "nodes": [
-    {
-      "id": "9bd5c531-681f-43e3-a7e7-fa0e19be3568",
-      "name": "Node 1",
-      "description": "Node 1 description",
-      "type": "llm"
-    },
-    {
-      "id": "647b9aa1-9166-4825-b8c5-bb5e8c54152b",
-      "name": "Node 2",
-      "type": "http"
-    },
-    {
-      "id": "3fc98d06-f852-4b2d-ad64-080d3672e04d",
-      "name": "Node 3",
-      "type": "llm"
-    },
-    {
-      "id": "1a58425e-1599-4a74-8997-b18deb07a8e4",
-      "name": "Node 4",
-      "type": "agent"
-    }
-  ],
-  "edges": [
-    {
-      "source": "start",
-      "target": "9bd5c531-681f-43e3-a7e7-fa0e19be3568"
-    },
-    {
-      "source": "9bd5c531-681f-43e3-a7e7-fa0e19be3568",
-      "target": "647b9aa1-9166-4825-b8c5-bb5e8c54152b"
-    },
-    {
-      "source": "647b9aa1-9166-4825-b8c5-bb5e8c54152b",
-      "target": "3fc98d06-f852-4b2d-ad64-080d3672e04d"
-    },
-    {
-      "source": "9bd5c531-681f-43e3-a7e7-fa0e19be3568",
-      "target": "1a58425e-1599-4a74-8997-b18deb07a8e4"
-    }
-  ]
-}
+< ./workflow_demo1.json
+
+
+###
+POST http://{{origin}}{{api_prefix}}/workflow
+Content-Type: application/json
+
+< ./workflow_demo2.json

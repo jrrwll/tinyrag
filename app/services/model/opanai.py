@@ -12,5 +12,7 @@ class OpenAIModelProvider(ModelProvider):
 
     def _create_chat_model(self, model: Model) -> BaseChatModel:
         return ChatOpenAI(
-            base_url=model.base_url, api_key=model.api_key, model=model.model_name
+            base_url=model.base_url,
+            api_key=model.api_key,  # type: ignore[arg-type]
+            model=model.model_name,
         )

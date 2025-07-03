@@ -1,5 +1,3 @@
-import uuid
-
 from sqlmodel import Field, SQLModel
 
 
@@ -10,6 +8,6 @@ class TableBase(SQLModel):
     deleted: bool = Field(default=False)
 
 
-class TableUUidBase(SQLModel):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    deleted: bool = Field(default=False)
+# class TableUUidBase(SQLModel):
+#     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+#     deleted: bool = Field(default=False)
