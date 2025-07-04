@@ -4,22 +4,21 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.core.workflow.base import WorkflowGraph
-from app.core.workflow.enums import WorkflowStatus, WorkflowType
+from app.core.workflow.enums import WorkflowStatus
 from app.entities.workflow import Workflow
 
 
 class WorkflowCreate(BaseModel):
-    type: WorkflowType
     name: str
     description: str | None = None
 
     # graph
-    graph: WorkflowGraph | None = None
+    graph: WorkflowGraph
 
     def to_entity(self) -> Workflow:
-        update_dict = {}
-        if self.graph:
-            update_dict["graph"] = self.graph.model_dump_json()
+        update_dict = {
+            "graph": self.graph.model_dump_json()
+        }
         return Workflow.model_validate(self, update=update_dict)
 
 
@@ -28,12 +27,11 @@ class WorkflowUpdate(WorkflowCreate):
 
     def update_entity(self, entity: Workflow) -> None:
         update_dict = self.model_dump(exclude_none=True)
-        if self.graph:
-            update_dict.update(
-                {
-                    "graph": self.graph.model_dump_json(),
-                }
-            )
+        update_dict.update(
+            {
+                "graph": self.graph.model_dump_json(),
+            }
+        )
         entity.sqlmodel_update(update_dict)
 
 
@@ -59,4 +57,5 @@ class WorkflowCheckListPublic(BaseModel):
 class NodeCheckListPublic(BaseModel):
     id: int
     name: str
-    missing_params: list[str] | None = None
+    missing_fields: list[str] | None = []
+    broken_relations: list[str] | None = []

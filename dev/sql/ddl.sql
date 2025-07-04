@@ -19,7 +19,6 @@ create table workflow (
     deleted     tinyint      not null default 0,
     name        varchar(100) not null,
     description varchar(1000)         default null,
-    type        varchar(32)  not null,
     status     varchar(32)  not null,
     graph  longtext
 ) default charset utf8mb4;

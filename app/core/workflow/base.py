@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.model.base import LLMPrompt, ModelParams, StructuredOutput
 from app.core.workflow.enums import NodeType
@@ -8,9 +8,11 @@ from app.core.workflow.exception_strategy import (
     ExceptionDefaultValue,
     ExceptionStrategyType,
 )
-from app.core.workflow.node.classify import ClassifyTopic, ClassifyVariable
-from app.core.workflow.node.http import HttpConfig
+from app.core.node.classify import ClassifyTopic, ClassifyVariable
+from app.core.node.http import HttpConfig
 from app.core.workflow.variable import InputVariable, Variable
+
+
 
 
 class WorkflowGraph(BaseModel):
@@ -56,35 +58,73 @@ class Edge(BaseModel):
 
 
 class NodeSettings(BaseModel):
-    output_variable: str | None = None
 
-    input_variables: list[InputVariable] | None = None
-    end_variables: list[Variable] | None = None
+    output_variable: str | None = Field(default=None)
 
-    model_id: int | None = None
-    model_params: ModelParams | None = None
-    prompts: list[LLMPrompt] | None = None
-    structured_output: list[StructuredOutput] | None = None
+    start_variables: list[InputVariable] | None = Field(
+        default=None, allow_types=[NodeType.Start]
+    )
+
+    end_variables: list[Variable] | None = Field(
+        default=None, allow_types=[NodeType.End]
+    )
+
+    model_id: int | None = Field(
+        default=None, allow_types=[NodeType.LLM, NodeType.Classify]
+    )
+    model_params: ModelParams | None = Field(
+        default=None, allow_types=[NodeType.LLM, NodeType.Classify]
+    )
+    prompts: list[LLMPrompt] | None = Field(
+        default=None, allow_types=[NodeType.LLM]
+    )
+    structured_output: list[StructuredOutput] | None = Field(
+        default=None, allow_types=[NodeType.LLM]
+    )
 
     exception_strategy: ExceptionStrategyType | None = None
     exception_node_id: int | None = None
     exception_default_values: list[ExceptionDefaultValue] | None = None
 
-    conditions: str | None = None
-    true_node_id: int | None = None
-    false_node_id: int | None = None
+    conditions: str | None = Field(
+        default=None, allow_types=[NodeType.Condition]
+    )
+    true_node_id: int | None = Field(
+        default=None, allow_types=[NodeType.Condition]
+    )
+    false_node_id: int | None = Field(
+        default=None, allow_types=[NodeType.Condition]
+    )
 
-    classify_variable: ClassifyVariable | None = None
-    classify_prompt: str | None = None
-    classify_topics: list[ClassifyTopic] | None = None
+    classify_variable: ClassifyVariable | None = Field(
+        default=None, allow_types=[NodeType.Classify]
+    )
+    classify_prompt: str | None = Field(
+        default=None, allow_types=[NodeType.Classify]
+    )
+    classify_topics: list[ClassifyTopic] | None = Field(
+        default=None, allow_types=[NodeType.Classify]
+    )
 
-    code: str | None = None
-    code_args: list[str] | None = None
+    code: str | None = Field(
+        default=None, allow_types=[NodeType.Code]
+    )
+    code_args: list[str] | None = Field(
+        default=None, allow_types=[NodeType.Code]
+    )
 
-    template: str | None = None
+    template: str | None = Field(
+        default=None, allow_types=[NodeType.Template]
+    )
     # template_type: TemplateType | None = None
-    template_args: list[Variable] | None = None
+    template_args: list[Variable] | None = Field(
+        default=None, allow_types=[NodeType.Template]
+    )
 
-    extract_file: str | None = None
+    extract_file: str | None = Field(
+        default=None, allow_types=[NodeType.DocExtract]
+    )
 
-    http_config: HttpConfig | None = None
+    http_config: HttpConfig | None = Field(
+        default=None, allow_types=[NodeType.HTTP]
+    )

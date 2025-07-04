@@ -10,6 +10,7 @@ from app.core.workflow.api import (
     WorkflowPublic,
     WorkflowUpdate,
 )
+from app.core.workflow.service.check_list import workflow_check_list
 from app.entities.workflow import Workflow
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
@@ -57,3 +58,4 @@ def check_list(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.workflow_not_found, id)
 
+    return workflow_check_list(session, entity)

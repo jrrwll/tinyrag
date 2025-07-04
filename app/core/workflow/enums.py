@@ -1,10 +1,6 @@
 from enum import StrEnum
 
 
-class WorkflowType(StrEnum):
-    Graph = "graph"
-
-
 class WorkflowStatus(StrEnum):
     Draft = "draft"
 
