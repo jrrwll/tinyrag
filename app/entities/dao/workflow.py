@@ -18,8 +18,7 @@ def page_and_count_workflows(
     )
     count = session.exec(count_statement).one()
 
-    offset = (page_no - 1) * pa
-    ge_size
+    offset = (page_no - 1) * page_size
     limit = page_size
 
     page_statement = (
