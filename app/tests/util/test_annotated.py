@@ -1,7 +1,9 @@
 import inspect
+from abc import ABC, ABCMeta, abstractmethod
 from enum import StrEnum
 from typing import Annotated, get_type_hints
 
+from app.core.model.privoder.base import ModelProvider
 from app.core.workflow.base import NodeSettings
 from app.util.metadata import get_extra_schema
 
@@ -19,7 +21,15 @@ class Box:
     name: str = Annotated[str, Type.A, Type.B]
 
 
-class PluginRegistry(type):
+def model_provider_registry(cls):
+    if not hasattr(cls, 'providers'):
+        cls.providers = {}
+
+    cls.providers[cls.__name__.lower()] = cls
+    return cls
+
+
+class PluginRegistry(ABCMeta):
     def __init__(cls, name, bases, attrs):
         super().__init__(name, bases, attrs)
         if not hasattr(cls, "plugins"):
@@ -28,30 +38,49 @@ class PluginRegistry(type):
             cls.plugins.append(cls)  # 注册新插件
 
 
+@model_provider_registry
 class Plugin(metaclass=PluginRegistry):
-    pass
+
+    @abstractmethod
+    def say(self) -> None:
+        pass
 
 
+@model_provider_registry
 class MyPlugin1(Plugin):
-    pass
+
+    def say(self) -> None:
+        print("MyPlugin1")
 
 
 class MyPlugin2(Plugin):
-    pass
+
+    def say(self) -> None:
+        print("MyPlugin2")
 
 
 def test_xxx():
+    print(f"\n\nimplements:\n{ModelProvider.implements}")
+
     hints = get_type_hints(Box)
     print(f"\n{hints}")
 
     annotations = inspect.get_annotations(Box)
     print(f"\n{annotations}")
 
-    print(f"\n{Plugin.plugins}")
-
+    print(f"\nplugins:\n{Plugin.plugins}")
     for plugin_cls in Plugin.plugins:
         print(f"{plugin_cls} -> {plugin_cls()}")
+
+    print(f"\nproviders:\n{Plugin.providers}")
 
     print("\n\n")
     for field_name, field_info in get_extra_schema(NodeSettings).items():
         print(f"{field_name} -> {field_info}")
+
+"""
+from cachetools import TTLCache
+
+_cache: TTLCache[int, BaseChatModel] = TTLCache(maxsize=100, ttl=30 * 60)
+
+"""

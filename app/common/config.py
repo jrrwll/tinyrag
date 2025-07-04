@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     MYSQL_DB: str = ""
 
     DEFAULT_PAGE_NODE: int = 20
+    DEFAULT_TEST_PROMPT: str = "Hi!"
 
     @computed_field  # type: ignore[prop-decorator]
     @property

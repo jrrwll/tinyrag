@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -22,6 +23,14 @@ class ModelPublic(BaseModel):
         if item.settings:
             item_dict["settings"] = json.loads(item.settings)
         return ModelPublic(**item_dict)
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    def __eq__(self, other: Any):
+        if not isinstance(other, Model):
+            return False
+        return self.id == other.id
 
 
 class ModelCreate(BaseModel):
@@ -64,4 +73,4 @@ class ModelTestRun(BaseModel):
 
 
 class ModelTestRunPublic(BaseModel):
-    test_result: dict  # type: ignore[type-arg]
+    result: dict  # type: ignore[type-arg]

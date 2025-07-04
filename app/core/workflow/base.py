@@ -3,8 +3,8 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from app.core.model.base import LLMPrompt, ModelParams, StructuredOutput
-from app.core.node.classify import ClassifyTopic, ClassifyVariable
-from app.core.node.http import HttpConfig
+from app.core.node.runner.classify import ClassifyTopic, ClassifyVariable
+from app.core.node.runner.http import HttpConfig
 from app.core.workflow.enums import NodeType
 from app.core.workflow.exception_strategy import (
     ExceptionDefaultValue,

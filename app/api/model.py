@@ -13,7 +13,7 @@ from app.core.model.api import (
     ModelTestRunPublic,
     ModelUpdate,
 )
-from app.core.model.service import get_model_provider
+from app.core.model.privoder.base import get_model_provider
 from app.entities.dao.model import page_and_count_models
 from app.entities.model import Model
 
@@ -101,5 +101,7 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.model_not_found, id)
 
-    provider = get_model_provider(entity.provider_name)
-    return provider.test_run(params, entity)
+    model = ModelPublic.new(entity)
+    provider = get_model_provider(model)
+    result = provider.test_run(params.prompt)
+    return ModelTestRunPublic(result=result)
