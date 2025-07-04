@@ -5,8 +5,11 @@ from fastapi import APIRouter
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow_run.api import (
-    WorkflowRunPublic,
+    WorkflowRunCreate, WorkflowRunExecuteStepPublic, WorkflowRunPublic,
+    WorkflowRunExecuteStep,
 )
+from app.core.workflow_run.service.run_step import workflow_run_execute_step
+from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
 
 router = APIRouter(prefix="/workflow/run", tags=["workflow", "workflow_run"])
@@ -18,27 +21,36 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.workflow_run_not_found, id)
 
-    pass
+    workflow_entity = session.get(WorkflowRun, entity.workflow_id)
+    if not workflow_entity:
+        raise BizException.new(ErrorCode.related_workflow_not_found, entity.workflow_id)
+
+    return WorkflowRunPublic.new(entity, workflow_entity)
 
 
-# @router.post("")
-# def run(session: SessionDep, params: WorkflowRunCreate) -> Any:
-#     pass
-#     return {"id": id}
-#
-#
-# @router.post("/run_step")
-# def run_step(session: SessionDep, params: WorkflowRunStepCreate) -> Any:
-#     pass
-#     return {"id": id}
+@router.post("", response_model=WorkflowRunPublic)
+def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
+    workflow_entity = session.get(WorkflowRun, params.workflow_id)
+    if not workflow_entity:
+        raise BizException.new(ErrorCode.workflow_not_found, params.workflow_id)
 
+    entity = params.to_entity()
 
-@router.delete("")
-def delete(session: SessionDep, id: int) -> Any:
-    entity = session.get(WorkflowRun, id)
-    if not entity:
-        raise BizException.new(ErrorCode.workflow_run_not_found, id)
-
-    session.delete(entity)
+    session.add(entity)
     session.commit()
-    return {"id": id}
+    session.refresh(entity)
+
+    return WorkflowRunPublic.new(entity, workflow_entity)
+
+
+@router.post("/run_step", response_model=WorkflowRunExecuteStepPublic)
+def execute_step(session: SessionDep, params: WorkflowRunExecuteStep) -> Any:
+    entity = session.get(WorkflowRun, params.id)
+    if not entity:
+        raise BizException.new(ErrorCode.workflow_run_not_found, params.id)
+
+    workflow_entity = session.get(Workflow, entity.workflow_id)
+    if not workflow_entity:
+        raise BizException.new(ErrorCode.related_workflow_not_found, entity.workflow_id)
+
+    return workflow_run_execute_step(session, entity, workflow_entity, params)

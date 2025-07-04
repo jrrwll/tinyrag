@@ -38,6 +38,7 @@ class ErrorCode(Enum):
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()
+    related_workflow_not_found = auto()
 
     code_main_func_undefined = auto()
     code_eval_error = auto()

@@ -1,16 +1,15 @@
 import uuid
+from datetime import datetime
 
 from sqlmodel import Field, Relationship
 
 from app.entities.base import TableBase
-from app.entities.workflow import Workflow
 
 
 class WorkflowRun(TableBase, table=True):
-    workflow: Workflow = Relationship()
-    started_at: str | None = Field(default=None)
-    stopped_at: str | None = Field(default=None)
-    conversation: list["Conversation"] = Relationship()
+    workflow_id: int
+    started_at: datetime | None = Field(default=None)
+    stopped_at: datetime | None = Field(default=None)
 
 
 class Conversation(TableBase, table=True):
