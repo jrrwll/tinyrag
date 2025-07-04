@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class WorkflowRunPublic(BaseModel):
     id: int
     created_at: str
-    
     updated_at: str
 
     workflow_id: int
