@@ -1,3 +1,6 @@
+GET http://{{origin}}{{api_prefix}}/workflow/list
+
+###
 GET http://{{origin}}{{api_prefix}}/workflow?id=1
 
 ###
@@ -15,3 +18,6 @@ POST http://{{origin}}{{api_prefix}}/workflow
 Content-Type: application/json
 
 < ./workflow_demo2.json
+
+###
+GET http://{{origin}}{{api_prefix}}/workflow/check_list?id=1

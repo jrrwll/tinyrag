@@ -1,7 +1,9 @@
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
+from app.common.base import PageResult
+from app.common.config import settings
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import (
@@ -12,9 +14,25 @@ from app.core.model.api import (
     ModelUpdate,
 )
 from app.core.model.service import get_model_provider
+from app.entities.dao.model import page_and_count_models
 from app.entities.model import Model
 
 router = APIRouter(prefix="/model", tags=["model"])
+
+
+@router.get("/list", response_model=PageResult[ModelPublic])
+def list(
+    session: SessionDep,
+    page_no: int = Query(default=1, ge=1, le=10000),
+    page_size: int = settings.DEFAULT_PAGE_NODE,
+) -> Any:
+    entities, count = page_and_count_models(session, page_no, page_size)
+    return PageResult[ModelPublic](
+        page_no=page_no,
+        page_size=page_size,
+        total=count,
+        items=[ModelPublic.new(entity) for entity in entities],
+    )
 
 
 @router.get("", response_model=ModelPublic)

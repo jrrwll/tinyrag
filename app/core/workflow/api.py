@@ -16,9 +16,7 @@ class WorkflowCreate(BaseModel):
     graph: WorkflowGraph
 
     def to_entity(self) -> Workflow:
-        update_dict = {
-            "graph": self.graph.model_dump_json()
-        }
+        update_dict = {"graph": self.graph.model_dump_json()}
         return Workflow.model_validate(self, update=update_dict)
 
 
@@ -49,6 +47,16 @@ class WorkflowPublic(WorkflowCreate):
         return WorkflowPublic(**item_dict)
 
 
+class SimpleWorkflowPublic(BaseModel):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    name: str
+    description: str | None = None
+    status: WorkflowStatus
+
+
 class WorkflowCheckListPublic(BaseModel):
     id: int
     nodes: list["NodeCheckListPublic"] | None = None
@@ -57,5 +65,5 @@ class WorkflowCheckListPublic(BaseModel):
 class NodeCheckListPublic(BaseModel):
     id: int
     name: str
-    missing_fields: list[str] | None = []
-    broken_relations: list[str] | None = []
+    missing_fields: list[str] = []
+    broken_relations: list[str] = []

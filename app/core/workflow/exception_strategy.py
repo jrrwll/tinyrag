@@ -10,5 +10,4 @@ class ExceptionStrategyType(StrEnum):
 
 class ExceptionDefaultValue(BaseModel):
     name: str
-    value: (str | int | float | bool |
-            list[str] | list[int] | list[float] | list[bool])
+    value: str | int | float | bool | list[str] | list[int] | list[float] | list[bool]

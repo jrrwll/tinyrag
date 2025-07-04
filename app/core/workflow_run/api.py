@@ -3,7 +3,8 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class WorkflowRunPublic(BaseModel):
+class WorkflowR
+    unPublic(BaseModel):
     id: int
     created_at: str
     updated_at: str

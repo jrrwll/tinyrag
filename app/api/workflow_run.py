@@ -5,9 +5,7 @@ from fastapi import APIRouter
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow_run.api import (
-    WorkflowRunCreate,
     WorkflowRunPublic,
-    WorkflowRunStepCreate,
 )
 from app.entities.workflow_run import WorkflowRun
 
@@ -23,16 +21,16 @@ def get(session: SessionDep, id: int) -> Any:
     pass
 
 
-@router.post("")
-def run(session: SessionDep, params: WorkflowRunCreate) -> Any:
-    pass
-    return {"id": id}
-
-
-@router.post("/run_step")
-def run_step(session: SessionDep, params: WorkflowRunStepCreate) -> Any:
-    pass
-    return {"id": id}
+# @router.post("")
+# def run(session: SessionDep, params: WorkflowRunCreate) -> Any:
+#     pass
+#     return {"id": id}
+#
+#
+# @router.post("/run_step")
+# def run_step(session: SessionDep, params: WorkflowRunStepCreate) -> Any:
+#     pass
+#     return {"id": id}
 
 
 @router.delete("")

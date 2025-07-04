@@ -1,3 +1,6 @@
+GET http://{{origin}}{{api_prefix}}/model/list
+
+###
 GET http://{{origin}}{{api_prefix}}/model?id=1
 
 ###
