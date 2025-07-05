@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -35,7 +36,7 @@ class WorkflowRunCreate(BaseModel):
 
 
 class WorkflowRunExecute(BaseModel):
-    workflow_run_id: int
+    id: int
 
 
 class WorkflowRunExecuteStep(WorkflowRunExecute):
@@ -50,5 +51,19 @@ class WorkflowRunExecuteStepPublic(BaseModel):
     output_variables: list
 
 
-class NodeRun(Node):
-    pass
+class NodeRun(BaseModel):
+    node: Node
+    output_variables: list | None = None
+
+    @staticmethod
+    def new(node: Node) -> "NodeRun":
+        return NodeRun(node=node)
+
+    def __hash__(self) -> int:
+        return hash(self.node.id)
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, NodeRun):
+            return False
+        else:
+            return self.node.id == other.node.id

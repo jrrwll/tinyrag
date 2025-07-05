@@ -1,0 +1,18 @@
+GET http://{{origin}}{{api_prefix}}/workflow/run?id=1
+
+###
+POST http://{{origin}}{{api_prefix}}/workflow/run
+Content-Type: application/json
+
+{
+  "workflow_id": 1
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/workflow/run/execute
+Content-Type: application/json
+
+{
+  "id": 1
+}
+

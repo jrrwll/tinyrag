@@ -3,6 +3,7 @@ from app.core.workflow_run.api import WorkflowRunExecute, \
     WorkflowRunExecuteStep, \
     WorkflowRunExecuteStepPublic, \
     WorkflowRunExecutePublic
+from app.core.workflow.api import WorkflowPublic
 from app.core.workflow_run.service.graph import GraphRunner
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
@@ -11,7 +12,9 @@ from app.entities.workflow_run import WorkflowRun
 def workflow_run_execute(session: SessionDep,
         entity: WorkflowRun, workflow_entity: Workflow,
         params: WorkflowRunExecute) -> WorkflowRunExecutePublic:
-    runner = GraphRunner()
+    w = WorkflowPublic.new(workflow_entity)
+
+    runner = GraphRunner(w.graph)
 
     runner.run()
 
@@ -23,8 +26,9 @@ def workflow_run_execute_step(session: SessionDep,
         entity: WorkflowRun, workflow_entity: Workflow,
         params: WorkflowRunExecuteStep) -> WorkflowRunExecuteStepPublic:
     node_id = params.node_id
+    w = WorkflowPublic.new(workflow_entity)
 
-    runner = GraphRunner()
+    runner = GraphRunner(w.graph)
 
     runner.run_node(node_id)
 

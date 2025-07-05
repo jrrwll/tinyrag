@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 
-from app.api import (
+from app.api.base import (
     api_router,
     exception_handler,
 )

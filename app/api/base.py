@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Request, Response
 from fastapi.exceptions import RequestValidationError
 
-from app.api import model, private, workflow
+from app.api import model, private, workflow, workflow_run
 from app.common.config import settings
 from app.common.error_code import BizException, ErrorCode
 
 api_router = APIRouter()
 api_router.include_router(model.router)
 api_router.include_router(workflow.router)
+api_router.include_router(workflow_run.router)
 
 
 if settings.IS_TEST_ENV:

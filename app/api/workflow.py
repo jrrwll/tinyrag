@@ -14,7 +14,7 @@ from app.core.workflow.api import (
     WorkflowUpdate,
 )
 from app.core.workflow.enums import WorkflowStatus
-from app.core.workflow.service.check_list import workflow_check_list
+from app.core.workflow.check_list import workflow_check_list
 from app.entities.dao.workflow import page_and_count_workflows
 from app.entities.workflow import Workflow
 

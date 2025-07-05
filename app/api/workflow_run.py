@@ -21,7 +21,7 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.workflow_run_not_found, id)
 
-    workflow_entity = session.get(WorkflowRun, entity.workflow_id)
+    workflow_entity = session.get(Workflow, entity.workflow_id)
     if not workflow_entity:
         raise BizException.new(ErrorCode.related_workflow_not_found, entity.workflow_id)
 
@@ -30,7 +30,7 @@ def get(session: SessionDep, id: int) -> Any:
 
 @router.post("", response_model=WorkflowRunPublic)
 def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
-    workflow_entity = session.get(WorkflowRun, params.workflow_id)
+    workflow_entity = session.get(Workflow, params.workflow_id)
     if not workflow_entity:
         raise BizException.new(ErrorCode.workflow_not_found, params.workflow_id)
 
