@@ -143,6 +143,10 @@ class MutableGraph[Node, Edge]:
         else:
             return self.successors(node)
 
+    def root_nodes(self) -> set[Node]:
+        in_degrees = self.in_degrees()
+        return set([node for node, d in in_degrees if d == 0])
+
     def topological_sort(self) -> list[Node]:
         if not self.directed:
             raise Exception("Not Supported for Undirected Graph")

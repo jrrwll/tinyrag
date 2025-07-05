@@ -10,7 +10,7 @@ from app.core.workflow.exception_strategy import (
     ExceptionDefaultValue,
     ExceptionStrategyType,
 )
-from app.core.workflow.variable import InputVariable, Variable
+from app.core.variable.base import InputVariable, Variable
 
 
 class WorkflowGraph(BaseModel):

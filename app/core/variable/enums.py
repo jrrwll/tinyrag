@@ -19,3 +19,10 @@ class InputVariableType(StrEnum):
     Option = "option"
     File = "file"
     Files = "files"
+
+
+class FileType(StrEnum):
+    Picture = "picture"
+    Video = "video"
+    Audio = "audio"
+    Document = "document"

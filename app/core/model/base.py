@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from app.core.model.enums import PromptRoleType
-from app.core.workflow.variable import VariableType
+from app.core.variable.enums import VariableType
 
 
 class ModelParams(BaseModel):

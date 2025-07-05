@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from app.core.workflow.base import Node
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
 
@@ -42,16 +43,12 @@ class WorkflowRunExecuteStep(WorkflowRunExecute):
 
 
 class WorkflowRunExecutePublic(BaseModel):
-    pass
+    output_variables: list
 
 
 class WorkflowRunExecuteStepPublic(BaseModel):
-    pass
+    output_variables: list
 
 
-class NodeRun:
-    pass
-
-
-class EdgeRun:
+class NodeRun(Node):
     pass

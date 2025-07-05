@@ -6,9 +6,9 @@ from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow_run.api import (
     WorkflowRunCreate, WorkflowRunExecuteStepPublic, WorkflowRunPublic,
-    WorkflowRunExecuteStep,
+    WorkflowRunExecuteStep, WorkflowRunExecutePublic, WorkflowRunExecute
 )
-from app.core.workflow_run.service.run_step import workflow_run_execute_step
+from app.core.workflow_run.service.run_step import workflow_run_execute, workflow_run_execute_step
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
 
@@ -43,7 +43,20 @@ def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
     return WorkflowRunPublic.new(entity, workflow_entity)
 
 
-@router.post("/run_step", response_model=WorkflowRunExecuteStepPublic)
+@router.post("/execute", response_model=WorkflowRunExecutePublic)
+def execute(session: SessionDep, params: WorkflowRunExecute) -> Any:
+    entity = session.get(WorkflowRun, params.id)
+    if not entity:
+        raise BizException.new(ErrorCode.workflow_run_not_found, params.id)
+
+    workflow_entity = session.get(Workflow, entity.workflow_id)
+    if not workflow_entity:
+        raise BizException.new(ErrorCode.related_workflow_not_found, entity.workflow_id)
+
+    return workflow_run_execute(session, entity, workflow_entity, params)
+
+
+@router.post("/execute_step", response_model=WorkflowRunExecuteStepPublic)
 def execute_step(session: SessionDep, params: WorkflowRunExecuteStep) -> Any:
     entity = session.get(WorkflowRun, params.id)
     if not entity:

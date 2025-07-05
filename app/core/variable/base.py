@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
 
-from app.core.variable.enums import InputVariableType
-from app.core.workflow.file import FileType
-
+from app.core.variable.enums import InputVariableType, FileType
 
 
 class InputVariable(BaseModel):
