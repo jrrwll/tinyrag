@@ -5,12 +5,12 @@ from pydantic import BaseModel, Field
 from app.core.model.base import LLMPrompt, ModelParams, StructuredOutput
 from app.core.node.runner.classify import ClassifyTopic, ClassifyVariable
 from app.core.node.runner.http import HttpConfig
+from app.core.variable.base import AssigningVariable, InputVariable
 from app.core.workflow.enums import NodeType
 from app.core.workflow.exception_strategy import (
     ExceptionDefaultValue,
     ExceptionStrategyType,
 )
-from app.core.variable.base import InputVariable, Variable
 
 
 class WorkflowGraph(BaseModel):
@@ -62,7 +62,7 @@ class NodeSettings(BaseModel):
         default=None, json_schema_extra={"allow_types": [NodeType.Start]}
     )
 
-    end_variables: list[Variable] | None = Field(
+    end_variables: list[AssigningVariable] | None = Field(
         default=None, json_schema_extra={"allow_types": [NodeType.End]}
     )
 
@@ -74,8 +74,12 @@ class NodeSettings(BaseModel):
         default=None,
         json_schema_extra={"allow_types": [NodeType.LLM, NodeType.Classify]},
     )
-    prompts: list[LLMPrompt] | None = Field(
-        default=None, json_schema_extra={"allow_types": [NodeType.LLM]}
+    user_prompt: str | None = Field(
+        default=None,
+        json_schema_extra={"allow_types": [NodeType.LLM]},
+    )
+    advanced_prompts: list[LLMPrompt] | None = Field(
+        default=None, json_schema_extra={"allow_types": [NodeType.LLM], "required": False}
     )
     structured_output: list[StructuredOutput] | None = Field(
         default=None, json_schema_extra={"allow_types": [NodeType.LLM]}
@@ -116,7 +120,7 @@ class NodeSettings(BaseModel):
         default=None, json_schema_extra={"allow_types": [NodeType.Template]}
     )
     # template_type: TemplateType | None = None
-    template_args: list[Variable] | None = Field(
+    template_args: list[AssigningVariable] | None = Field(
         default=None, json_schema_extra={"allow_types": [NodeType.Template]}
     )
 

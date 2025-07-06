@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from app.core.variable.enums import InputVariableType, FileType
@@ -17,7 +19,13 @@ class InputVariable(BaseModel):
     file_extensions: list[str] | None = Field(default=None)
 
 
+class AssigningVariable(BaseModel):
+    left: str
+    right: str
+    node_id: int | None = None
+
+
 class Variable(BaseModel):
     name: str
-    value: str
-    node_id: int | None = None
+    value: Any
+

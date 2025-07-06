@@ -38,6 +38,7 @@ class Settings(BaseSettings):
 
     DEFAULT_PAGE_NODE: int = 20
     DEFAULT_TEST_PROMPT: str = "Hi!"
+    DEFAULT_NODE_OUTPUT_VARIABLE: str = "result"
 
     @computed_field  # type: ignore[prop-decorator]
     @property

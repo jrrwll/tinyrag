@@ -4,8 +4,9 @@ from enum import StrEnum
 from typing import Annotated, get_type_hints
 
 from app.core.model.privoder.base import ModelProvider
+from app.core.node.runner.base import NodeRunner
 from app.core.workflow.base import NodeSettings
-from app.util.metadata import get_extra_schema
+from app.util.metadata import find_sub_types, get_extra_schema, walk_packages
 
 
 class Type(StrEnum):
@@ -59,7 +60,7 @@ class MyPlugin2(Plugin):
         print("MyPlugin2")
 
 
-def test_xxx():
+def test_registry():
     print(f"\n\nimplements:\n{ModelProvider.implements}")
 
     hints = get_type_hints(Box)
@@ -78,9 +79,13 @@ def test_xxx():
     for field_name, field_info in get_extra_schema(NodeSettings).items():
         print(f"{field_name} -> {field_info}")
 
-"""
-from cachetools import TTLCache
 
-_cache: TTLCache[int, BaseChatModel] = TTLCache(maxsize=100, ttl=30 * 60)
+def test_walk_packages():
+    print(f"\nimplements:\n{NodeRunner._implements}")
 
-"""
+    import app.core.node.runner as runner
+    implements = find_sub_types(NodeRunner, runner)
+    print(f"\nimplements:\n{implements}")
+
+    walk_packages(runner)
+    print(f"\nimplements:\n{NodeRunner._implements}")

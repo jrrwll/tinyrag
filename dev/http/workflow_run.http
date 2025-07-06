@@ -13,6 +13,12 @@ POST http://{{origin}}{{api_prefix}}/workflow/run/execute
 Content-Type: application/json
 
 {
-  "id": 1
+  "id": 1,
+  "input_variables": [
+    {
+      "name": "query",
+      "value": "背一首家喻户晓的唐诗给我"
+    }
+  ]
 }
 

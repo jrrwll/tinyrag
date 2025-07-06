@@ -12,6 +12,12 @@ Content-Type: application/json
 
 < ./workflow_demo1.json
 
+###
+PUT http://{{origin}}{{api_prefix}}/workflow
+Content-Type: application/json
+
+< ./workflow_demo1.json
+
 
 ###
 POST http://{{origin}}{{api_prefix}}/workflow

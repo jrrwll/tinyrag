@@ -1,4 +1,5 @@
 {
+  "id": 1,
   "name": "Workflow 2",
   "description": "complex demo",
   "type": "graph",

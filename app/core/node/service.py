@@ -8,7 +8,7 @@ from app.core.workflow.base import Node
 @lru_cache(maxsize=1000)
 def get_node_runner(node: Node) -> NodeRunner:
     node_type = node.type
-    for cls in NodeRunner.implements:
+    for cls in NodeRunner.implements():
         if cls.get_node_type() == node_type:
             return cls(node)
 

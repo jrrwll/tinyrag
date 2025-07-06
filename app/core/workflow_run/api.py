@@ -3,6 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.core.variable.base import Variable
 from app.core.workflow.base import Node
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
@@ -37,6 +38,7 @@ class WorkflowRunCreate(BaseModel):
 
 class WorkflowRunExecute(BaseModel):
     id: int
+    input_variables: list[Variable] | None = None
 
 
 class WorkflowRunExecuteStep(WorkflowRunExecute):
@@ -44,16 +46,17 @@ class WorkflowRunExecuteStep(WorkflowRunExecute):
 
 
 class WorkflowRunExecutePublic(BaseModel):
-    output_variables: list
+    output_variables: list[Variable]
 
 
 class WorkflowRunExecuteStepPublic(BaseModel):
-    output_variables: list
+    output_variables: list[Variable]
 
 
 class NodeRun(BaseModel):
     node: Node
-    output_variables: list | None = None
+    input_variables: list[Variable] = []
+    output_variables: list[Variable] = []
 
     @staticmethod
     def new(node: Node) -> "NodeRun":

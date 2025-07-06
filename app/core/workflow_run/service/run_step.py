@@ -14,7 +14,7 @@ def workflow_run_execute(session: SessionDep,
         params: WorkflowRunExecute) -> WorkflowRunExecutePublic:
     w = WorkflowPublic.new(workflow_entity)
 
-    runner = GraphRunner(w.graph)
+    runner = GraphRunner(w.graph, params.input_variables)
 
     runner.run()
 
@@ -28,7 +28,7 @@ def workflow_run_execute_step(session: SessionDep,
     node_id = params.node_id
     w = WorkflowPublic.new(workflow_entity)
 
-    runner = GraphRunner(w.graph)
+    runner = GraphRunner(w.graph, params.input_variables)
 
     runner.run_node(node_id)
 

@@ -1,4 +1,5 @@
 {
+  "id": 1,
   "name": "Workflow 1",
   "description": "simple demo",
   "type": "graph",
@@ -28,7 +29,8 @@
           "model_params": {
             "temperature": 1
           },
-          "prompts": [
+          "user_prompt": "{query}",
+          "advanced_prompts": [
             {
               "role": "system",
               "content": "你是一个AI助手，你性格古怪，对于用户的提问，你再回答完成之后，还会反问用户一个相关的问题"
@@ -38,10 +40,14 @@
             {
               "name": "question",
               "type": "string",
-              "description": "你需要反问的问题"
+              "description": "你反问用户的问题"
+            },
+            {
+              "name": "answer",
+              "type": "string",
+              "description": "你的回答"
             }
-          ],
-          "output_variable": "answer"
+          ]
         }
       },
       {
@@ -53,12 +59,7 @@
           "model_params": {
             "temperature": 0.5
           },
-          "prompts": [
-            {
-              "role": "user",
-              "content": "用户提问：{query}\n\nAI助手的回答：{answer}\n\n请评估该AI助手的回答是否准确，和回答该助手反问的问题：{answer}"
-            }
-          ],
+          "user_prompt": "用户提问：{query}\n\nAI助手的回答：{answer}\n\n请评估该AI助手的回答是否准确，和回答该助手反问的问题：{answer}",
           "structured_output": [
             {
               "name": "score",
@@ -68,10 +69,9 @@
             {
               "name": "answer",
               "type": "string",
-              "description": "你给出的答案，回答AI助手反问的问题"
+              "description": "你给出的答案，用于回答AI助手反问的问题"
             }
           ],
-          "output_variable": "text",
           "end_variables": [
             {
               "name": "query_answer",
