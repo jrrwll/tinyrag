@@ -83,4 +83,4 @@ def get_model_provider(model: ModelPublic) -> ModelProvider:
         if cls.get_provider_name() == provider_name:
             return cls(model)
 
-    raise BizException(ErrorCode.model_provider_not_supported, provider_name)
+    raise BizException.new(ErrorCode.model_provider_not_supported, provider_name)

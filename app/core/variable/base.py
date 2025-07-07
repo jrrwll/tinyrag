@@ -19,7 +19,8 @@ class InputVariable(BaseModel):
     file_extensions: list[str] | None = Field(default=None)
 
 
-class AssigningVariable(BaseModel):
+# left = node_id.right
+class ContextVariable(BaseModel):
     left: str
     right: str
     node_id: int | None = None

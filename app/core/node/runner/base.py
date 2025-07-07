@@ -10,7 +10,7 @@ from app.util.metadata import walk_packages
 
 class NodeRunnerRegistry(ABCMeta):
 
-    def __init__(cls, name, bases, attrs):
+    def __init__(cls, name, bases, attrs): # type: ignore[no-untyped-def]
         super().__init__(name, bases, attrs)
         if not hasattr(cls, "_implements"):
             cls._implements = []
@@ -39,4 +39,4 @@ class NodeRunner(metaclass=NodeRunnerRegistry):
     def implements() -> list[Type["NodeRunner"]]:
         import app.core.node.runner as _runner
         walk_packages(_runner)
-        return NodeRunner._implements
+        return NodeRunner._implements # type: ignore[return-value]

@@ -72,18 +72,35 @@
               "description": "你给出的答案，用于回答AI助手反问的问题"
             }
           ],
+          "context_variables": [
+            {
+              "left": "query",
+              "right": "query"
+            }
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "name": "End Node",
+        "type": "end",
+        "settings": {
           "end_variables": [
             {
-              "name": "query_answer",
-              "value": "answer"
+              "left": "query",
+              "right": "query"
             },
             {
-              "name": "query_answer_score",
-              "value": "score"
+              "left": "query_answer",
+              "right": "answer"
             },
             {
-              "name": "ai_query_answer",
-              "value": "answer",
+              "left": "query_answer_score",
+              "right": "score"
+            },
+            {
+              "left": "ai_query_answer",
+              "right": "answer",
               "node_id": 2
             }
           ]
@@ -98,6 +115,10 @@
       {
         "source": "2",
         "target": "3"
+      },
+      {
+        "source": "3",
+        "target": "4"
       }
     ]
   }

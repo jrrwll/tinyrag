@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from app.core.model.base import LLMPrompt, ModelParams, StructuredOutput
 from app.core.node.runner.classify import ClassifyTopic, ClassifyVariable
 from app.core.node.runner.http import HttpConfig
-from app.core.variable.base import AssigningVariable, InputVariable
+from app.core.variable.base import ContextVariable, InputVariable
 from app.core.workflow.enums import NodeType
 from app.core.workflow.exception_strategy import (
     ExceptionDefaultValue,
@@ -62,7 +62,11 @@ class NodeSettings(BaseModel):
         default=None, json_schema_extra={"allow_types": [NodeType.Start]}
     )
 
-    end_variables: list[AssigningVariable] | None = Field(
+    context_variables: list[ContextVariable] | None = Field(
+        default=None, json_schema_extra={"disallow_types": [NodeType.Start]}
+    )
+
+    end_variables: list[ContextVariable] | None = Field(
         default=None, json_schema_extra={"allow_types": [NodeType.End]}
     )
 
@@ -120,7 +124,7 @@ class NodeSettings(BaseModel):
         default=None, json_schema_extra={"allow_types": [NodeType.Template]}
     )
     # template_type: TemplateType | None = None
-    template_args: list[AssigningVariable] | None = Field(
+    template_args: list[ContextVariable] | None = Field(
         default=None, json_schema_extra={"allow_types": [NodeType.Template]}
     )
 

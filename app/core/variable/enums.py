@@ -34,6 +34,9 @@ class VariableType(StrEnum):
                 return list[bool]
         raise AssertionError(f"Unknown variable type: {self}")
 
+    def __str__(self) -> str:
+        return self.to_type().__name__
+
 
 class InputVariableType(StrEnum):
     Text = "text"

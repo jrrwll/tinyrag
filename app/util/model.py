@@ -1,10 +1,12 @@
+from typing import Any, Dict, Tuple, Type
+
 from pydantic import BaseModel, Field, create_model
-from typing import Dict, Tuple, Type, Any, Optional
+from pydantic.fields import FieldInfo
 
 
-def create_model_type(
+def create_model_type( # type: ignore[no-untyped-def]
         model_name: str,
-        fields: Dict[str, Tuple[Type[Any], Dict[str, Any] | Field]],
+        fields: Dict[str, Tuple[Type[Any], Dict[str, Any] | FieldInfo]],
         base: Type[BaseModel] = BaseModel,
         **kwargs
 ) -> Type[BaseModel]:
@@ -14,7 +16,7 @@ def create_model_type(
             field_config = Field(**field_config)
         field_definitions[field_name] = (field_type, field_config)
 
-    return create_model(
+    return create_model( # type: ignore[no-any-return]
         model_name,
         __base__=base,
         **field_definitions,

@@ -145,7 +145,7 @@ class MutableGraph[Node, Edge]:
 
     def root_nodes(self) -> set[Node]:
         in_degrees = self.in_degrees()
-        return set([node for node, d in in_degrees if d == 0])
+        return set([node for node, d in in_degrees.items() if d == 0])
 
     def topological_sort(self) -> list[Node]:
         if not self.directed:

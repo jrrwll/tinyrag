@@ -1,31 +1,35 @@
+import json
 from functools import cached_property
 from queue import Queue
 from urllib.parse import quote_plus
 
 from app.common.error_code import BizException, ErrorCode
 from app.core.node.service import get_node_runner
-from app.core.variable.base import Variable
+from app.core.variable.base import ContextVariable, Variable
 from app.core.workflow.base import Edge, WorkflowGraph
+from app.core.workflow.enums import NodeType
 from app.core.workflow_run.api import NodeRun
 from app.util.graph import MutableGraph
 
 
 class GraphRunner:
-
     nodes: dict[int, NodeRun]
     graph: MutableGraph[NodeRun, Edge]
     root_node: NodeRun
 
+    output_variables: list[Variable] = []
+
     def __init__(self, g: WorkflowGraph, input_variables: list[Variable]):
         self.nodes = {node.id: NodeRun.new(node) for node in g.nodes}
         self.graph = self._build_graph(g)
-        self.root_node = [n for n, d in self.graph.in_degrees().items() if d == 0][0]
+        self.root_node = next(iter(self.graph.root_nodes()))
         self.root_node.input_variables = input_variables
 
-    def run(self):
+    def run(self) -> None:
         self._traversal(self.root_node)
 
-    def run_node(self, input_variables: list[Variable] | None, node_id: int, traversal: bool = False):
+    def run_node(self, input_variables: list[Variable] | None, node_id: int,
+            traversal: bool = False) -> None:
         node = self.nodes.get(node_id)
         if not node:
             raise BizException.new(ErrorCode.model_not_found, node_id)
@@ -38,7 +42,7 @@ class GraphRunner:
             node_runner = get_node_runner(node.node)
             node.output_variables = node_runner.run(node.input_variables)
 
-    def _traversal(self, node: NodeRun):
+    def _traversal(self, node: NodeRun) -> None:
         queue = Queue()
         queue.put(node)
 
@@ -46,13 +50,42 @@ class GraphRunner:
             node = queue.get()
             node_runner = get_node_runner(node.node)
 
+            self._prepare_context_variables(node)
             node.output_variables = node_runner.run(node.input_variables)
+
             for n in self.graph.successors(node):
                 n.input_variables = node.output_variables
                 queue.put(n)
 
-    def _prepare_context(self):
-        pass
+    def _prepare_context_variables(self, node: NodeRun) -> None:
+        input_variables = node.input_variables
+        context_variables = node.node.settings.context_variables
+
+        if not context_variables:
+            return
+
+        for variable in context_variables:
+            target_name = variable.left
+            name = variable.right
+            node_id = variable.node_id
+            if node_id:
+                output_variables = self.nodes[node_id].output_variables
+                value = next((v.value for v in output_variables
+                              if v.name == name), None)
+                if value:
+                    input_variables.append(Variable(name=target_name, value=value))
+            else:
+                current_node = node
+                while current_node.node.type != NodeType.Start:
+                    predecessors = self.graph.predecessors(current_node)
+                    if not predecessors:
+                        break
+                    current_node = next(iter(predecessors))
+                    value = next((v.value for v in current_node.output_variables
+                                  if v.name == name), None)
+                    if value:
+                        input_variables.append(Variable(name=target_name, value=value))
+                        break
 
     def _build_graph(self, g: WorkflowGraph) -> MutableGraph[NodeRun, Edge]:
         edges = g.edges
@@ -88,14 +121,45 @@ def _node_label(n: NodeRun) -> str:
     s = [f"<{node.type}> {node.name}"]
     settings = node.settings
 
-    if settings.extract_file:
-        s.append(f"\n\nextract_file={settings.extract_file}")
+    if settings.model_id:
+        s.append(f"\n\nmodel = {settings.model_id}")
+        if settings.user_prompt:
+            s.append(f"\nuser_prompt = ```\n{settings.user_prompt}\n```")
+        if settings.structured_output:
+            for st in settings.structured_output:
+                s.append(f"\n{st.name}: {st.type} = '{st.description}'")
 
-    end_variables = settings.end_variables
-    if end_variables:
-        s.append("\n\nend_variables:")
-        for end_variable in end_variables:
-            sep = f"{end_variable.node_id}." if end_variable.node_id else ""
-            s.append(f"\n {end_variable.name}={sep}{end_variable.value}")
+    if settings.conditions:
+        s.append(f"\n\nconditions = '{settings.conditions}'")
+    elif settings.extract_file:
+        s.append(f"\n\nextract_file = {settings.extract_file}")
+    elif settings.template:
+        s.append(f"\n\ntemplate = ```\n{settings.template}\n```\n")
+        if settings.template_args:
+            _fill_variables_str(settings.template_args, s)
+    elif settings.code:
+        s.append(f"\n\ncode = ```\n{settings.code}\n```\n")
+        s.append(f"\ncode_args = {settings.code_args}")
+    elif settings.http_config:
+        s.append(f"\nhttp_config = ```\n{settings.http_config.
+                 model_dump_json(indent=2).replace('"', '\'')}\n```")
+    elif settings.start_variables:
+        s.append("\n")
+        for v in settings.start_variables:
+            if v.description:
+                s.append(f"\n{v.name}: {v.type} = '{v.description}'")
+            else:
+                s.append(f"\n{v.name}: {v.type}")
+    elif settings.end_variables:
+        s.append("\n")
+        _fill_variables_str(settings.end_variables, s)
 
     return "".join(s)
+
+
+def _fill_variables_str(variables: list[ContextVariable], s: list[str]) -> None:
+    for variable in variables:
+        sep = f"{variable.node_id}." if variable.node_id else ""
+        s.append(f"\n  {variable.left} = {sep}{variable.right}")
+
+

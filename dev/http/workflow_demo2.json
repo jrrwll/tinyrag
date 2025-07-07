@@ -55,14 +55,11 @@
             "top_p": 0.9,
             "top_k": 1
           },
-          "prompts": [
+          "user_prompt": "{my_text} 是好评还是差评",
+          "advanced_prompts": [
             {
               "role": "system",
               "content": "用户会给定一系列商品的评价给你，你只需要评判这些评价即可。不要做其他任何多余的事"
-            },
-            {
-              "role": "user",
-              "content": "{my_text} 是好评还是差评"
             }
           ],
           "structured_output": [
@@ -70,6 +67,11 @@
               "name": "good",
               "type": "string",
               "description": "好评输出Y，差评输出N"
+            },
+            {
+              "name": "good_reason",
+              "type": "string",
+              "description": "好评差评的判断依据"
             }
           ],
           "exception_strategy": "node",
@@ -110,8 +112,8 @@
           "output_variable": "result",
           "end_variables": [
             {
-              "name": "code_result",
-              "value": "result"
+              "left": "code_result",
+              "right": "result"
             }
           ]
         }
@@ -121,7 +123,7 @@
         "name": "Condition Node",
         "type": "condition",
         "settings": {
-          "condition": "{good} == 'Y'",
+          "conditions": "{good} == 'Y'",
           "true_node_id": "6",
           "false_node_id": "10"
         }
@@ -168,16 +170,16 @@
           "template": "The result is {{class_name}}",
           "template_args": [
             {
-              "name": "class_name",
-              "value": "class_name",
+              "left": "class_name",
+              "right": "class_name",
               "node_id": "7"
             }
           ],
           "output_variable": "output",
           "end_variables": [
             {
-              "name": "template_output",
-              "value": "output"
+              "left": "template_output",
+              "right": "output"
             }
           ]
         }
@@ -191,8 +193,8 @@
           "output_variable": "output",
           "end_variables": [
             {
-              "name": "template_output",
-              "value": "output"
+              "left": "template_output",
+              "right": "output"
             }
           ]
         }
@@ -212,8 +214,8 @@
           "output_variable": "text",
           "end_variables": [
             {
-              "name": "text_output",
-              "value": "text"
+              "left": "text_output",
+              "right": "text"
             }
           ]
         }

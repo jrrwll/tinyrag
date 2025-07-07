@@ -57,3 +57,13 @@ source .venv/bin/activate
 
 curl http://localhost:8000/api/v1/openapi.json
 ```
+
+## Demo
+
+**Demo 1**：[workflow_demo1.json](dev/http/workflow_demo1.json)
+
+![alt]()
+
+**Demo 2**：[workflow_demo2.json](dev/http/workflow_demo2.json)
+
+![alt]()

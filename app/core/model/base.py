@@ -21,3 +21,4 @@ class StructuredOutput(BaseModel):
     name: str
     type: VariableType
     description: str | None = None
+    options: list[str] | None = None

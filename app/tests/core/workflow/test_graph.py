@@ -14,7 +14,7 @@ def test_graph():
         print(p)
 
         w = WorkflowCreate.model_validate_json(p.read_text())
-        d = GraphRunner(w.graph)
+        d = GraphRunner(w.graph, [])
         print(d.digraph)
         print(d.quickchart_url)
         print(w.graph.model_dump_json())
