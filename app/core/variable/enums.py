@@ -2,6 +2,9 @@ from enum import StrEnum
 from typing import Any, Type
 
 
+type VariableTypeHint = str | int | float | bool | list[str] | list[int] | list[float] | list[bool]
+
+
 class VariableType(StrEnum):
     String = "string"
     Integer = "integer"

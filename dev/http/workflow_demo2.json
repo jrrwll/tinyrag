@@ -85,7 +85,7 @@
         "settings": {
           "http_config": {
             "url": "http://{{OLLAMA_HOST}}:11434/api/tags",
-            "method": "POST",
+            "method": "GET",
             "headers": {
               "Content-Type": "application/json"
             },

@@ -5,7 +5,7 @@ from typing import Annotated, get_type_hints
 
 from app.core.model.privoder.base import ModelProvider
 from app.core.node.runner.base import NodeRunner
-from app.core.workflow.base import NodeSettings
+from app.core.workflow.base import NodeConfig
 from app.util.metadata import find_sub_types, get_extra_schema, walk_packages
 
 
@@ -76,7 +76,7 @@ def test_registry():
     print(f"\nproviders:\n{Plugin.providers}")
 
     print("\n\n")
-    for field_name, field_info in get_extra_schema(NodeSettings).items():
+    for field_name, field_info in get_extra_schema(NodeConfig).items():
         print(f"{field_name} -> {field_info}")
 
 

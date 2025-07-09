@@ -15,8 +15,10 @@ dependencies = [
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
     "pymysql>=1.1.1",
+    "requests>=2.32.4",
     "sqlmodel>=0.0.24",
     "types-cachetools>=6.0.0.20250525",
+    "types-requests>=2.32.4.20250611",
     "uvicorn>=0.34.3",
 ]
 

@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from functools import cache
-from typing import Type
+from typing import Tuple, Type
 
 from app.core.variable.base import Variable
 from app.core.workflow.base import Node
 from app.core.workflow.enums import NodeType
 from app.util.metadata import walk_packages
+from pydantic import BaseModel
 
 
 class NodeRunnerRegistry(ABCMeta):
@@ -16,27 +17,48 @@ class NodeRunnerRegistry(ABCMeta):
             cls._implements = []
         else:
             cls._implements.append(cls)
+        if not hasattr(cls, "_mappings"):
+            cls._mappings = {}
+        else:
+            cls._mappings[cls.get_node_type()] = cls.get_config_type()
 
 
-class NodeRunner(metaclass=NodeRunnerRegistry):
+class NodeRunner[T: BaseModel](metaclass=NodeRunnerRegistry):
 
     node: Node
+    config: T
 
     def __init__(self, node: Node):
         self.node = node
+        self.config = self.get_config_type().model_validate(node.config)
 
     @staticmethod
     @abstractmethod
     def get_node_type() -> NodeType:
         pass
 
+    @staticmethod
+    @abstractmethod
+    def get_config_type() -> Type[T]:
+        pass
+
     @abstractmethod
     def run(self, input_variables: list[Variable]) -> list[Variable]:
         pass
 
-    @cache
     @staticmethod
     def implements() -> list[Type["NodeRunner"]]:
+        implements, _ = NodeRunner.implements_and_mappings()
+        return implements
+
+    @staticmethod
+    def mappings() -> dict[NodeType, Type[BaseModel]]:
+        _, mappings = NodeRunner.implements_and_mappings()
+        return mappings
+
+    @cache
+    @staticmethod
+    def implements_and_mappings() -> Tuple[list[Type["NodeRunner"]], dict[NodeType, Type[BaseModel]]]:
         import app.core.node.runner as _runner
         walk_packages(_runner)
-        return NodeRunner._implements # type: ignore[return-value]
+        return NodeRunner._implements, NodeRunner._mappings # type: ignore[return-value]

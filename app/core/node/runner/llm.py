@@ -1,12 +1,13 @@
+from typing import Type
 from app.core.model.base import LLMPrompt
 from app.core.model.enums import PromptRoleType
 from app.core.model.privoder.base import get_model_provider
 from app.core.model.service import create_structured_output_type, get_model, \
     process_prompt
+from app.core.node.base import LLMConfig
 from app.core.node.runner.base import NodeRunner
 from app.core.variable.base import Variable
 from app.core.workflow.enums import NodeType
-
 
 
 class LLMNodeRunner(NodeRunner):
@@ -15,13 +16,15 @@ class LLMNodeRunner(NodeRunner):
     def get_node_type() -> NodeType:
         return NodeType.LLM
 
-    def run(self, input_variables: list[Variable]) -> list[Variable]:
-        settings = self.node.settings
+    @staticmethod
+    def get_config_type() -> Type[LLMConfig]:
+        return LLMConfig
 
-        model_id = settings.model_id
-        model_params = settings.model_params
-        user_prompt = settings.user_prompt
-        advanced_prompts = settings.advanced_prompts
+    def run(self, input_variables: list[Variable]) -> list[Variable]:
+        model_id = self.config.model_id
+        model_params = self.config.model_params
+        user_prompt = self.config.user_prompt
+        advanced_prompts = self.config.advanced_prompts
 
         prompts = list(advanced_prompts if advanced_prompts else [])
         prompts.append(LLMPrompt(role=PromptRoleType.User, content=user_prompt))
@@ -31,11 +34,11 @@ class LLMNodeRunner(NodeRunner):
         model = get_model(model_id)
         model_provider = get_model_provider(model)
 
-        if settings.structured_output:
+        if config.structured_output:
             structured_output_type = create_structured_output_type(
-                self.node.id, settings.structured_output)
+                self.node.id, config.structured_output)
             return model_provider.run_structured_output(
                 model_params, messages, structured_output_type)
         else:
             content = model_provider.run(model_params, messages)
-            return [Variable(name=settings.output_variable, value=content)]
+            return [Variable(name=config.output_variable, value=content)]

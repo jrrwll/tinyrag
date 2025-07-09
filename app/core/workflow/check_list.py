@@ -6,7 +6,6 @@ from app.core.workflow.api import (
     WorkflowCheckListPublic,
     WorkflowPublic,
 )
-from app.core.workflow.base import NodeSettings
 from app.core.workflow.enums import NodeType
 from app.entities.model import Model
 from app.entities.workflow import Workflow
@@ -24,15 +23,15 @@ def workflow_check_list(
         node = NodeCheckListPublic(id=n.id, name=n.name)
         nodes.append(node)
 
-        _find_missing_fields(node, n.type, n.settings)
+        _find_missing_fields(node, n.type, n.config)
 
-        _find_broken_relations(node, n.settings, session)
+        _find_broken_relations(node, n.config, session)
 
     return WorkflowCheckListPublic(id=w.id, nodes=nodes)
 
 
 def _find_missing_fields(
-    node: NodeCheckListPublic, node_type: NodeType, settings: NodeSettings
+    node: NodeCheckListPublic, node_type: NodeType, settings: dict
 ) -> None:
     allow_type_fields = _get_node_allow_type_fields()[node_type]
 
@@ -46,10 +45,10 @@ def _find_missing_fields(
 
 @cache
 def _get_node_allow_type_fields() -> dict[NodeType, list[str]]:
-    all_fields = list(NodeSettings.model_fields.keys())
+    all_fields = list(NodeConfig.model_fields.keys())
 
     fields: dict[NodeType, list[str]] = {}
-    for field_name, schema in get_extra_schema(NodeSettings).items():
+    for field_name, schema in get_extra_schema(NodeConfig).items():
         allow_types = schema.get("allow_types")
         if allow_types:
             for allow_type in allow_types:
@@ -64,7 +63,7 @@ def _get_node_allow_type_fields() -> dict[NodeType, list[str]]:
 
 
 def _find_broken_relations(
-    node: NodeCheckListPublic, settings: NodeSettings, session: SessionDep
+    node: NodeCheckListPublic, settings: dict, session: SessionDep
 ) -> None:
     if settings.model_id:
         model_entity = session.get(Model, settings.model_id)

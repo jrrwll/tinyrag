@@ -22,7 +22,7 @@ uv add --dev pytest mypy ruff coverage
 
 uv add langchain langgraph langchain_ollama langchain_openai
 
-uv add cachetools types-cachetools
+uv add cachetools types-cachetools requests types-requests
 ```
 
 ### run the project

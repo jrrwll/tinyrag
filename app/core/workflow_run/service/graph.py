@@ -1,4 +1,3 @@
-import json
 from functools import cached_property
 from queue import Queue
 from urllib.parse import quote_plus
@@ -59,7 +58,7 @@ class GraphRunner:
 
     def _prepare_context_variables(self, node: NodeRun) -> None:
         input_variables = node.input_variables
-        context_variables = node.node.settings.context_variables
+        context_variables = node.node.config.context_variables
 
         if not context_variables:
             return
@@ -119,40 +118,40 @@ class GraphRunner:
 def _node_label(n: NodeRun) -> str:
     node = n.node
     s = [f"<{node.type}> {node.name}"]
-    settings = node.settings
+    config = node.config
 
-    if settings.model_id:
-        s.append(f"\n\nmodel = {settings.model_id}")
-        if settings.user_prompt:
-            s.append(f"\nuser_prompt = ```\n{settings.user_prompt}\n```")
-        if settings.structured_output:
-            for st in settings.structured_output:
+    if config.model_id:
+        s.append(f"\n\nmodel = {config.model_id}")
+        if config.user_prompt:
+            s.append(f"\nuser_prompt = ```\n{config.user_prompt}\n```")
+        if config.structured_output:
+            for st in config.structured_output:
                 s.append(f"\n{st.name}: {st.type} = '{st.description}'")
 
-    if settings.conditions:
-        s.append(f"\n\nconditions = '{settings.conditions}'")
-    elif settings.extract_file:
-        s.append(f"\n\nextract_file = {settings.extract_file}")
-    elif settings.template:
-        s.append(f"\n\ntemplate = ```\n{settings.template}\n```\n")
-        if settings.template_args:
-            _fill_variables_str(settings.template_args, s)
-    elif settings.code:
-        s.append(f"\n\ncode = ```\n{settings.code}\n```\n")
-        s.append(f"\ncode_args = {settings.code_args}")
-    elif settings.http_config:
-        s.append(f"\nhttp_config = ```\n{settings.http_config.
+    if config.conditions:
+        s.append(f"\n\nconditions = '{config.conditions}'")
+    elif config.extract_file:
+        s.append(f"\n\nextract_file = {config.extract_file}")
+    elif config.template:
+        s.append(f"\n\ntemplate = ```\n{config.template}\n```\n")
+        if config.template_args:
+            _fill_variables_str(config.template_args, s)
+    elif config.code:
+        s.append(f"\n\ncode = ```\n{config.code}\n```\n")
+        s.append(f"\ncode_args = {config.code_args}")
+    elif config.http_config:
+        s.append(f"\nhttp_config = ```\n{config.http_config.
                  model_dump_json(indent=2).replace('"', '\'')}\n```")
-    elif settings.start_variables:
+    elif config.start_variables:
         s.append("\n")
-        for v in settings.start_variables:
+        for v in config.start_variables:
             if v.description:
                 s.append(f"\n{v.name}: {v.type} = '{v.description}'")
             else:
                 s.append(f"\n{v.name}: {v.type}")
-    elif settings.end_variables:
+    elif config.end_variables:
         s.append("\n")
-        _fill_variables_str(settings.end_variables, s)
+        _fill_variables_str(config.end_variables, s)
 
     return "".join(s)
 
