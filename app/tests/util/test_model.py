@@ -1,4 +1,6 @@
-from pydantic import Field
+from typing import Protocol
+
+from pydantic import BaseModel, Field
 
 from app.util.model import create_model_type
 
@@ -20,3 +22,24 @@ def test_create_dynamic_model():
     user = UserModel(name="张三", age=30, email="zhangsan@example.com")
     print(f"\nuser={user}")
     print(user.model_json_schema())
+
+
+class SpeakProtocol(Protocol):
+    def say(self) -> str: ...
+
+
+class Box(BaseModel):
+    name: str
+
+    def say(self) -> str:
+        return f"I'm {self.name}"
+
+
+def process[T: BaseModel & SpeakProtocol](obj: T) -> None:
+    print(obj.say(), obj.model_dump())
+
+
+def test_protocol():
+    box = Box(name='Box')
+    print(f"\nbox: {box}")
+    process(box)
