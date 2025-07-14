@@ -1,4 +1,6 @@
-from typing import Any, Dict, Tuple, Type
+from dataclasses import dataclass, field
+from typing import Any
+from typing import Dict, Tuple, Type
 
 from pydantic import BaseModel, Field, create_model
 from pydantic.fields import FieldInfo
@@ -23,3 +25,21 @@ def create_model_type( # type: ignore[no-untyped-def]
         **kwargs
     )
 
+
+@dataclass
+class OptionalValue[T: Any]:
+    value: T | None = field(default=None)
+
+    @property
+    def is_present(self):
+        return self.value is not None
+
+    @property
+    def is_empty(self):
+        return self.value is None
+
+    def __repr__(self):
+        if self.is_present:
+            return f"OptionalValue(value={self.value})"
+        else:
+            return "OptionalValue(empty)"

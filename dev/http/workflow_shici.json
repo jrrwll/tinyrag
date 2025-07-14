@@ -1,0 +1,112 @@
+{
+  "id": 1,
+  "name": "诗词检索",
+  "description": "工作流：理解用户输入，推荐或检索诗词给用户",
+  "type": "graph",
+  "graph": {
+    "nodes": [
+      {
+        "id": "1",
+        "name": "Start Node",
+        "type": "start",
+        "settings": {
+          "start_variables": [
+            {
+              "name": "query",
+              "type": "text",
+              "description": "提问",
+              "required": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "name": "LLM Node",
+        "description": "理解用户的提示语，并提取需要检索的主题和关键字",
+        "type": "llm",
+        "config": {
+          "llm_config": {
+            "model_id": 1,
+            "model_params": {
+              "temperature": 1
+            },
+            "user_prompt": "A（角色定义）  \n你精通中国传统诗词的意象体系、修辞手法及创作技巧，擅长从用户模糊的提问中提炼出核心关键字和主题。\n\nB（用户需求）  \n我想请你从用户的提问中提炼出多个核心关键字用于接下来的诗词检索\n\nC（用户具体的提问）\n###{query}###\n",
+            "advanced_prompts": [
+              {
+                "role": "system",
+                "content": "你是一个熟悉中国传统诗词的AI助手，对你的要求：\n1. 你需要用中文回答问题，即使用户输入的不是中文。\n2. 如果用户输入的不是中文，你需要将其翻译成中文。然后再回答问题。"
+              }
+            ],
+            "structured_output": [
+              {
+                "name": "translated_query",
+                "type": "string",
+                "description": "用户输入的不是中文时，你需要将用户输入翻译成中文，这里是你翻译后的结果"
+              },
+              {
+                "name": "keywords",
+                "type": "string_array",
+                "description": "用户提问的关键字"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "3",
+        "name": "Rag Node",
+        "type": "rag",
+        "config": {
+          "rag_config": {
+            "knowledge_repository_id": 1,
+            "retrieval_keywords": {
+              "type": "variable",
+              "value": "keywords"
+            }
+          }
+        }
+      },
+      {
+        "id": "4",
+        "name": "End Node",
+        "type": "end",
+        "settings": {
+          "end_variables": [
+            {
+              "left": "query",
+              "right": "query"
+            },
+            {
+              "left": "query_answer",
+              "right": "answer"
+            },
+            {
+              "left": "query_answer_score",
+              "right": "score"
+            },
+            {
+              "left": "ai_query_answer",
+              "right": "answer",
+              "node_id": 2
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "1",
+        "target": "2"
+      },
+      {
+        "source": "2",
+        "target": "3"
+      },
+      {
+        "source": "3",
+        "target": "4"
+      }
+    ]
+  }
+}

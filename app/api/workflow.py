@@ -25,7 +25,7 @@ router = APIRouter(prefix="/workflow", tags=["workflow"])
 def list(
     session: SessionDep,
     page_no: int = Query(default=1, ge=1, le=100000),
-    page_size: int = Query(default=settings.DEFAULT_PAGE_NODE, ge=1, le=1000),
+    page_size: int = Query(default=settings.DEFAULT_PAGE_SIZE, ge=1, le=1000),
     status: WorkflowStatus | None = None,
 ) -> Any:
     entities, count = page_and_count_workflows(session, page_no, page_size, status)

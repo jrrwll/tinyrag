@@ -32,9 +32,11 @@ except KeyError:
 class ErrorCode(Enum):
     unknown_error = auto()
     request_validation_error = auto()
+    request_validation_error_detail = auto()
 
     model_not_found = auto()
     model_provider_not_supported = auto()
+    default_model_not_set = auto()
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()
@@ -44,6 +46,9 @@ class ErrorCode(Enum):
 
     code_main_func_undefined = auto()
     code_eval_error = auto()
+
+    file_not_found = auto()
+    dataset_not_found = auto()
 
     def get_status_code_and_message(self) -> tuple[int, str]:
         for status_code, kv in _config.items():

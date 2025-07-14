@@ -1,10 +1,13 @@
 # ruff: noqa: E712
 from collections.abc import Sequence
 
+from sqlmodel import Session
 from sqlmodel import func, select
 
+from app.common.db import engine
 from app.common.deps import SessionDep
-from app.entities.model import Model
+from app.core.model.enums import ModelType
+from app.entities.model import DefaultModel, Model
 
 
 def page_and_count_models(
@@ -27,3 +30,21 @@ def page_and_count_models(
     )
     models = session.exec(page_statement).all()
     return models, count
+
+
+def get_default_models() -> dict[ModelType, Model]:
+    with Session(engine) as session:
+        select_all_statement = select(DefaultModel)
+        default_models = session.exec(select_all_statement).all()
+
+        model_ids = [default_model.id
+                     for default_model in default_models]
+        if not model_ids:
+            return {}
+
+        select_in_statement = select(Model).where(
+            Model.id in model_ids,
+            Model.deleted == False
+        )
+        models = session.exec(select_in_statement).all()
+        return {model.type: model for model in models}

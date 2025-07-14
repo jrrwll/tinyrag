@@ -10,6 +10,7 @@ class TableBase(SQLModel):
     deleted: bool = Field(default=False)
 
 
-# class TableUUidBase(SQLModel):
-#     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+# class TableUUIDBase(SQLModel):
+#     id: UUID = Field(default_factory=uuid4, primary_key=True)
+#     created_at: datetime
 #     deleted: bool = Field(default=False)

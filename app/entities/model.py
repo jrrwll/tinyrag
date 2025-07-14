@@ -12,3 +12,11 @@ class Model(TableBase, table=True):
     base_url: str | None = Field(max_length=1000)
     api_key: str | None = Field(default=None, max_length=1000)
     settings: str | None = Field(default=None)
+
+
+class DefaultModel(TableBase, table=True):
+
+    __tablename__ = 'default_model'
+
+    model_type: ModelType
+    model_id: int | None = None

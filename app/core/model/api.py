@@ -74,3 +74,8 @@ class ModelTestRun(BaseModel):
 
 class ModelTestRunPublic(BaseModel):
     result: dict  # type: ignore[type-arg]
+
+
+class SetupDefaultModel(BaseModel):
+    model_type: ModelType | None = None
+    model_id: int | None = None

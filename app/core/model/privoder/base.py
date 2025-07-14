@@ -2,17 +2,18 @@ from abc import ABCMeta, abstractmethod
 from functools import cached_property, lru_cache
 from typing import Type
 
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import BaseMessage
 from pydantic import BaseModel
 
 from app.common.config import settings
 from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelPublic
-from app.core.model.base import LLMPrompt, ModelParams
-from app.core.model.service import process_model_config, process_prompt
+from app.core.model.base import ModelParams
+from app.core.model.service import process_model_config
 from app.core.variable.base import Variable
 from app.util.langchain.callbacks import CompleteResponseHandler
-from langchain_core.messages import BaseMessage
 
 
 class ModelProviderRegistry(ABCMeta):
@@ -36,13 +37,21 @@ class ModelProvider(metaclass=ModelProviderRegistry):
     def get_provider_name() -> str:
         pass
 
+    @abstractmethod
+    def _create_chat_model(self) -> BaseChatModel:
+        pass
+
+    @abstractmethod
+    def _create_text_embedding(self) -> Embeddings:
+        pass
+
     @cached_property
     def chat_model(self) -> BaseChatModel:
         return self._create_chat_model()
 
-    @abstractmethod
-    def _create_chat_model(self) -> BaseChatModel:
-        pass
+    @cached_property
+    def embeddings_model(self) -> Embeddings:
+        return self._create_text_embedding()
 
     def test_run(self,
             prompt: str | None = None) -> dict:  # type: ignore[type-arg]

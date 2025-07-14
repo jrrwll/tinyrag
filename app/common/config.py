@@ -9,8 +9,11 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_root_dir = str(Path(__file__).resolve().parents[2])
 # .env in the root dir of the project
-_env_file = str(Path(__file__).resolve().parents[2] / ".env")
+_env_file = f"{_root_dir}.env"
+
+_singleton_workdir = f"{_root_dir}/workdir"
 
 
 class Settings(BaseSettings):
@@ -36,9 +39,16 @@ class Settings(BaseSettings):
     MYSQL_PASSWORD: str = ""
     MYSQL_DB: str = ""
 
-    DEFAULT_PAGE_NODE: int = 20
+    DEFAULT_PAGE_SIZE: int = 20
+    DEFAULT_MAX_PAGE_SIZE: int = 1000
+    DEFAULT_MAX_PAGE_NO: int = 100000
+
     DEFAULT_TEST_PROMPT: str = "Hi!"
     DEFAULT_NODE_OUTPUT_VARIABLE: str = "result"
+
+    UPLOAD_DIRECTORY = f"{_singleton_workdir}/uploads"
+    # suggest to use a nfs/oss directory for uploads, for example /nfs/uploads
+    FILES_DIRECTORY = f"{_singleton_workdir}/files"
 
     @computed_field  # type: ignore[prop-decorator]
     @property
