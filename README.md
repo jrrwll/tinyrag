@@ -20,9 +20,11 @@ uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings pymysql
 # ruff: code smell check
 uv add --dev pytest mypy ruff coverage
 
-uv add langchain langgraph langchain_ollama langchain_openai
+uv add langchain langgraph langchain_community 
+uv add langchain_ollama langchain_openai
 
 uv add cachetools types-cachetools requests types-requests
+uv add beautifulsoup4
 ```
 
 ### run the project

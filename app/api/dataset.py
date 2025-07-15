@@ -52,6 +52,13 @@ def create_import(session: SessionDep, params: DatasetImportCreate) -> Any:
     return DatasetPublic(**entity.model_dump())
 
 
+@router.post("/init", response_model=DatasetPublic)
+def create_import(session: SessionDep, id: int) -> Any:
+
+
+    return DatasetPublic(**entity.model_dump())
+
+
 @router.post("/preview_chunk", response_model=PreviewChunkPublic)
 def preview_chunk(params: PreviewChunk) -> Any:
     return preview_file_chunk(params)

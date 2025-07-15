@@ -9,4 +9,6 @@ class Dataset(TableBase, table=True):
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = Field(default=True)
-    config: str | None = Field(default=None)
+
+    embedding_model: str | None = None
+    retrieval_model: str | None = None

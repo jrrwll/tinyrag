@@ -39,8 +39,7 @@ def upload_file(file: UploadFile) -> FilePublic:
     entity = File(id=md5, name=filename, size=size,
          extension=extension, mime_type=mime_type)
 
-    tail1, tail2 = md5[-4:-2], md5[-2:]
-    save_dir = f"{settings.FILES_DIRECTORY}/{tail1}/{tail2}"
+    save_dir = _get_file_dir(md5)
     os.makedirs(save_dir, exist_ok=True)
     save_path = f"{save_dir}/{md5}"
     shutil.move(file_path, save_path) # maybe very slow
@@ -63,9 +62,18 @@ def upload_file(file: UploadFile) -> FilePublic:
     return FilePublic(**existing_entity.model_dump())
 
 
-def delete_file(entity: File):
+def delete_file(entity: File) -> None:
     md5 = entity.id
     tail = md5[-4:]
     save_path = f"{settings.FILES_DIRECTORY}/{tail}/{md5}"
     if os.path.exists(save_path):
         os.remove(save_path)
+
+
+def get_file_path(file_id: str) -> str:
+    return f"{_get_file_dir(file_id)}/{file_id}"
+
+
+def _get_file_dir(file_id: str) -> str:
+    tail1, tail2 = file_id[-4:-2], file_id[-2:]
+    return f"{settings.FILES_DIRECTORY}/{tail1}/{tail2}"
