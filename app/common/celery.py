@@ -84,7 +84,6 @@ def task_started_handler(task_id: str, **kwargs):
         session.commit()
 
 
-
 @task_postrun.connect
 def task_completed_handler(task_id, **kwargs):
     result = kwargs.get("retval")
