@@ -1,0 +1,51 @@
+GET http://{{origin}}{{api_prefix}}/dataset/list
+
+###
+POST http://{{origin}}{{api_prefix}}/dataset
+Content-Type: application/json
+
+{
+  "name": "空白知识库",
+  "description": "some description"
+}
+
+###
+PUT http://{{origin}}{{api_prefix}}/dataset
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "空白知识库",
+  "description": "some description2"
+}
+
+###
+# chunk_overlap: int | None = None
+#    chunk_size: int | None = None
+#    separators: list[str] | None = None
+POST http://{{origin}}{{api_prefix}}/dataset/preview_chunk
+Content-Type: application/json
+
+{
+  "file_id": "",
+  "process_rule": {
+    "text_splitter": {
+      "chunk_overlap": 50,
+      "chunk_size": 1024,
+      "separators": [
+        "\n\n"
+      ]
+    }
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/dataset/import
+Content-Type: application/json
+
+{
+  "id": 1,
+  "file": {
+
+  }
+}

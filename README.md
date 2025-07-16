@@ -30,7 +30,7 @@ uv add cachetools types-cachetools requests types-requests
 uv add beautifulsoup4
 
 # middleware
-uv add celery celery-stubs flower redis
+uv add celery celery-stubs flower redis boto3 mypy-boto3-s3
 ```
 
 ### run the project
