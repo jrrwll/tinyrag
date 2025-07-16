@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import Response
 from fastapi.responses import JSONResponse
 
-from app.common.config import settings
+from app.config import settings
 
 _common_dir = Path(__file__).resolve().parent
 _error_code_file = str(_common_dir / "error_code.ini")

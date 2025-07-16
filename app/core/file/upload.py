@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import UploadFile
 from sqlmodel import Session
 
-from app.common.config import settings
+from app.config import settings
 from app.common.db import engine
 from app.core.file.api import FilePublic
 from app.entities.file import File

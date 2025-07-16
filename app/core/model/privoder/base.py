@@ -7,7 +7,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel
 
-from app.common.config import settings
+from app.config import settings
 from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelPublic
 from app.core.model.base import ModelParams

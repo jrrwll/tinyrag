@@ -4,7 +4,7 @@ from fastapi import APIRouter, Query
 from sqlmodel import select
 
 from app.common.base import PageResult, wrap_api_result
-from app.common.config import settings
+from app.config import settings
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import (

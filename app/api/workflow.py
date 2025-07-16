@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Query
 
 from app.common.base import PageResult
-from app.common.config import settings
+from app.config import settings
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow.api import (

@@ -14,17 +14,23 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
-uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings pymysql
+uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings
+uv add python-multipart pymysql
 
 # mypy: static type check
 # ruff: code smell check
 uv add --dev pytest mypy ruff coverage
 
+# langchain
 uv add langchain langgraph langchain_community 
 uv add langchain_ollama langchain_openai
 
+# utility
 uv add cachetools types-cachetools requests types-requests
 uv add beautifulsoup4
+
+# middleware
+uv add celery celery-stubs flower redis
 ```
 
 ### run the project

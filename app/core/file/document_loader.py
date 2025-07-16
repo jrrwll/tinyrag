@@ -2,11 +2,10 @@ from pathlib import Path
 from typing import Iterator, Sequence
 
 import bs4
-from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import TextLoader
-
+from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.documents import Document
 
 

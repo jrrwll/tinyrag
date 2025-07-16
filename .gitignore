@@ -20,5 +20,9 @@ htmlcov
 .pytest_cache
 .ruff_cache
 
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
 # singleton workdir
 /workdir/

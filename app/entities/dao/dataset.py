@@ -1,8 +1,9 @@
 # ruff: noqa: E712
 from sqlmodel import and_, func, select
 
+from app.common.db import open_session
 from app.common.deps import SessionDep
-from app.entities.dataset import Dataset
+from app.entities.dataset import Dataset, Document, DocumentChunk
 
 
 def page_and_count_datasets(
@@ -36,3 +37,17 @@ def page_and_count_datasets(
     )
     models = session.exec(page_statement).mappings().all()
     return [dict(i) for i in models], count
+
+
+def save_document(entity: Document) -> Document:
+    with open_session() as session:
+        session.add(entity)
+        session.commit()
+        session.refresh(entity)
+    return entity
+
+
+def save_document_chucks(entities: list[DocumentChunk]) -> None:
+    with open_session() as session:
+        session.add_all(entities)
+        session.commit()
