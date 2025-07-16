@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-from app import celery
+from app.common.celery import celery
 from app.common.celery import send_celery_task
 from app.common.db import open_session
 from app.core.dataset.api import DatasetImport, DatasetImportFile, \

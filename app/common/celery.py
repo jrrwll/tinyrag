@@ -1,13 +1,11 @@
 from datetime import datetime
-from typing import Any
 
+import pytz
 from celery import Celery
-from celery.signals import after_setup_task_logger, task_prerun, task_postrun
+from celery.signals import task_postrun, task_prerun
 
 from app.common.db import open_session
 from app.config import settings
-import pytz
-
 from app.entities.task import AsyncTask, AsyncTaskStatus
 
 _celery_main = 'tasks'
@@ -74,7 +72,7 @@ def send_celery_task(task_id: str, task_name: str, *args, **kwargs) -> None:
 
 
 @task_prerun.connect
-def task_started_handler(task_id: str):
+def task_started_handler(task_id: str, **kwargs):
     """任务开始运行时更新状态"""
     with open_session() as session:
         entity = session.get(AsyncTask, task_id)
@@ -84,6 +82,7 @@ def task_started_handler(task_id: str):
         entity.status = AsyncTaskStatus.Started
         entity.submitted_at = datetime.now()
         session.commit()
+
 
 
 @task_postrun.connect

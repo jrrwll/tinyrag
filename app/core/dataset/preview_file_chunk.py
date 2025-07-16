@@ -3,7 +3,7 @@ from langchain_core.vectorstores import InMemoryVectorStore
 from app.common.db import open_session
 from app.common.error_code import BizException, ErrorCode
 from app.core.dataset.api import PreviewChunk, PreviewChunkPublic
-from app.core.dataset.process_rule import get_text_splitter, split_documents
+from app.core.dataset.process_rule import get_text_splitter
 from app.core.file.service import load_document_file
 from app.core.model.default_model import get_default_model_provider
 from app.core.model.enums import ModelType
