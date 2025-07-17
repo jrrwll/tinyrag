@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.common.base import PageResult, wrap_api_result
+from app.common.base import ApiResult, PageResult, wrap_api_result
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
@@ -10,7 +10,6 @@ from app.core.dataset.api import DatasetCreate, \
     DatasetImport, DatasetPublic, \
     PreviewChunk, PreviewChunkPublic, SimpleDatasetPublic
 from app.core.dataset.preview_file_chunk import preview_file_chunk
-from app.core.file.upload import get_file_path
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.dataset import page_and_count_datasets
 from app.entities.dao.file import get_files
@@ -20,7 +19,7 @@ from app.tasks.dataset_import_task import send_dataset_import_task
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
 
-@router.get("/list", response_model=PageResult[SimpleDatasetPublic])
+@router.get("/list", response_model=ApiResult[PageResult[SimpleDatasetPublic]])
 def list(
         session: SessionDep,
         page_no: int = Query(default=1, ge=1, le=settings.DEFAULT_MAX_PAGE_NO),
@@ -37,7 +36,7 @@ def list(
     )
 
 
-@router.get("", response_model=DatasetPublic)
+@router.get("", response_model=ApiResult[DatasetPublic])
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(Dataset, id)
     if not entity:
@@ -46,12 +45,12 @@ def get(session: SessionDep, id: int) -> Any:
     return DatasetPublic(**entity.model_dump())
 
 
-@router.post("/preview_chunk", response_model=PreviewChunkPublic)
+@router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic])
 def preview_chunk(params: PreviewChunk) -> Any:
     return preview_file_chunk(params)
 
 
-@router.post("", response_model=DatasetPublic)
+@router.post("", response_model=ApiResult[DatasetPublic])
 def create(session: SessionDep, params: DatasetCreate) -> Any:
     entity = Dataset(name=params.name, description=params.description)
     session.add(entity)
@@ -60,7 +59,7 @@ def create(session: SessionDep, params: DatasetCreate) -> Any:
     return DatasetPublic.new(entity)
 
 
-@router.post("/import", response_model=AsyncTaskPublic)
+@router.post("/import", response_model=ApiResult[AsyncTaskPublic])
 def import_document(session: SessionDep, params: DatasetImport) -> Any:
     if not params.file and not params.website:
         raise BizException.new(

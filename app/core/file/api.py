@@ -2,12 +2,14 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from app.core.file.enums import FileType
+
 
 class FilePublic(BaseModel):
     id: str
     created_at: datetime
 
+    type: FileType
     name: str
     size: int
-    extension: str | None = None
-    mime_type: str | None = None
+    mime_type: str

@@ -6,13 +6,20 @@ from app.common.db import open_session
 from app.core.dataset.api import DatasetImport, DatasetImportFile, \
     DatasetImportWebsite, DatasetPublic
 from app.core.dataset.process_rule import get_text_splitter
-from app.core.file.service import load_document_file
+from app.core.file.service.load import load_document_file
 from app.core.task.api import AsyncTaskPublic
 from app.core.task.service import update_task_progress
 from app.entities.dao.dataset import save_document, save_document_chucks
 from app.entities.dataset import Document as DocumentEntity, DocumentChunk
 from app.entities.file import File
 from app.entities.task import AsyncTask
+from pydantic import BaseModel
+
+
+class _ImportTaskParams(BaseModel):
+    params: DatasetImport
+    dataset: DatasetPublic
+    files: dict[str, File]
 
 
 def send_dataset_import_task(
@@ -27,15 +34,23 @@ def send_dataset_import_task(
         session.refresh(entity)
 
     task_id = str(entity.id)
+    task_params = _ImportTaskParams(
+        params=params,
+        dataset=dataset,
+        files=files,
+    ).model_dump_json()
     send_celery_task(task_id, dataset_import_task.__name__,
-                     task_id, params, dataset, files)
+                     task_id, task_params)
     return AsyncTaskPublic.new(entity)
 
 
 @celery.task(queue="dataset", bind=True, track_started=True)
-def dataset_import_task(
-        task_id: str, params: DatasetImport, dataset: DatasetPublic,
-        files: dict[str, File]):
+def dataset_import_task(task_id: str, task_params_json: str):
+    task_params = _ImportTaskParams.model_validate_json(task_params_json)
+    params = task_params.params
+    dataset = task_params.dataset
+    files = task_params.files
+
     if params.file:
         _import_files(task_id, params.file, dataset, files)
     elif params.website:

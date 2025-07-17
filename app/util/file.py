@@ -9,9 +9,10 @@ def is_binary_file(file_path: str) -> bool:
         # check unprintable chars
         if b'\0' in chunk:
             return True
+        if all(c < 128 for c in chunk):
+            return False
 
-        # check ascii chars
-        return all(0 <= byte <= 127 for byte in chunk)
+    return True
 
 
 def get_file_md5(file_path: str) -> str:

@@ -47,7 +47,10 @@ class ErrorCode(Enum):
     code_main_func_undefined = auto()
     code_eval_error = auto()
 
+    file_type_not_supported = auto()
     file_not_found = auto()
+    file_not_a_document = auto()
+
     dataset_not_found = auto()
 
     def get_status_code_and_message(self) -> tuple[int, str]:

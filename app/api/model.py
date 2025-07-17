@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Query
 from sqlmodel import select
 
-from app.common.base import PageResult, wrap_api_result
+from app.common.base import ApiResult, PageResult, wrap_api_result
 from app.config import settings
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
@@ -22,7 +22,7 @@ from app.entities.model import DefaultModel, Model
 router = APIRouter(prefix="/model", tags=["model"])
 
 
-@router.get("/list", response_model=PageResult[ModelPublic])
+@router.get("/list", response_model=ApiResult[PageResult[ModelPublic]])
 def list(
     session: SessionDep,
     page_no: int = Query(default=1, ge=1, le=settings.DEFAULT_MAX_PAGE_NO),
@@ -30,15 +30,16 @@ def list(
                            ge=1, le=settings.DEFAULT_MAX_PAGE_SIZE),
 ) -> Any:
     entities, count = page_and_count_models(session, page_no, page_size)
-    return PageResult[ModelPublic](
+    page_result = PageResult[ModelPublic](
         page_no=page_no,
         page_size=page_size,
         total=count,
         items=[ModelPublic.new(entity) for entity in entities],
     )
+    return wrap_api_result(page_result)
 
 
-@router.get("", response_model=ModelPublic)
+@router.get("", response_model=ApiResult[ModelPublic])
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
@@ -47,7 +48,7 @@ def get(session: SessionDep, id: int) -> Any:
     return ModelPublic.new(entity)
 
 
-@router.post("", response_model=ModelPublic)
+@router.post("", response_model=ApiResult[ModelPublic])
 def create(session: SessionDep, params: ModelCreate) -> Any:
     entity = params.to_entity()
 
@@ -58,7 +59,7 @@ def create(session: SessionDep, params: ModelCreate) -> Any:
     return ModelPublic.new(entity)
 
 
-@router.put("", response_model=ModelPublic)
+@router.put("", response_model=ApiResult[ModelPublic])
 def update(session: SessionDep, params: ModelUpdate) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
@@ -73,7 +74,7 @@ def update(session: SessionDep, params: ModelUpdate) -> Any:
     return ModelPublic.new(entity)
 
 
-@router.delete("")
+@router.delete("", response_model=ApiResult[Any])
 def delete(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
@@ -98,7 +99,7 @@ def update_enable(session: SessionDep, id: int) -> Any:
     return {"id": id, "enable": entity.enable}
 
 
-@router.post("/test_run", response_model=ModelTestRunPublic)
+@router.post("/test_run", response_model=ApiResult[ModelTestRunPublic])
 def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
@@ -107,10 +108,10 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     model = ModelPublic.new(entity)
     provider = get_model_provider(model)
     result = provider.test_run(params.prompt)
-    return ModelTestRunPublic(result=result)
+    return wrap_api_result(ModelTestRunPublic(result=result))
 
 
-@router.get("/default_model", response_model=ModelPublic)
+@router.get("/default_model", response_model=ApiResult[ModelPublic])
 def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
     default_model = _find_default_model(session, model_type)
     if default_model and default_model.model_id:
@@ -122,7 +123,7 @@ def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
     return wrap_api_result()
 
 
-@router.post("/default_model")
+@router.post("/default_model", response_model=ApiResult[Any])
 def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -> Any:
     model_id, model_type = params.model_id, params.model_type
     if not model_id and not model_type:

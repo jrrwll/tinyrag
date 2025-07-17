@@ -14,7 +14,7 @@ class AsyncTask(TableUUIDBase, table=True):
     payload: str
     status: AsyncTaskStatus = AsyncTaskStatus.Pending
 
-    submitted_at: datetime = Field(default=datetime.now)
+    submitted_at: datetime
     completed_at: datetime | None = None
     result: str | None = None
     progress: int = 0

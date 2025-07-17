@@ -6,7 +6,7 @@ from app.entities.file import File
 
 def get_files(session: SessionDep, file_ids: list[str]) -> dict[str, File]:
     statement = select(File).where(
-        File.id in file_ids,
+        File.id.in_(file_ids),
     )
 
     files = session.exec(statement).all()

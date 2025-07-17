@@ -1,4 +1,3 @@
-import mimetypes
 import os
 import os.path
 import shutil
@@ -7,9 +6,11 @@ from uuid import uuid4
 from fastapi import UploadFile
 from sqlmodel import Session
 
-from app.config import settings
 from app.common.db import engine
+from app.common.error_code import BizException, ErrorCode
+from app.config import settings
 from app.core.file.api import FilePublic
+from app.core.file.service.file_type import detect_file_type
 from app.entities.file import File
 from app.util.datetme import format_date_compact
 from app.util.file import get_file_md5
@@ -24,8 +25,13 @@ def upload_file(file: UploadFile) -> FilePublic:
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    md5 = get_file_md5(file_path)
+    file_type = detect_file_type(file_path)
+    if not file_type:
+        raise BizException.new(ErrorCode.file_type_not_supported)
+    else:
+        file_type, mime_type = file_type
 
+    md5 = get_file_md5(file_path)
     with Session(engine) as session:
         existing_entity = session.get(File, md5)
 
@@ -33,11 +39,8 @@ def upload_file(file: UploadFile) -> FilePublic:
         return FilePublic(**existing_entity.model_dump())
 
     filename, size = file.filename, file.size
-    _, extension = os.path.splitext(filename)
-    mime_type, _ = mimetypes.guess_type(file_path)
-
-    entity = File(id=md5, name=filename, size=size,
-         extension=extension, mime_type=mime_type)
+    entity = File(id=md5, type=file_type, name=filename,
+                  size=size, mime_type=mime_type)
 
     save_dir = _get_file_dir(md5)
     os.makedirs(save_dir, exist_ok=True)
@@ -59,13 +62,11 @@ def upload_file(file: UploadFile) -> FilePublic:
             os.remove(save_path)
         raise ex
 
-    return FilePublic(**existing_entity.model_dump())
+    return FilePublic(**entity.model_dump())
 
 
 def delete_file(entity: File) -> None:
-    md5 = entity.id
-    tail = md5[-4:]
-    save_path = f"{settings.FILES_DIRECTORY}/{tail}/{md5}"
+    save_path = get_file_path(entity.id)
     if os.path.exists(save_path):
         os.remove(save_path)
 

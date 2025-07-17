@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Callable, Iterator
 import os
 
 
@@ -27,3 +27,10 @@ def partition_list[T](a: list[T], size: int | None = None) -> list[list[T]]:
         output.append(a[i:i + size])
         i += size
     return output
+
+
+def any_match[T](iterator: Iterator[T], predicate: Callable[[T], bool]) -> T | None:
+    for i in iterator:
+        if predicate(i):
+            return i
+    return None
