@@ -25,9 +25,5 @@ def create_s3_client() -> S3Client:
 s3_client = create_s3_client()
 
 
-def upload_file(file_path: str):
-    try:
-        s3_client.upload_file(file_path, settings.S3_UPLOAD_BUCKET, 'file_in_s3.txt')
-        print("File uploaded successfully.")
-    except Exception as e:
-        print(f"Error occurred: {e}")
+def upload_file(file_path: str, key: str):
+    s3_client.upload_file(file_path, settings.S3_UPLOAD_BUCKET, key)
