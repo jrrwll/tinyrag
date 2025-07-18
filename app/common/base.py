@@ -6,6 +6,10 @@ class ApiResult[T: BaseModel](BaseModel):
     msg: str | None = None
     data: T | None = None
 
+    @classmethod
+    def new[R: BaseModel | None](cls, data: R = None) -> ApiResult[R]:
+        return ApiResult(data=data)
+
 
 # PEP 695 Generic Bounds
 class PageResult[T: BaseModel](BaseModel):
@@ -13,6 +17,10 @@ class PageResult[T: BaseModel](BaseModel):
     page_size: int
     total: int
     items: list[T]
+
+
+class IdResult(BaseModel):
+    id: int | str
 
 
 def wrap_api_result[T: BaseModel | None](data: T = None) -> ApiResult[T]:

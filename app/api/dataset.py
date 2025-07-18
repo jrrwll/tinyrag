@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.common.base import ApiResult, PageResult, wrap_api_result
+from app.common.base import ApiResult, PageResult
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
@@ -28,12 +28,13 @@ def list(
         enable: bool | None = None,
 ) -> Any:
     entities, count = page_and_count_datasets(session, page_no, page_size, enable)
-    return PageResult[SimpleDatasetPublic](
+    res = PageResult[SimpleDatasetPublic](
         page_no=page_no,
         page_size=page_size,
         total=count,
         items=[SimpleDatasetPublic(**entity) for entity in entities],
     )
+    return ApiResult.new(res)
 
 
 @router.get("", response_model=ApiResult[DatasetPublic])
@@ -42,12 +43,12 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.dataset_not_found, id)
 
-    return DatasetPublic(**entity.model_dump())
+    return ApiResult.new(DatasetPublic(**entity.model_dump()))
 
 
 @router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic])
 def preview_chunk(params: PreviewChunk) -> Any:
-    return preview_file_chunk(params)
+    return ApiResult.new(preview_file_chunk(params))
 
 
 @router.post("", response_model=ApiResult[DatasetPublic])
@@ -56,7 +57,7 @@ def create(session: SessionDep, params: DatasetCreate) -> Any:
     session.add(entity)
     session.commit()
     session.refresh(entity)
-    return DatasetPublic.new(entity)
+    return ApiResult.new(DatasetPublic.new(entity))
 
 
 @router.post("/import", response_model=ApiResult[AsyncTaskPublic])
@@ -87,4 +88,4 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
     # import task
     dataset = DatasetPublic.new(entity)
     task = send_dataset_import_task(params, dataset, files)
-    return wrap_api_result(task)
+    return ApiResult.new(task)

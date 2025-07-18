@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter, Query
 from sqlmodel import select
 
-from app.common.base import ApiResult, PageResult, wrap_api_result
+from app.common.base import ApiResult, IdResult, PageResult, wrap_api_result
 from app.config import settings
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
@@ -12,7 +12,7 @@ from app.core.model.api import (
     ModelPublic,
     ModelTestRun,
     ModelTestRunPublic,
-    ModelUpdate, SetupDefaultModel,
+    ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel,
 )
 from app.core.model.enums import ModelType
 from app.core.model.privoder.base import get_model_provider
@@ -30,13 +30,13 @@ def list(
                            ge=1, le=settings.DEFAULT_MAX_PAGE_SIZE),
 ) -> Any:
     entities, count = page_and_count_models(session, page_no, page_size)
-    page_result = PageResult[ModelPublic](
+    res = PageResult[ModelPublic](
         page_no=page_no,
         page_size=page_size,
         total=count,
         items=[ModelPublic.new(entity) for entity in entities],
     )
-    return wrap_api_result(page_result)
+    return ApiResult.new(res)
 
 
 @router.get("", response_model=ApiResult[ModelPublic])
@@ -45,10 +45,10 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.model_not_found, id)
 
-    return ModelPublic.new(entity)
+    return ApiResult.new(ModelPublic.new(entity))
 
 
-@router.post("", response_model=ApiResult[ModelPublic])
+@router.post("", response_model=ApiResult[IdResult])
 def create(session: SessionDep, params: ModelCreate) -> Any:
     entity = params.to_entity()
 
@@ -56,10 +56,10 @@ def create(session: SessionDep, params: ModelCreate) -> Any:
     session.commit()
     session.refresh(entity)
 
-    return ModelPublic.new(entity)
+    return ApiResult.new(IdResult(id=entity.id))
 
 
-@router.put("", response_model=ApiResult[ModelPublic])
+@router.put("", response_model=ApiResult[Any])
 def update(session: SessionDep, params: ModelUpdate) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
@@ -69,23 +69,11 @@ def update(session: SessionDep, params: ModelUpdate) -> Any:
 
     session.add(entity)
     session.commit()
-    session.refresh(entity)
 
-    return ModelPublic.new(entity)
-
-
-@router.delete("", response_model=ApiResult[Any])
-def delete(session: SessionDep, id: int) -> Any:
-    entity = session.get(Model, id)
-    if not entity:
-        raise BizException.new(ErrorCode.model_not_found, id)
-
-    session.delete(entity)
-    session.commit()
-    return {"id": id}
+    return ApiResult.new()
 
 
-@router.post("/update_enable", response_model=dict)
+@router.post("/update_enable", response_model=ApiResult[ModelUpdateEnablePublic])
 def update_enable(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
@@ -96,7 +84,19 @@ def update_enable(session: SessionDep, id: int) -> Any:
     session.commit()
     session.refresh(entity)
 
-    return {"id": id, "enable": entity.enable}
+    return ApiResult.new(ModelUpdateEnablePublic(
+        id=id, enable=entity.enable))
+
+
+@router.delete("", response_model=ApiResult[Any])
+def delete(session: SessionDep, id: int) -> Any:
+    entity = session.get(Model, id)
+    if not entity:
+        raise BizException.new(ErrorCode.model_not_found, id)
+
+    session.delete(entity)
+    session.commit()
+    return ApiResult.new()
 
 
 @router.post("/test_run", response_model=ApiResult[ModelTestRunPublic])
@@ -108,7 +108,7 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     model = ModelPublic.new(entity)
     provider = get_model_provider(model)
     result = provider.test_run(params.prompt)
-    return wrap_api_result(ModelTestRunPublic(result=result))
+    return ApiResult.new(ModelTestRunPublic(result=result))
 
 
 @router.get("/default_model", response_model=ApiResult[ModelPublic])
@@ -119,8 +119,8 @@ def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
         model_entity = session.get(Model, model_id)
         if not model_entity:
             raise BizException.new(ErrorCode.model_not_found, model_id)
-        return wrap_api_result(ModelPublic.new(model_entity))
-    return wrap_api_result()
+        return ApiResult.new(ModelPublic.new(model_entity))
+    return ApiResult.new()
 
 
 @router.post("/default_model", response_model=ApiResult[Any])
@@ -134,13 +134,13 @@ def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -
     if model_type:
         entity = _find_default_model(session, model_type)
         if not entity:
-            return wrap_api_result()
+            return ApiResult.new()
 
         entity.model_id = None
         session.add(entity)
         session.commit()
         session.refresh(entity)
-        return wrap_api_result()
+        return ApiResult.new()
 
     # set case
     model_entity = session.get(Model, model_id)
@@ -157,7 +157,7 @@ def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -
     session.add(entity)
     session.commit()
     session.refresh(entity)
-    return wrap_api_result()
+    return ApiResult.new()
 
 
 def _find_default_model(session: SessionDep, model_type: ModelType

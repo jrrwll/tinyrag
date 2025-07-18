@@ -67,6 +67,11 @@ class ModelUpdate(BaseModel):
         entity.sqlmodel_update(update_dict)
 
 
+class ModelUpdateEnablePublic(BaseModel):
+    id: int
+    enable: bool
+
+
 class ModelTestRun(BaseModel):
     id: int
     prompt: str | None = None
