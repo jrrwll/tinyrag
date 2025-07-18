@@ -1,4 +1,5 @@
 from datetime import datetime
+import threading
 
 import pytz
 from celery import Celery
@@ -9,6 +10,10 @@ from app.config import settings
 from app.entities.task import AsyncTask, AsyncTaskStatus
 
 _celery_main = 'tasks'
+
+# beat
+_beat_schedule = {
+}
 
 def init_celery_app() -> Celery:
     app = Celery(
@@ -51,11 +56,9 @@ def init_celery_app() -> Celery:
 
     app.set_default()
 
-    # beat
-    beat_schedule = {
-    }
-    imports = list(beat_schedule.keys())
-    app.conf.update(beat_schedule=beat_schedule, imports=imports)
+
+    imports = list(_beat_schedule.keys())
+    app.conf.update(beat_schedule=_beat_schedule, imports=imports)
 
     return app
 
@@ -105,3 +108,28 @@ def task_completed_handler(task_id, **kwargs):
         entity.progress = 100
         session.add(entity)
         session.commit()
+
+
+def start_embedded_servers():
+    worker_thread = threading.Thread(target=_run_worker, daemon=True)
+    worker_thread.start()
+
+    if _beat_schedule:
+        beat_thread = threading.Thread(target=_run_beat, daemon=True)
+        beat_thread.start()
+
+
+def _run_worker():
+    celery.worker_main([
+        'worker',
+        '--loglevel=info',
+        '--pool=solo',
+        '--concurrency=1'
+    ])
+
+
+def _run_beat():
+    from celery.apps.beat import Beat
+
+    beat = Beat(app=celery)
+    beat.run()

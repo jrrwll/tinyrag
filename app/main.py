@@ -5,7 +5,9 @@ from app.api.base import (
     api_router,
     exception_handler,
 )
+from app.common.celery import start_embedded_servers
 from app.common.logging import add_request_id, config_logging
+from app.common.rq import shutdown_rq_manager, startup_rq_manager
 from app.config import settings
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -24,6 +26,13 @@ app = FastAPI(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_exception_handler(Exception, exception_handler)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_request_id)
+
+# assert event_type in ("startup", "shutdown")
+app.add_event_handler("startup", startup_rq_manager)
+app.add_event_handler("shutdown", shutdown_rq_manager)
+
+if settings.IS_TEST_ENV:
+    start_embedded_servers()
 
 
 # debug in IDE
