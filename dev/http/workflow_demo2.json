@@ -9,7 +9,7 @@
         "id": "1",
         "name": "Start Node",
         "type": "start",
-        "settings": {
+        "config": {
           "start_variables": [
             {
               "name": "my_text",
@@ -48,7 +48,7 @@
         "name": "LLM Node",
         "description": "some description",
         "type": "llm",
-        "settings": {
+        "config": {
           "model_id": 1,
           "model_params": {
             "temperature": 0.5,
@@ -82,32 +82,35 @@
         "id": "3",
         "name": "Exception Node",
         "type": "http",
-        "settings": {
-          "http_config": {
-            "url": "http://{{OLLAMA_HOST}}:11434/api/tags",
-            "method": "GET",
-            "headers": {
-              "Content-Type": "application/json"
-            },
-            "json_body": "{\n              \"message\": \"{my_text}\"\n            }"
+        "config": {
+          "url": "http://{{OLLAMA_HOST}}:11434/api/tags",
+          "method": "GET",
+          "headers": {
+            "Content-Type": "application/json"
           },
-          "exception_strategy": "default_value",
-          "exception_default_values": [
-            {
-              "name": "body",
-              "value": "[\n  \"qwen3:4b\",\n  \"llama3.2:latest\",\n  \"nomic-embed-text:latest\",\n  \"phi4:latest\",\n  \"qwen2.5:7b\",\n  \"qwq:latest\",\n  \"qwen2.5-coder:7b\",\n  \"deepseek-r1:7b\"\n]"
-            }
-          ]
+          "json_body": "{\n              \"message\": \"{my_text}\"\n            }",
+          "exception_config": {
+            "exception_strategy": "default_value",
+            "exception_default_values": [
+              {
+                "name": "body",
+                "value": "[\n  \"qwen3:4b\",\n  \"llama3.2:latest\",\n  \"nomic-embed-text:latest\",\n  \"phi4:latest\",\n  \"qwen2.5:7b\",\n  \"qwq:latest\",\n  \"qwen2.5-coder:7b\",\n  \"deepseek-r1:7b\"\n]"
+              }
+            ]
+          }
         }
       },
       {
         "id": "4",
         "name": "Code Node",
         "type": "code",
-        "settings": {
+        "config": {
           "code": "def main(arg1: str) -> list[str]:\n    body_obj = json.loads(arg1)\n    if isinstance(body_obj, dict):\n        return [model['name'] for model in body_obj['models']]\n    else:\n        return body_obj",
-          "code_args": [
-            "body"
+          "context_variables": [
+            {
+              "left": "body",
+              "right": "body"
+            }
           ],
           "output_variable": "result",
           "end_variables": [
@@ -122,7 +125,7 @@
         "id": "5",
         "name": "Condition Node",
         "type": "condition",
-        "settings": {
+        "config": {
           "conditions": "{good} == 'Y'",
           "true_node_id": "6",
           "false_node_id": "10"
@@ -132,8 +135,8 @@
         "id": "6",
         "name": "Doc Extract Node",
         "type": "doc_extract",
-        "settings": {
-          "extract_file": "my_file",
+        "config": {
+          "file": "my_file",
           "output_variable": "text"
         }
       },
@@ -141,7 +144,7 @@
         "id": "7",
         "name": "Classify Node",
         "type": "classify",
-        "settings": {
+        "config": {
           "classify_variable": {
             "name": "text",
             "node_id": "6"
@@ -166,7 +169,7 @@
         "id": "8",
         "name": "Template Node",
         "type": "template",
-        "settings": {
+        "config": {
           "template": "The result is {{class_name}}",
           "template_args": [
             {
@@ -188,7 +191,7 @@
         "id": "9",
         "name": "Template Node2",
         "type": "template",
-        "settings": {
+        "config": {
           "template": "No more news for {{class_name}}",
           "output_variable": "output",
           "end_variables": [
@@ -203,14 +206,9 @@
         "id": "10",
         "name": "LLM Node2",
         "type": "llm",
-        "settings": {
+        "config": {
           "model_id": 1,
-          "prompts": [
-            {
-              "role": "user",
-              "content": "{my_number} ** 3 等于多少"
-            }
-          ],
+          "user_prompt": "{my_number} ** 3 等于多少",
           "output_variable": "text",
           "end_variables": [
             {

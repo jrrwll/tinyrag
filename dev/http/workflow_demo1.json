@@ -9,7 +9,7 @@
         "id": "1",
         "name": "Start Node",
         "type": "start",
-        "settings": {
+        "config": {
           "start_variables": [
             {
               "name": "query",
@@ -24,7 +24,7 @@
         "id": "2",
         "name": "LLM Node",
         "type": "llm",
-        "settings": {
+        "config": {
           "model_id": 1,
           "model_params": {
             "temperature": 1
@@ -54,7 +54,7 @@
         "id": "3",
         "name": "LLM Node2",
         "type": "llm",
-        "settings": {
+        "config": {
           "model_id": 1,
           "model_params": {
             "temperature": 0.5
@@ -84,7 +84,7 @@
         "id": "4",
         "name": "End Node",
         "type": "end",
-        "settings": {
+        "config": {
           "end_variables": [
             {
               "left": "query",

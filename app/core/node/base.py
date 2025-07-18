@@ -1,4 +1,5 @@
 from enum import StrEnum
+from urllib.parse import quote_plus
 
 from pydantic import BaseModel, Field
 
@@ -85,6 +86,13 @@ class HttpConfig(BaseModel):
 
     exception_config: ExceptionConfig | None = None
 
+    @property
+    def request_url(self):
+        if not self.params:
+            return self.url
+        return self.url + "?" + "&".join(
+            [f"{quote_plus(k)}={v}" for k, v in self.params.items()])
+
 
 class ConditionConfig(BaseModel):
     conditions: str
@@ -100,7 +108,7 @@ class ClassifyConfig(BaseModel):
 
 class CodeConfig(BaseModel):
     code: str
-    code_args: list[ContextVariable]
+    context_variables: list[ContextVariable] | None = None
 
     exception_config: ExceptionConfig | None = None
 

@@ -7,7 +7,7 @@ class ApiResult[T: BaseModel](BaseModel):
     data: T | None = None
 
     @classmethod
-    def new[R: BaseModel | None](cls, data: R = None) -> ApiResult[R]:
+    def new[R: BaseModel | None](cls, data: R = None) -> "ApiResult[R]":
         return ApiResult(data=data)
 
 
@@ -21,7 +21,3 @@ class PageResult[T: BaseModel](BaseModel):
 
 class IdResult(BaseModel):
     id: int | str
-
-
-def wrap_api_result[T: BaseModel | None](data: T = None) -> ApiResult[T]:
-    return ApiResult(data=data)

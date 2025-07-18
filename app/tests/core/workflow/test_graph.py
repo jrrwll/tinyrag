@@ -27,6 +27,7 @@ demo_graphs = [
 
 
 def test_graph():
+    print()
     for graph in demo_graphs:
         print(graph.model_dump_json())
 

@@ -1,3 +1,4 @@
+# mypy: disable-error-code="assignment,attr-defined"
 from functools import cached_property
 from queue import Queue
 from urllib.parse import quote_plus
@@ -60,7 +61,7 @@ class GraphRunner:
 
     def _prepare_context_variables(self, node: NodeRun) -> None:
         input_variables = node.input_variables
-        context_variables = node.node.config.context_variables
+        context_variables = node.node.config.get("context_variables")
 
         if not context_variables:
             return
@@ -122,8 +123,7 @@ def _node_label(n: NodeRun) -> str:
     s = [f"<{node.type}> {node.name}"]
     node_config = node.config
 
-    match node.type:
-        case NodeType.LLM:
+    if node.type == NodeType.LLM:
             config = LLMConfig.model_validate(node_config)
             s.append(f"\n\nmodel = {config.model_id}")
             s.append(f"\nuser_prompt = ```\n{config.user_prompt}\n```")
@@ -131,31 +131,30 @@ def _node_label(n: NodeRun) -> str:
                 for st in config.structured_output:
                     s.append(f"\n{st.name}: {st.type} = '{st.description}'")
 
-        case NodeType.Condition:
+    elif node.type == NodeType.Condition:
             config = ConditionConfig.model_validate(node_config)
             s.append(f"\n\nconditions = '{config.conditions}'")
 
-        case NodeType.DocExtract:
+    elif node.type == NodeType.DocExtract:
             config = DocExtractConfig.model_validate(node_config)
             s.append(f"\n\nextract_file = {config.file}")
 
-        case NodeType.Template:
+    elif node.type == NodeType.Template:
             config = TemplateConfig.model_validate(node_config)
             s.append(f"\n\ntemplate = ```\n{config.template}\n```\n")
-            if config.template_args:
-                _fill_variables_str(config.template_args, s)
+            if config.context_variables:
+                _fill_variables_str(config.context_variables, s)
 
-        case NodeType.Code:
+    elif node.type == NodeType.Code:
             config = CodeConfig.model_validate(node_config)
             s.append(f"\n\ncode = ```\n{config.code}\n```\n")
-            s.append(f"\ncode_args = {config.code_args}")
+            s.append(f"\ncode_args = {config.context_variables}")
 
-        case NodeType.HTTP:
+    elif node.type == NodeType.HTTP:
             config = HttpConfig.model_validate(node_config)
-            s.append(f"\nhttp_config = ```\n{config.http_config.
-                     model_dump_json(indent=2).replace('"', '\'')}\n```")
-
-        case NodeType.Start:
+            s.append(f"\n{config.method} {config.request_url}"
+                     .replace('"', '\''))
+    elif node.type == NodeType.Start:
             config = StartConfig.model_validate(node_config)
             s.append("\n")
             for v in config.start_variables:
@@ -164,7 +163,7 @@ def _node_label(n: NodeRun) -> str:
                 else:
                     s.append(f"\n{v.name}: {v.type}")
 
-        case NodeType.End:
+    elif node.type == NodeType.End:
             config = EndConfig.model_validate(node_config)
             s.append("\n")
             _fill_variables_str(config.end_variables, s)

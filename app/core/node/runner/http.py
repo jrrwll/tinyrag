@@ -40,12 +40,8 @@ class HttpNodeRunner(NodeRunner):
 
 
 def request(http_config: HttpConfig) -> requests.Response:
-    method = http_config.method.value
-    url = http_config.url
-    params = http_config.params
-    if params:
-        url += "?" + "&".join([f"{quote_plus(k)}={v}"
-                               for k, v in params.items()])
+    method = http_config.method.value()
+    url = http_config.request_url
 
     headers = http_config.headers
     body = http_config.body

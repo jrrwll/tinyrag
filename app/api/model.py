@@ -1,12 +1,12 @@
-from typing import Any, Union
+from typing import Any
 
 from fastapi import APIRouter, Query
 from sqlmodel import select
 
-from app.common.base import ApiResult, IdResult, PageResult, wrap_api_result
-from app.config import settings
+from app.common.base import ApiResult, IdResult, PageResult
 from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
+from app.config import settings
 from app.core.model.api import (
     ModelCreate,
     ModelPublic,
