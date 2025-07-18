@@ -9,7 +9,7 @@ from app.core.file.service.load import load_document_file
 from app.core.model.default_model import get_default_model_provider
 from app.core.model.enums import ModelType
 from app.entities.file import File
-from app.util.lang import take_limit
+from app.util.lang.collection import take_limit
 
 
 def preview_file_chunk(params: PreviewChunk) -> PreviewChunkPublic:

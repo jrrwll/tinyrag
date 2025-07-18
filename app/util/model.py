@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+import json
 from typing import Any
 from typing import Dict, Tuple, Type
 
@@ -26,20 +26,8 @@ def create_model_type( # type: ignore[no-untyped-def]
     )
 
 
-@dataclass
-class OptionalValue[T: Any]:
-    value: T | None = field(default=None)
-
-    @property
-    def is_present(self):
-        return self.value is not None
-
-    @property
-    def is_empty(self):
-        return self.value is None
-
-    def __repr__(self):
-        if self.is_present:
-            return f"OptionalValue(value={self.value})"
-        else:
-            return "OptionalValue(empty)"
+def dump_json(a: Any):
+    if isinstance(a, BaseModel):
+        return json.dumps(a.model_dump(), ensure_ascii=False)
+    else:
+        return json.dumps(a, ensure_ascii=False)

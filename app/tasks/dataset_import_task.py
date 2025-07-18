@@ -1,10 +1,11 @@
+import logging
+
 import orjson
 from langchain_core.documents import Document
 from pydantic import BaseModel
 
-from app.common.celery import celery
-from app.common.celery import send_celery_task
 from app.common.db import open_session
+from app.common.scheduler import send_rq_task
 from app.core.dataset.api import DatasetImport, DatasetImportFile, \
     DatasetImportWebsite, DatasetPublic
 from app.core.dataset.process_rule import get_text_splitter
@@ -15,6 +16,8 @@ from app.entities.dao.dataset import save_document, save_document_chucks
 from app.entities.dataset import Document as DocumentEntity, DocumentChunk
 from app.entities.file import File
 from app.entities.task import AsyncTask
+
+logger = logging.getLogger(__name__)
 
 
 class ImportTaskParams(BaseModel):
@@ -42,12 +45,12 @@ def send_dataset_import_task(
     )
     task_params_json = orjson.dumps(task_params.model_dump())
 
-    send_celery_task(task_id, dataset_import_task.__name__,
-                     task_id, task_params_json)
+    send_rq_task(task_id, dataset_import_task, task_id, task_params_json)
+
     return AsyncTaskPublic.new(entity)
 
 
-@celery.task(queue="dataset", bind=True, track_started=True)
+# @celery.task(queue="dataset", bind=True, track_started=True)
 def dataset_import_task(task_id: str, task_params_json: bytes):
     task_params = ImportTaskParams.model_validate(
         orjson.loads(task_params_json))
@@ -94,7 +97,10 @@ def _import_files(
             position += 1
 
         task_raito += task_raito_step
-        update_task_progress(task_id, int(task_raito * 100))
+        progress = int(task_raito * 100)
+        if not update_task_progress(task_id, progress):
+            logger.warning(f"async_task={task_id}, "
+                           f"update task progress={progress} failed")
 
 
 def _import_website(

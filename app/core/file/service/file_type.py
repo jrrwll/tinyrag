@@ -5,7 +5,7 @@ from filetype.types import AUDIO, IMAGE, Type, VIDEO, archive, document
 
 from app.core.file.enums import FileType
 from app.util.file import is_binary_file
-from app.util.lang import any_match
+from app.util.lang.collection import any_match
 
 
 def detect_file_type(file_path: str) -> Tuple[FileType, str] | None:

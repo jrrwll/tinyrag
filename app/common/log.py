@@ -10,7 +10,7 @@ from datetime import datetime
 import pytz
 
 
-request_id_var = contextvars.ContextVar("request_id")
+request_id_var = contextvars.ContextVar("request_id", default="")
 
 
 # @app.middleware("http")

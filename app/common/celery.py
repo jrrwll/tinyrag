@@ -76,7 +76,6 @@ def send_celery_task(task_id: str, task_name: str, *args, **kwargs) -> None:
 
 @task_prerun.connect
 def task_started_handler(task_id: str, **kwargs):
-    """任务开始运行时更新状态"""
     with open_session() as session:
         entity = session.get(AsyncTask, task_id)
         if not entity:
@@ -133,3 +132,14 @@ def _run_beat():
 
     beat = Beat(app=celery)
     beat.run()
+
+"""
+# task define demo
+
+send_celery_task(task_id, dataset_import_task.__name__,
+                 task_id, task_params_json)
+
+@celery.task(queue="dataset", bind=True, track_started=True)
+def dataset_import_task(task_id: str, task_params_json: bytes):
+    pass
+"""
