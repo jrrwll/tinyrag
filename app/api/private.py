@@ -8,6 +8,7 @@ router = APIRouter(tags=["private"], prefix="/private")
 logger = logging.getLogger(__name__)
 
 
-@router.get("/logging")
-def logging() -> Any:
-    logger.info(f"test log is: router={router}")
+@router.get("/test_log")
+def test_log() -> Any:
+    logger.info(f"test log is: {logger}")
+

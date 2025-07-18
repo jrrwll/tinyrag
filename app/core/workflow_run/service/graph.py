@@ -3,6 +3,8 @@ from queue import Queue
 from urllib.parse import quote_plus
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.node.base import CodeConfig, ConditionConfig, DocExtractConfig, \
+    EndConfig, HttpConfig, LLMConfig, StartConfig, TemplateConfig
 from app.core.node.service import get_node_runner
 from app.core.variable.base import ContextVariable, Variable
 from app.core.workflow.base import Edge, WorkflowGraph
@@ -118,40 +120,54 @@ class GraphRunner:
 def _node_label(n: NodeRun) -> str:
     node = n.node
     s = [f"<{node.type}> {node.name}"]
-    config = node.config
+    node_config = node.config
 
-    if config.model_id:
-        s.append(f"\n\nmodel = {config.model_id}")
-        if config.user_prompt:
+    match node.type:
+        case NodeType.LLM:
+            config = LLMConfig.model_validate(node_config)
+            s.append(f"\n\nmodel = {config.model_id}")
             s.append(f"\nuser_prompt = ```\n{config.user_prompt}\n```")
-        if config.structured_output:
-            for st in config.structured_output:
-                s.append(f"\n{st.name}: {st.type} = '{st.description}'")
+            if config.structured_output:
+                for st in config.structured_output:
+                    s.append(f"\n{st.name}: {st.type} = '{st.description}'")
 
-    if config.conditions:
-        s.append(f"\n\nconditions = '{config.conditions}'")
-    elif config.extract_file:
-        s.append(f"\n\nextract_file = {config.extract_file}")
-    elif config.template:
-        s.append(f"\n\ntemplate = ```\n{config.template}\n```\n")
-        if config.template_args:
-            _fill_variables_str(config.template_args, s)
-    elif config.code:
-        s.append(f"\n\ncode = ```\n{config.code}\n```\n")
-        s.append(f"\ncode_args = {config.code_args}")
-    elif config.http_config:
-        s.append(f"\nhttp_config = ```\n{config.http_config.
-                 model_dump_json(indent=2).replace('"', '\'')}\n```")
-    elif config.start_variables:
-        s.append("\n")
-        for v in config.start_variables:
-            if v.description:
-                s.append(f"\n{v.name}: {v.type} = '{v.description}'")
-            else:
-                s.append(f"\n{v.name}: {v.type}")
-    elif config.end_variables:
-        s.append("\n")
-        _fill_variables_str(config.end_variables, s)
+        case NodeType.Condition:
+            config = ConditionConfig.model_validate(node_config)
+            s.append(f"\n\nconditions = '{config.conditions}'")
+
+        case NodeType.DocExtract:
+            config = DocExtractConfig.model_validate(node_config)
+            s.append(f"\n\nextract_file = {config.file}")
+
+        case NodeType.Template:
+            config = TemplateConfig.model_validate(node_config)
+            s.append(f"\n\ntemplate = ```\n{config.template}\n```\n")
+            if config.template_args:
+                _fill_variables_str(config.template_args, s)
+
+        case NodeType.Code:
+            config = CodeConfig.model_validate(node_config)
+            s.append(f"\n\ncode = ```\n{config.code}\n```\n")
+            s.append(f"\ncode_args = {config.code_args}")
+
+        case NodeType.HTTP:
+            config = HttpConfig.model_validate(node_config)
+            s.append(f"\nhttp_config = ```\n{config.http_config.
+                     model_dump_json(indent=2).replace('"', '\'')}\n```")
+
+        case NodeType.Start:
+            config = StartConfig.model_validate(node_config)
+            s.append("\n")
+            for v in config.start_variables:
+                if v.description:
+                    s.append(f"\n{v.name}: {v.type} = '{v.description}'")
+                else:
+                    s.append(f"\n{v.name}: {v.type}")
+
+        case NodeType.End:
+            config = EndConfig.model_validate(node_config)
+            s.append("\n")
+            _fill_variables_str(config.end_variables, s)
 
     return "".join(s)
 
@@ -160,5 +176,3 @@ def _fill_variables_str(variables: list[ContextVariable], s: list[str]) -> None:
     for variable in variables:
         sep = f"{variable.node_id}." if variable.node_id else ""
         s.append(f"\n  {variable.left} = {sep}{variable.right}")
-
-
