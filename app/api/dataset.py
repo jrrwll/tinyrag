@@ -2,13 +2,14 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.common.base import ApiResult, PageResult
-from app.common.deps import SessionDep
+from app.common.api import ApiResult, PageResult
+from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
+from app.common.log import LogDep
 from app.config import settings
 from app.core.dataset.api import DatasetCreate, \
     DatasetImport, DatasetPublic, \
-    PreviewChunk, PreviewChunkPublic, SimpleDatasetPublic
+    DatasetUpdate, PreviewChunk, PreviewChunkPublic, SimpleDatasetPublic
 from app.core.dataset.preview_file_chunk import preview_file_chunk
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.dataset import page_and_count_datasets
@@ -27,7 +28,8 @@ def list(
                                ge=1, le=settings.DEFAULT_MAX_PAGE_SIZE),
         enable: bool | None = None,
 ) -> Any:
-    entities, count = page_and_count_datasets(session, page_no, page_size, enable)
+    entities, count = page_and_count_datasets(session, page_no, page_size,
+                                              enable)
     res = PageResult[SimpleDatasetPublic](
         page_no=page_no,
         page_size=page_size,
@@ -46,21 +48,38 @@ def get(session: SessionDep, id: int) -> Any:
     return ApiResult.new(DatasetPublic(**entity.model_dump()))
 
 
-@router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic])
+@router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic],
+             dependencies=[LogDep])
 def preview_chunk(params: PreviewChunk) -> Any:
     return ApiResult.new(preview_file_chunk(params))
 
 
-@router.post("", response_model=ApiResult[DatasetPublic])
+@router.post("", response_model=ApiResult[DatasetPublic], dependencies=[LogDep])
 def create(session: SessionDep, params: DatasetCreate) -> Any:
-    entity = Dataset(name=params.name, description=params.description)
+    entity = params.to_entity()
     session.add(entity)
     session.commit()
     session.refresh(entity)
     return ApiResult.new(DatasetPublic.new(entity))
 
 
-@router.post("/import", response_model=ApiResult[AsyncTaskPublic])
+@router.put("", response_model=ApiResult[Any], dependencies=[LogDep])
+def update(session: SessionDep, params: DatasetUpdate) -> Any:
+    id = params.id
+    entity = session.get(Dataset, id)
+    if not entity:
+        raise BizException.new(ErrorCode.dataset_not_found, id)
+
+    params.update_entity(entity)
+
+    session.add(entity)
+    session.commit()
+
+    return ApiResult.new()
+
+
+@router.post("/import", response_model=ApiResult[AsyncTaskPublic],
+             dependencies=[LogDep])
 def import_document(session: SessionDep, params: DatasetImport) -> Any:
     if not params.file and not params.website:
         raise BizException.new(

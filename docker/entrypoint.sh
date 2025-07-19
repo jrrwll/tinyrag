@@ -1,9 +1,5 @@
 if [[ "${MODE}" == "worker" ]]; then
-    exec rq worker --with-scheduler -A app.celery worker \
-            -P ${CELERY_WORKER_CLASS:-gevent} $CONCURRENCY_OPTION \
-            --max-tasks-per-child ${MAX_TASK_PRE_CHILD:-50} \
-            --loglevel ${LOG_LEVEL:-INFO} \
-            -Q ${CELERY_QUEUES:-dataset,mail,ops_trace,app_deletion}
+    exec python -m app
 else
     if [[ "${DEBUG}" == "true" ]]; then
         exec uvicorn app:app \

@@ -1,6 +1,9 @@
 GET http://{{origin}}{{api_prefix}}/dataset/list
 
 ###
+GET http://{{origin}}{{api_prefix}}/dataset?id=1
+
+###
 POST http://{{origin}}{{api_prefix}}/dataset
 Content-Type: application/json
 
@@ -16,24 +19,36 @@ Content-Type: application/json
 {
   "id": 1,
   "name": "空白知识库",
-  "description": "some description2"
-}
-
-###
-# chunk_overlap: int | None = None
-#    chunk_size: int | None = None
-#    separators: list[str] | None = None
-POST http://{{origin}}{{api_prefix}}/dataset/preview_chunk
-Content-Type: application/json
-
-{
-  "file_id": "1754d69628eee87b5e559944ba4af5ac",
+  "description": "some description2",
   "process_rule": {
     "text_splitter": {
       "chunk_overlap": 50,
       "chunk_size": 256,
       "separators": [
-        "\n\n"
+        "\n\n",
+        "\n",
+        " ",
+        ""
+      ]
+    }
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/dataset/preview_chunk
+Content-Type: application/json
+
+{
+  "file_id": "6bd6766b56467942ea6ed31875df9294",
+  "process_rule": {
+    "text_splitter": {
+      "chunk_overlap": 50,
+      "chunk_size": 256,
+      "separators": [
+        "\n\n",
+        "\n",
+        " ",
+        ""
       ]
     }
   }
@@ -47,7 +62,7 @@ Content-Type: application/json
   "id": 1,
   "file": {
     "file_ids": [
-      "1754d69628eee87b5e559944ba4af5ac"
+      "6bd6766b56467942ea6ed31875df9294"
     ]
   }
 }

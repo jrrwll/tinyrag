@@ -28,9 +28,9 @@ def update_task_status(task_id: str, expect_status: AsyncTaskStatus,
             AsyncTask.id == task_id,
             AsyncTask.status == expect_status,
         ).values(values)
-        res = session.exec(update_sql).one()
+        res = session.exec(update_sql)
         session.commit()
-        return bool(res)
+        return res.rowcount > 0
 
 
 def update_task_progress(task_id: str, progress: int) -> bool:
@@ -39,6 +39,6 @@ def update_task_progress(task_id: str, progress: int) -> bool:
             AsyncTask.id == task_id,
             AsyncTask.status == AsyncTaskStatus.Started,
         ).values(progress=progress)
-        res = session.exec(update_sql).one()
+        res = session.exec(update_sql)
         session.commit()
-        return bool(res)
+        return res.rowcount > 0

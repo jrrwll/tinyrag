@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import (
-    computed_field,
+    computed_field, PositiveInt
 )
 from pydantic_settings import BaseSettings
 
@@ -29,3 +29,19 @@ class DeploymentConfig(BaseSettings):
     @classmethod
     def ROOT_DIR(cls) -> str:
         return _root_dir
+
+
+_log_format_prefix = "%(asctime)s.%(msecs)03d %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]"
+
+
+class LoggingConfig(BaseSettings):
+
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: str = f"{_log_format_prefix}: %(message)s"
+    LOG_ACCESS_FORMAT: str = "%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s]: - %(client_addr)s - %(request_line)s %(status_code)s"
+    LOG_DATEFORMAT: str | None = None
+    LOG_TZ: str = "UTC"
+
+    LOG_FILE: str | None = None
+    LOG_FILE_MAX_SIZE: PositiveInt = 20 # MB
+    LOG_FILE_BACKUP_COUNT: PositiveInt = 10

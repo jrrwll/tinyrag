@@ -3,12 +3,14 @@ import threading
 import time
 from datetime import datetime
 from typing import Any, Callable, Self
+import traceback
 
 from redis import Redis
 from rq import Queue, Worker
 from rq.job import Job
 from rq_scheduler import Scheduler
 
+from app.common.log import request_id_var
 from app.config import settings
 from app.core.task.service import update_task_status
 from app.entities.task import AsyncTaskStatus
@@ -17,30 +19,33 @@ from app.util.model import dump_json
 logger = logging.getLogger(__name__)
 
 
-class CustomJob(Job):
+class AsyncTaskJob(Job):
 
     def _execute(self) -> Any:
+        request_id = self.meta.get("request_id")
+        request_id_var.set(request_id if request_id else "")
+
         task_id = self.id
         if not update_task_status(
                 task_id, AsyncTaskStatus.Pending, AsyncTaskStatus.Started):
             logger.warning(f"async_task={task_id}, failed to update status Pending -> Started")
             return None
 
-        res, ex = None, None
+        res, ex_str = None, None
         try:
             res = super()._execute()
-        except Exception as e:
-            ex = e
+        except Exception:
+            ex_str = traceback.format_exc()
 
         res_str = dump_json(res) if res else None
 
-        if not ex:
+        if not ex_str:
             if not update_task_status(task_id, AsyncTaskStatus.Started,
                 AsyncTaskStatus.Success, res_str):
                 logger.warning(f"async_task={task_id}, failed to update status Started -> Success")
         else:
             if not update_task_status(task_id, AsyncTaskStatus.Started,
-                AsyncTaskStatus.Failure, str(ex)):
+                AsyncTaskStatus.Failure, ex_str):
                 logger.warning(f"async_task={task_id}, failed to update status Started -> Failure")
 
         return res
@@ -66,7 +71,8 @@ class RQManager:
         return cls._instance
 
     def submit_task(self, func: Callable[..., Any], *args, **kwargs) -> Job:
-        return self.queue.enqueue(func, *args, **kwargs)
+        meta = {"request_id": request_id_var.get()}
+        return self.queue.enqueue(func, meta=meta, *args, **kwargs)
 
     def schedule_task(self, scheduled_time: datetime,
             func: Callable[..., Any], *args, **kwargs) -> Job:
@@ -85,14 +91,15 @@ class RQManager:
     def start_worker(self):
 
         def run_worker():
-            worker = Worker(['default'], connection=self.connection)
+            worker = Worker([self.queue], connection=self.connection,
+                            job_class=AsyncTaskJob)
             logger.info("🚀 RQ Worker started in thread mode")
             while not self.shutdown_flag.is_set():
                 try:
                     worker.work(burst=True, with_scheduler=False)
                 except Exception as e:
                     logger.error(f"RQ  Worker error: {e}")
-                    time.sleep(1)
+                time.sleep(1)
             logger.info("🚀 RQ Worker exited")
 
         self.worker_thread = threading.Thread(target=run_worker, daemon=True)
@@ -107,7 +114,7 @@ class RQManager:
                     self.scheduler.run(burst=True)
                 except Exception as e:
                     logger.error(f"RQ Scheduler error: {e}")
-                    time.sleep(1)
+                time.sleep(1)
             logger.info("⏰ RQ Scheduler exited")
 
         self.scheduler_thread = threading.Thread(target=run_scheduler,
@@ -153,8 +160,7 @@ def send_rq_scheduled_task(job_id: str, scheduled_time: datetime,
         job_id=job_id)
 
 
-# production mode
-if __name__ == '__main__':
+def main() -> None:
     from rq.worker import DequeueStrategy
 
     dequeue_strategy = DequeueStrategy.DEFAULT
@@ -164,7 +170,8 @@ if __name__ == '__main__':
         dequeue_strategy = DequeueStrategy.RANDOM
 
     rq_manager = RQManager()
-    worker = Worker([rq_manager.queue], connection=rq_manager.connection)
+    worker = Worker([rq_manager.queue], connection=rq_manager.connection,
+                    job_class=AsyncTaskJob)
     # block forever
     worker.work(with_scheduler=True, logging_level=settings.LOG_LEVEL,
                 dequeue_strategy=dequeue_strategy)

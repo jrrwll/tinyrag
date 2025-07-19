@@ -13,6 +13,7 @@ class AsyncTaskPublic(BaseModel):
     status: AsyncTaskStatus
 
     submitted_at: datetime
+    started_at: datetime | None = None
     completed_at: datetime | None = None
     result: str | None = None
     progress: int | None = None

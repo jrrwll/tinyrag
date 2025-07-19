@@ -17,14 +17,17 @@ class Document(TableBase, table=True):
     dataset_id: int
     position: int
     file_id: str | None = None
-    word_count: int
+    word_count: int = 0
 
 
 class DocumentChunk(TableBase, table=True):
+
+    __tablename__ = 'document_chunk'
+
     dataset_id: int
     document_id: int
     position: int
     content: str = Field(max_length=10000)
-    word_count: int
+    word_count: int = 0
     keywords: str
 

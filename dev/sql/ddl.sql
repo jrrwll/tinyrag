@@ -88,6 +88,7 @@ create table async_task (
     payload      longtext     not null,
     status       varchar(32)  not null,
     submitted_at timestamp    not null default current_timestamp,
+    started_at   timestamp    null     default null,
     completed_at timestamp    null     default null,
     result       longtext              default null,
     progress     int                   default 0

@@ -1,7 +1,7 @@
 # ruff: noqa: E712
 from sqlmodel import and_, func, select
 
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.core.workflow.enums import WorkflowStatus
 from app.entities.workflow import Workflow
 

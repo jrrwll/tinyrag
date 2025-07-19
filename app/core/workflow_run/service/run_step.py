@@ -1,4 +1,4 @@
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.core.workflow_run.api import WorkflowRunExecute, \
     WorkflowRunExecuteStep, \
     WorkflowRunExecuteStepPublic, \

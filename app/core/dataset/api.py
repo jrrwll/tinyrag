@@ -1,8 +1,9 @@
+import json
 from datetime import datetime
-from enum import StrEnum
 
 from pydantic import BaseModel
 
+from app.config import settings
 from app.core.dataset.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
 from app.entities.dataset import Dataset
@@ -13,12 +14,27 @@ class DatasetCreate(BaseModel):
     name: str
     description: str | None = None
 
+    process_rule: ProcessRule | None = None
+
     def to_entity(self) -> Dataset:
-        pass
+        process_rule = self.process_rule
+        if not process_rule:
+            process_rule = settings.dataset_default_process_rule
+        return Dataset(name=self.name, description=self.description,
+                process_rule=process_rule.model_dump_json())
 
 
 class DatasetUpdate(DatasetCreate):
     id: int
+
+    def update_entity(self, entity: Dataset) -> None:
+        update_dict = self.model_dump(exclude_none=True)
+        update_dict.update(
+            {
+                "process_rule": self.process_rule.model_dump_json(),
+            }
+        )
+        entity.sqlmodel_update(update_dict)
 
 
 class DatasetImportFile(BaseModel):

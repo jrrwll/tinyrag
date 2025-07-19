@@ -1,6 +1,6 @@
 from functools import cache
 
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.core.workflow.api import (
     NodeCheckListPublic,
     WorkflowCheckListPublic,

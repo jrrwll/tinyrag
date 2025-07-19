@@ -1,7 +1,7 @@
 from pydantic_settings import SettingsConfigDict
 
 from app.config.api import ApiConfig
-from app.config.deployment import DeploymentConfig
+from app.config.base import DeploymentConfig, LoggingConfig
 from app.config.feature import FeatureConfig
 from app.config.middleware import MiddlewareConfig
 from app.config.settings_source import SettingsSourceConfig
@@ -10,6 +10,7 @@ from app.config.settings_source import SettingsSourceConfig
 class Settings(
     ApiConfig,
     DeploymentConfig,
+    LoggingConfig,
     MiddlewareConfig,
     FeatureConfig,
     SettingsSourceConfig,

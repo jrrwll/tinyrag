@@ -5,7 +5,7 @@ from sqlmodel import Session
 from sqlmodel import func, select
 
 from app.common.db import engine
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.core.model.enums import ModelType
 from app.entities.model import DefaultModel, Model
 

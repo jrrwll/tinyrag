@@ -5,11 +5,13 @@ from logging.handlers import RotatingFileHandler
 from app.config import settings
 import os.path
 import logging
-from fastapi import Request, Response
+from fastapi import Request, Response, Depends
+from fastapi.routing import APIRoute
 from datetime import datetime
 import pytz
 
 
+logger = logging.getLogger(__name__)
 request_id_var = contextvars.ContextVar("request_id", default="")
 
 
@@ -46,7 +48,7 @@ def config_logging():
     log_handlers.append(logging.StreamHandler(sys.stdout))
     # add requestId
     for handler in log_handlers:
-        handler.addFilter(RequestIdFilter())
+        handler.addFilter(_RequestIdFilter())
 
     logging.basicConfig(
         level=settings.LOG_LEVEL,
@@ -68,10 +70,24 @@ def config_logging():
                 handler.formatter.converter = time_converter
 
 
-class RequestIdFilter(logging.Filter):
-    # This is a logging filter that makes the request ID available for use in
-    # the logging format. Note that we're checking if we're in a request
-    # context, as we may want to log things before Flask is fully loaded.
+class _RequestIdFilter(logging.Filter):
+
     def filter(self, record):
         record.requestId = request_id_var.get() if request_id_var.get() else ""
         return True
+
+
+def _request_logger(request: Request):
+    route: APIRoute = request.scope.get("route")
+    typ = request.scope.get("type", "")
+    http_version = request.scope.get("http_version")
+    request_str = f"{request.method} {route.path} {typ.upper()}/{http_version}"
+
+    client = request.client
+    if client:
+        logger.info(f"{request_str} - {client.host}:{client.port}")
+    else:
+        logger.info(request_str)
+
+
+LogDep = Depends(_request_logger)

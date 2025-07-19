@@ -10,6 +10,7 @@ class AsyncTask(SQLModel, table=True):
     __tablename__ = "async_task"
 
     id: str = Field(primary_key=True)
+    created_at: datetime
     updated_at: datetime
 
     name: str = Field(min_length=1, max_length=100)

@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from app.common.scheduler import RQManager
+from app.common.rq import RQManager
 
 router = APIRouter(tags=["private"], prefix="/private")
 

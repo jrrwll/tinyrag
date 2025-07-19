@@ -1,11 +1,12 @@
 import logging
+from uuid import uuid4
 
 import orjson
 from langchain_core.documents import Document
 from pydantic import BaseModel
 
 from app.common.db import open_session
-from app.common.scheduler import send_rq_task
+from app.common.rq import send_rq_task
 from app.core.dataset.api import DatasetImport, DatasetImportFile, \
     DatasetImportWebsite, DatasetPublic
 from app.core.dataset.process_rule import get_text_splitter
@@ -30,14 +31,14 @@ def send_dataset_import_task(
         params: DatasetImport, dataset: DatasetPublic,
         files: dict[str, File]) -> AsyncTaskPublic:
     dataset_id = dataset.id
+    task_id = str(uuid4())
     with open_session() as session:
-        entity = AsyncTask(name=f"dataset_import{dataset_id}",
+        entity = AsyncTask(id=task_id, name=f"dataset_import{dataset_id}",
                            payload=dataset.model_dump_json())
         session.add(entity)
         session.commit()
         session.refresh(entity)
 
-    task_id = str(entity.id)
     task_params = ImportTaskParams(
         params=params,
         dataset=dataset,

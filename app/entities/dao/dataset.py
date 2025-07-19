@@ -2,7 +2,7 @@
 from sqlmodel import and_, func, select
 
 from app.common.db import open_session
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.entities.dataset import Dataset, Document, DocumentChunk
 
 

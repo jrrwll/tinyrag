@@ -1,6 +1,6 @@
 from sqlmodel import select
 
-from app.common.deps import SessionDep
+from app.common.db import SessionDep
 from app.entities.workflow_run import WorkflowRun
 
 
