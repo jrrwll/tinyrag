@@ -1,3 +1,4 @@
+# mypy: disable-error-code="no-untyped-def,no-any-return,union-attr,no-untyped-call,import-untyped"
 import logging
 import threading
 import time
@@ -14,7 +15,7 @@ from app.common.constants import APP_NAME
 from app.common.log import request_id_var
 from app.config import settings
 from app.core.task.service import update_task_status
-from app.entities.task import AsyncTaskStatus
+from app.core.task.enums import AsyncTaskStatus
 from app.util.datetme import isoformat_dict
 from app.util.model import dump_json
 
@@ -71,7 +72,7 @@ class AsyncTaskJob(Job):
 
 class RQManager:
     """singleton"""
-    _instance: Self = None
+    _instance: Self = None # type: ignore[assignment]
 
     connection: Redis
     queue: Queue

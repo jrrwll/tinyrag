@@ -25,5 +25,5 @@ def get_file_md5(file_path: str) -> str:
     return hash_md5.hexdigest()
 
 
-def mkdirs(dir_path: str) -> bool:
-    return os.makedirs(dir_path, exist_ok=True)
+def mkdirs(dir_path: str) -> None:
+    os.makedirs(dir_path, exist_ok=True)

@@ -9,7 +9,7 @@ def format_date_compact(d: datetime = datetime.now()) -> str:
     return d.strftime('%Y%m%d')
 
 
-def isoformat_dict(d: dict) -> None: # type: ignore[no-untyped-def]
+def isoformat_dict(d: dict) -> None: # type: ignore[type-arg]
     for k, v in d.items():
         if isinstance(v, datetime):
             d[k] = v.isoformat()

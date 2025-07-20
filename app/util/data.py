@@ -7,14 +7,14 @@ class OptionalValue[T: Any]:
     value: T | None = field(default=None)
 
     @property
-    def is_present(self):
+    def is_present(self) -> bool:
         return self.value is not None
 
     @property
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return self.value is None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.is_present:
             return f"OptionalValue(value={self.value})"
         else:

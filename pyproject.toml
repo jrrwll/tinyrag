@@ -29,6 +29,7 @@ dependencies = [
     "rq-scheduler>=0.14.0",
     "sqlmodel>=0.0.24",
     "types-cachetools>=6.0.0.20250525",
+    "types-pytz>=2025.2.0.20250516",
     "types-requests>=2.32.4.20250611",
     "uvloop>=0.21.0",
 ]

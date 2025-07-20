@@ -1,10 +1,10 @@
 from pydantic import BaseModel, JsonValue
 
 
-class ApiResult[T: BaseModel | JsonValue](BaseModel):
+class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
     code: int = 0
     msg: str | None = None
-    data: T | None = None
+    data: T = None
 
     @classmethod
     def new[R: BaseModel | JsonValue | None](cls, data: R = None) -> "ApiResult[R]":

@@ -6,7 +6,7 @@ from app.core.model.privoder import ModelProvider
 from app.core.model.privoder.base import get_model_provider
 from app.entities.dao.model import get_default_models
 from app.entities.model import Model
-from app.util.lang.data import OptionalValue
+from app.util.data import OptionalValue
 
 _default_model_cache: TTLCache[
     ModelType, OptionalValue[Model]] = TTLCache(

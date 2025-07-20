@@ -16,20 +16,20 @@ request_id_var = contextvars.ContextVar("request_id", default="")
 
 
 # @app.middleware("http")
-async def add_request_id(request: Request, call_next) -> Response:
+async def add_request_id(request: Request, call_next) -> Response: # type: ignore[no-untyped-def]
     request_id = request.headers.get("request_id")
     if not request_id:
         request_id = str(uuid.uuid4())
 
     request_id_var.set(request_id)
 
-    response = await call_next(request)
+    response: Response = await call_next(request)
 
     response.headers["request_id"] = request_id
     return response
 
 
-def config_logging():
+def config_logging() -> None:
     log_handlers: list[logging.Handler] = []
 
     log_file = settings.LOG_FILE
@@ -62,7 +62,7 @@ def config_logging():
     if log_tz:
         timezone = pytz.timezone(log_tz)
 
-        def time_converter(seconds):
+        def time_converter(seconds): # type: ignore[no-untyped-def]
             return datetime.fromtimestamp(seconds, tz=timezone).timetuple()
 
         for handler in logging.root.handlers:
@@ -72,13 +72,13 @@ def config_logging():
 
 class _RequestIdFilter(logging.Filter):
 
-    def filter(self, record):
+    def filter(self, record) -> bool: # type: ignore[no-untyped-def]
         record.requestId = request_id_var.get() if request_id_var.get() else ""
         return True
 
 
-def _request_logger(request: Request):
-    route: APIRoute = request.scope.get("route")
+def _request_logger(request: Request) -> None:
+    route: APIRoute = request.scope.get("route") # type: ignore[assignment]
     typ = request.scope.get("type", "")
     http_version = request.scope.get("http_version")
     request_str = f"{request.method} {route.path} {typ.upper()}/{http_version}"

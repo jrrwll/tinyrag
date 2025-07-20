@@ -26,7 +26,7 @@ uv add langchain langgraph langchain_community
 uv add langchain_ollama langchain_openai
 
 # utility
-uv add cachetools types-cachetools requests types-requests filetype
+uv add cachetools types-cachetools requests types-requests filetype pytz types-pytz
 uv add beautifulsoup4 pypdf
 
 # middleware
