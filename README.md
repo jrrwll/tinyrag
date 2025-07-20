@@ -24,6 +24,7 @@ uv add --dev pytest mypy ruff coverage
 # langchain
 uv add langchain langgraph langchain_community 
 uv add langchain_ollama langchain_openai
+uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
 
 # utility
 uv add cachetools types-cachetools requests types-requests filetype pytz types-pytz
