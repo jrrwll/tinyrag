@@ -34,6 +34,6 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 COPY . /opt/tinyrag/
 
 COPY docker/entrypoint.sh /entrypoint.sh
-COPY .env.example /opt/tinyrag/.env
+COPY dev/.env.example /opt/tinyrag/.env
 
 ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter
 from fastapi import File, UploadFile
 
-from app.common.api import ApiResult
+from app.util.api import ApiResult
 from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.file.api import FilePublic

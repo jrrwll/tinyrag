@@ -38,7 +38,6 @@ class LoggingConfig(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = f"{_log_format_prefix}: %(message)s"
-    LOG_ACCESS_FORMAT: str = "%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s]: - %(client_addr)s - %(request_line)s %(status_code)s"
     LOG_DATEFORMAT: str | None = None
     LOG_TZ: str = "UTC"
 

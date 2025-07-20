@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.common.api import ApiResult, PageResult
+from app.util.api import ApiResult, PageResult
 from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import LogDep
@@ -20,7 +20,8 @@ from app.tasks.dataset_import_task import send_dataset_import_task
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
 
-@router.get("/list", response_model=ApiResult[PageResult[SimpleDatasetPublic]])
+@router.get("/list", response_model=ApiResult[PageResult[SimpleDatasetPublic]],
+            dependencies=[LogDep])
 def list(
         session: SessionDep,
         page_no: int = Query(default=1, ge=1, le=settings.DEFAULT_MAX_PAGE_NO),

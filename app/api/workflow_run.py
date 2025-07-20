@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from app.common.api import ApiResult, IdResult
+from app.util.api import ApiResult, IdResult
 from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow_run.api import (WorkflowRunCreate, WorkflowRunExecute,

@@ -14,7 +14,7 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
-uv add fastapi uvicorn gunicorn sqlmodel pydantic pydantic-settings
+uv add fastapi sqlmodel pydantic pydantic-settings "granian[reload]"
 uv add python-multipart pymysql
 
 # mypy: static type check
@@ -26,11 +26,12 @@ uv add langchain langgraph langchain_community
 uv add langchain_ollama langchain_openai
 
 # utility
-uv add cachetools types-cachetools requests types-requests
-uv add beautifulsoup4
+uv add cachetools types-cachetools requests types-requests filetype
+uv add beautifulsoup4 pypdf
 
 # middleware
-uv add celery celery-stubs flower redis boto3 mypy-boto3-s3
+#uv add celery celery-stubs flower 
+uv add rq rq-scheduler redis boto3 mypy-boto3-s3
 ```
 
 ### run the project
@@ -42,7 +43,7 @@ grant all privileges on tinyrag.* to 'tinyrag'@'%';
 ```
 
 ```shell
-cp .env.example .env
+cp dev/.env.example .env
 
 export SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
 sed -i "s/SECRET_KEY=.*/SECRET_KEY=${SECRET_KEY}/" .env
