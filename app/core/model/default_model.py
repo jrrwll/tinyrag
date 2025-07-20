@@ -8,6 +8,7 @@ from app.entities.dao.model import get_default_models
 from app.entities.model import Model
 from app.util.data import OptionalValue
 
+# TODO broadcast to clear caches
 _default_model_cache: TTLCache[
     ModelType, OptionalValue[Model]] = TTLCache(
     maxsize=10, ttl=10 * 60)  # 10min
