@@ -29,5 +29,4 @@ class DocumentChunk(TableBase, table=True):
     position: int
     content: str = Field(max_length=10000)
     word_count: int = 0
-    keywords: str
 

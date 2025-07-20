@@ -120,7 +120,4 @@ def _to_document_chuck(index: int, doc: Document,
         position=index,
         content=doc.page_content,
         word_count=word_count,
-        keywords=doc.metadata.get("keywords", ""),
-        created_at=doc_entity.created_at,
-        updated_at=doc_entity.updated_at,
     )

@@ -10,16 +10,34 @@ from rq import Queue, Worker
 from rq.job import Job
 from rq_scheduler import Scheduler
 
+from app.common.constants import APP_NAME
 from app.common.log import request_id_var
 from app.config import settings
 from app.core.task.service import update_task_status
 from app.entities.task import AsyncTaskStatus
+from app.util.datetme import isoformat_dict
 from app.util.model import dump_json
 
 logger = logging.getLogger(__name__)
 
 
 class AsyncTaskJob(Job):
+
+    @classmethod
+    def dict(cls, job: Job) -> dict[str, Any]:
+        job_dict = {
+            "id": job.id,
+            "description": job.description,
+            "status": job.get_status(),
+            "meta": job.meta,
+            "func_name": job.func_name,
+            "created_at": job.created_at,
+            "enqueued_at": job.enqueued_at,
+            "started_at": job.started_at,
+            "ended_at": job.ended_at,
+        }
+        isoformat_dict(job_dict)
+        return job_dict
 
     def _execute(self) -> Any:
         request_id = self.meta.get("request_id")
@@ -80,7 +98,7 @@ class RQManager:
 
     def init(self):
         self.connection = Redis.from_url(settings.RQ_REDIS_URL)
-        self.queue = Queue(connection=self.connection)
+        self.queue = Queue(name=APP_NAME, connection=self.connection)
 
         if settings.IS_TEST_ENV:
             self.scheduler = Scheduler(connection=self.connection)

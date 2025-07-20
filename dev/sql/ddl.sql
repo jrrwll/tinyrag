@@ -76,8 +76,7 @@ create table document_chunk (
     document_id bigint        not null,
     position    int           not null,
     content     varchar(1024) not null,
-    word_count  int                    default 0,
-    keywords    text
+    word_count  int                    default 0
 ) default charset utf8mb4;
 
 create table async_task (

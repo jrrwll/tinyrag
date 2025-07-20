@@ -66,9 +66,6 @@ class DatasetPublic(SimpleDatasetPublic):
     embedding_model: EmbeddingModelConfig | None = None
     retrieval_model: RetrievalModelConfig | None = None
 
-    def to_entity(self) -> Dataset:
-        pass
-
     @staticmethod
     def new(entity: Dataset) -> "DatasetPublic":
         entity_dict = entity.model_dump(exclude_none=True)

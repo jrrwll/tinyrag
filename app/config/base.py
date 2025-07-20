@@ -31,7 +31,7 @@ class DeploymentConfig(BaseSettings):
         return _root_dir
 
 
-_log_format_prefix = "%(asctime)s.%(msecs)03d %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]"
+_log_format_prefix = "%(asctime)s %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]"
 
 
 class LoggingConfig(BaseSettings):

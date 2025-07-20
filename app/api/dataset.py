@@ -24,9 +24,8 @@ router = APIRouter(prefix="/dataset", tags=["dataset"])
             dependencies=[LogDep])
 def list(
         session: SessionDep,
-        page_no: int = Query(default=1, ge=1, le=settings.DEFAULT_MAX_PAGE_NO),
-        page_size: int = Query(default=settings.DEFAULT_PAGE_SIZE,
-                               ge=1, le=settings.DEFAULT_MAX_PAGE_SIZE),
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query,
         enable: bool | None = None,
 ) -> Any:
     entities, count = page_and_count_datasets(session, page_no, page_size,
@@ -46,7 +45,7 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.dataset_not_found, id)
 
-    return ApiResult.new(DatasetPublic(**entity.model_dump()))
+    return ApiResult.new(DatasetPublic.new(entity))
 
 
 @router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic],
