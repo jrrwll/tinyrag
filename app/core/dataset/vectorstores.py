@@ -1,5 +1,3 @@
-from functools import cache
-
 from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore
 from langchain_milvus import Milvus
@@ -13,23 +11,34 @@ from app.core.dataset.enums import VectorStoreType
 from app.core.model.default_model import get_default_model_provider
 from app.core.model.enums import ModelType
 from langchain_core.embeddings import Embeddings
+from cachetools import TTLCache
 
-@cache
+
+# TODO broadcast to clear caches
+_cache: TTLCache[VectorStoreType, VectorStore] = TTLCache(maxsize=1, ttl=10 * 60) # 10min
+
 def get_vector_store() -> VectorStore:
+    typ = settings.VECTOR_STORE_TYPE
+
+    vector_store = _cache.get(typ)
+    if vector_store:
+        return vector_store
+
     model_provider = get_default_model_provider(ModelType.TextEmbedding)
     if not model_provider:
         raise BizException.new(ErrorCode.default_model_not_set, ModelType.TextEmbedding)
     embeddings = model_provider.embeddings_model
 
-    typ = settings.VECTOR_STORE_TYPE
     if typ == VectorStoreType.Qdrant:
-        return create_qdrant_vector_store(embeddings)
+        vector_store = create_qdrant_vector_store(embeddings)
     elif typ == VectorStoreType.PGVector:
-        return create_pg_vector_store(embeddings)
+        vector_store = create_pg_vector_store(embeddings)
     elif typ == VectorStoreType.Milvus:
-        return create_milvus_vector_store(embeddings)
+        vector_store = create_milvus_vector_store(embeddings)
     else:
-        return create_chroma_vector_store(embeddings)
+        vector_store = create_chroma_vector_store(embeddings)
+    _cache[typ] = vector_store
+    return _cache[typ]
 
 
 def create_chroma_vector_store(embeddings: Embeddings) -> VectorStore:
