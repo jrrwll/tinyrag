@@ -4,6 +4,8 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings
 
+from app.common.constants import APP_NAME
+
 
 class DatabaseConfig(BaseSettings):
 
@@ -12,7 +14,7 @@ class DatabaseConfig(BaseSettings):
     DB_PORT: int = 3306
     DB_USER: str = ""
     DB_PASSWORD: str = ""
-    DB_DATABASE: str = "tinyrag"
+    DB_DATABASE: str = APP_NAME
     DB_EXTRAS: str = ""
 
     @computed_field  # type: ignore[prop-decorator]
