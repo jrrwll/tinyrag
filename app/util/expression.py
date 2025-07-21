@@ -1,5 +1,6 @@
 import json
 from typing import Any
+import ast
 
 from app.common.error_code import BizException, ErrorCode
 
@@ -20,12 +21,13 @@ _safe_globals = {
         "max": max,
         "min": min,
     },
-    "json": json,
+    "json_loads": json.loads,
+    "json_dumps": json.dumps,
 }
 
 
 # eval main function and return the result
-def eval_code(code: str, *args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+def eval_main_func(code: str, *args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
     safe_locals = {}  # type: ignore[var-annotated]
     exec(code, _safe_globals, safe_locals)
 
@@ -37,3 +39,29 @@ def eval_code(code: str, *args, **kwargs) -> Any:  # type: ignore[no-untyped-def
         return main_func(*args, **kwargs)
     except Exception as e:
         raise BizException.new(ErrorCode.code_eval_error, str(e))
+
+
+def eval_code(code: str, **kwargs) -> Any:
+    """
+    :raise NameError if some var is not defined
+    """
+    mod = ast.parse(code, mode='exec')
+
+    # no statements
+    if not mod.body:
+        return None
+
+    last_stmt = mod.body.pop()
+    if not isinstance(last_stmt, ast.Expr):
+        return None
+
+    last = ast.Expression(body=last_stmt.value)
+
+    exec_code = compile(mod, '<string>', 'exec')
+    last_code = compile(last,    '<string>', 'eval')
+
+    # local scope
+    loc = dict(kwargs)
+    exec(exec_code, _safe_globals, loc)
+
+    return eval(last_code, _safe_globals, loc)

@@ -44,7 +44,7 @@ def get_vector_store() -> VectorStore:
 def create_chroma_vector_store(embeddings: Embeddings) -> VectorStore:
     return Chroma(
         collection_name=settings.VECTOR_STORE_COLLECTION_NAME,
-        persist_directory=settings.vector_store__persist_directory,
+        persist_directory=settings.vector_store_persist_directory,
         embedding_function=embeddings,
     )
 

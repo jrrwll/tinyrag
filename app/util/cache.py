@@ -2,7 +2,7 @@ import time
 from functools import wraps
 
 
-def ttl_cache(ttl_seconds):
+def ttl_cache(ttl: int):
     def decorator(func):
         cache = {}
         @wraps(func)
@@ -10,7 +10,7 @@ def ttl_cache(ttl_seconds):
             key = (args, frozenset(kwargs.items()))
             if key in cache:
                 value, timestamp = cache[key]
-                if time.time() - timestamp < ttl_seconds:
+                if time.time() - timestamp < ttl:
                     return value
 
             value = func(*args, **kwargs)

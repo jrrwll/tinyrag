@@ -99,6 +99,8 @@ class ConditionConfig(BaseModel):
     true_node_id: int
     false_node_id: int
 
+    context_variables: list[ContextVariable] | None = None
+
 
 class ClassifyConfig(BaseModel):
     classify_variable: ClassifyVariable

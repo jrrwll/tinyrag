@@ -37,3 +37,11 @@ def detect_file_type(file_path: str) -> Tuple[FileType, str] | None:
 
     return None
 
+
+_allow_types = (list(IMAGE + AUDIO + VIDEO) +
+                [document.Doc(), document.Docx(), archive.Pdf()])
+
+_allow_text_extensions = ["txt", "md", "adoc", "tex", "typ"]
+
+allow_extensions: list[str] = ([t.extension for t in _allow_types] +
+                               _allow_text_extensions)

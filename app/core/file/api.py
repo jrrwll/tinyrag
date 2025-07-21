@@ -13,3 +13,13 @@ class FilePublic(BaseModel):
     name: str
     size: int
     mime_type: str
+
+
+class FileUploadPublic(BaseModel):
+
+    file_size_limit: int
+    image_file_size_limit: int
+    audio_file_size_limit: int
+    video_file_size_limit: int
+
+    allow_extensions: list[str]
