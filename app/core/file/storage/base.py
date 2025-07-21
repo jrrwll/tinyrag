@@ -4,8 +4,12 @@ import os.path
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Generator
-
+from functools import cache
 from pydantic import BaseModel
+
+from app.config import settings
+from app.core.file.enums import StorageType
+from app.util.metadata import find_sub_types
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +24,22 @@ class FileEntry(BaseModel):
 
 class StorageProvider(ABC):
 
+    @staticmethod
+    @abstractmethod
+    def get_storage_type() -> StorageType:
+        pass
+
     @abstractmethod
     def test_connect(self) -> None:
         pass
 
     @abstractmethod
-    def list_files(self, prefix: str, recursive: bool = False) -> Generator[
+    def exists(self, key_or_prefix: str) -> bool:
+        pass
+
+    @abstractmethod
+    def list_files(self, prefix: str, recursive: bool = False,
+            limit: int | None = None) -> Generator[
         FileEntry, None, None]:
         pass
 
@@ -50,3 +64,16 @@ class StorageProvider(ABC):
                 file_count += 1
 
         return file_count
+
+
+@cache
+def get_storage_provider() -> StorageProvider:
+    import app.core.file.storage as _storage
+
+    storage_type = settings.STORAGE_TYPE
+    typs = find_sub_types(StorageProvider, _storage)
+    for typ in typs:
+        if typ.get_storage_type() == storage_type:
+            return typ()
+
+    raise AssertionError("StorageProvider")

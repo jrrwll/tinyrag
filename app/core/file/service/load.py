@@ -8,8 +8,12 @@ from app.entities.file import File
 from app.util.langchain.document_loader import load_docx, load_pdf, load_text
 
 
-def load_document_file(file: File) -> Iterator[Document]:
-    file_path = get_file_path(file.id)
+# File or file_path
+def load_document_file(file: File | str) -> Iterator[Document]:
+    if isinstance(file, File):
+        file_path = get_file_path(file.id)
+    else:
+        file_path = file
 
     file_type = file.type
     if file_type == FileType.Pdf:

@@ -60,5 +60,6 @@ class NodeRunner[T: BaseModel](metaclass=NodeRunnerRegistry):
     @staticmethod
     def implements_and_mappings() -> Tuple[list[Type["NodeRunner"]], dict[NodeType, Type[BaseModel]]]:
         import app.core.node.runner as _runner
+
         walk_packages(_runner)
         return NodeRunner._implements, NodeRunner._mappings # type: ignore[return-value]

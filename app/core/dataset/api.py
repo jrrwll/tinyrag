@@ -42,7 +42,7 @@ class DatasetImportFile(BaseModel):
 
 
 class DatasetImportRemoteFile(BaseModel):
-    file_dir: str
+    file_path: str
 
 
 class DatasetImportWebsite(BaseModel):

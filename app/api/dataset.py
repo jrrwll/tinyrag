@@ -10,11 +10,12 @@ from app.core.dataset.api import DatasetCreate, \
     DatasetImport, DatasetPublic, \
     DatasetUpdate, PreviewChunk, PreviewChunkPublic, SimpleDatasetPublic
 from app.core.dataset.preview_file_chunk import preview_file_chunk
+from app.core.file.service.base import get_remote_files
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.dataset import page_and_count_datasets
 from app.entities.dao.file import get_files
 from app.entities.dataset import Dataset
-from app.tasks.dataset_import_task import send_dataset_import_task
+from app.tasks.dataset_import import send_dataset_import_task
 from app.util.api import ApiResult, PageResult
 
 router = APIRouter(prefix="/dataset", tags=["dataset"])
@@ -93,9 +94,15 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
         raise BizException.new(ErrorCode.dataset_not_found, dataset_id)
 
     files = {}
+    remote_files = []
     # check params
     if params.file:
         file_ids = params.file.file_ids
+        if not file_ids:
+            raise BizException.new(
+                ErrorCode.request_validation_error_detail,
+                "file_ids is empty"
+            )
         files = get_files(session, file_ids)
         missing_file_ids = [file_id for file_id in file_ids
                             if file_id not in files]
@@ -103,8 +110,10 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
             raise BizException.new(
                 ErrorCode.file_not_found, missing_file_ids
             )
+    elif params.remote_file:
+        remote_files = get_remote_files(params.remote_file.file_path)
 
     # import task
     dataset = DatasetPublic.new(entity)
-    task = send_dataset_import_task(params, dataset, files)
+    task = send_dataset_import_task(params, dataset, files, remote_files)
     return ApiResult.new(task)

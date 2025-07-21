@@ -7,6 +7,7 @@ from app.core.file.enums import StorageType
 
 class StorageConfig(BaseSettings):
     STORAGE_TYPE: StorageType = StorageType.Opendal
+    STORAGE_LIST_FILE_MAX_COUNT: int = 1000
 
     OPENDAL_SCHEME: str = "fs"
     OPENDAL_LOCAL_PATH: str | None = None
@@ -19,8 +20,8 @@ class StorageConfig(BaseSettings):
     S3_ENDPOINT: str | None = None
     S3_REGION: str | None = None
     S3_BUCKET_NAME: str | None = APP_NAME
-    S3_KEY_ID: str | None = None
     S3_ACCESS_KEY: str | None = None
+    S3_SECRET_KEY: str | None = None
 
     @property
     def opendal_local_path(self):

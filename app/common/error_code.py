@@ -50,6 +50,7 @@ class ErrorCode(Enum):
     file_type_not_supported = auto()
     file_not_found = auto()
     file_not_a_document = auto()
+    remote_file_not_found = auto()
 
     dataset_not_found = auto()
 

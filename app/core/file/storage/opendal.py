@@ -3,12 +3,16 @@ from typing import Generator
 from opendal import Operator
 
 from app.config import settings
+from app.core.file.enums import StorageType
 from app.core.file.storage.base import FileEntry, StorageProvider
 
 
 class OpendalStorageProvider(StorageProvider):
-
     client: Operator
+
+    @staticmethod
+    def get_storage_type() -> StorageType:
+        return StorageType.Opendal
 
     def __init__(self):
         if settings.OPENDAL_SCHEME == "fs":
@@ -30,9 +34,13 @@ class OpendalStorageProvider(StorageProvider):
         entries = self.client.list("/", limit=1)
         next(iter(entries), [])
 
-    def list_files(self, prefix: str, recursive: bool = False) -> Generator[
+    def exists(self, key_or_prefix: str) -> bool:
+        return self.client.exists(key_or_prefix)
+
+    def list_files(self, prefix: str, recursive: bool = False,
+            limit: int | None = None) -> Generator[
         FileEntry, None, None]:
-        entries = self.client.list(prefix, recursive=recursive)
+        entries = self.client.list(prefix, recursive=recursive, limit=limit)
         for entry in entries:
             key = entry.path
             metadata = entry.metadata
@@ -53,5 +61,5 @@ class OpendalStorageProvider(StorageProvider):
 
     def upload_file(self, key: str, local_path: str) -> None:
         with open(local_path, "rb") as f:
-            while chunk := f.read(8 << 20): # 8M buf
+            while chunk := f.read(8 << 20):  # 8M buf
                 self.client.write(key, chunk)
