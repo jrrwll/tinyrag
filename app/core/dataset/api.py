@@ -41,6 +41,10 @@ class DatasetImportFile(BaseModel):
     file_ids: list[str]
 
 
+class DatasetImportRemoteFile(BaseModel):
+    file_dir: str
+
+
 class DatasetImportWebsite(BaseModel):
     file_ids: list[str]
 
@@ -49,6 +53,7 @@ class DatasetImport(BaseModel):
     id: int
 
     file: DatasetImportFile | None = None
+    remote_file: DatasetImportRemoteFile | None = None
     website: DatasetImportWebsite | None = None
 
 

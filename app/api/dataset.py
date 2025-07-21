@@ -1,8 +1,7 @@
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 
-from app.util.api import ApiResult, PageResult
 from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import LogDep
@@ -16,6 +15,7 @@ from app.entities.dao.dataset import page_and_count_datasets
 from app.entities.dao.file import get_files
 from app.entities.dataset import Dataset
 from app.tasks.dataset_import_task import send_dataset_import_task
+from app.util.api import ApiResult, PageResult
 
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
@@ -81,10 +81,10 @@ def update(session: SessionDep, params: DatasetUpdate) -> Any:
 @router.post("/import", response_model=ApiResult[AsyncTaskPublic],
              dependencies=[LogDep])
 def import_document(session: SessionDep, params: DatasetImport) -> Any:
-    if not params.file and not params.website:
+    if not params.file and not params.remote_file and not params.website:
         raise BizException.new(
             ErrorCode.request_validation_error_detail,
-            "neither file or website is unset"
+            "neither file or remote_file or website is unset"
         )
 
     dataset_id = params.id
