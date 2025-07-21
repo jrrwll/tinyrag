@@ -70,6 +70,7 @@ def dataset_import_task(task_id: str, task_params_json: bytes):
 
 
 
+# FIXME
 def save_documents(dataset: DatasetPublic):
     position = 0
     for doc in docs:
