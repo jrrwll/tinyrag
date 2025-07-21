@@ -1,3 +1,4 @@
+import logging
 from typing import Generator
 
 from opendal import Operator
@@ -5,6 +6,8 @@ from opendal import Operator
 from app.config import settings
 from app.core.file.enums import StorageType
 from app.core.file.storage.base import FileEntry, StorageProvider
+
+logger = logging.getLogger(__name__)
 
 
 class OpendalStorageProvider(StorageProvider):
@@ -51,15 +54,19 @@ class OpendalStorageProvider(StorageProvider):
                     key=key,
                     size=metadata.content_length,
                     last_modified=metadata.last_modified,
+                    mime_type=metadata.content_type,
                 )
 
     def download_file(self, key: str, local_path: str) -> None:
-        data = self.client.read(key)
-        with open(local_path, "wb") as f:
-            self.client.read()
-            f.write(data)
+        logger.info(f"Storage download {key} to {local_path}")
+        with self.client.open(key, "rb") as r, \
+                open(local_path, "wb") as w:
+            while chunk := r.read(8 << 20):  # 8M buffer
+                w.write(chunk)
 
     def upload_file(self, key: str, local_path: str) -> None:
-        with open(local_path, "rb") as f:
-            while chunk := f.read(8 << 20):  # 8M buf
-                self.client.write(key, chunk)
+        logger.info(f"Storage upload {local_path} to {key}")
+        with self.client.open(key, "wb") as w, \
+                open(local_path, "rb") as r:
+            while chunk := r.read(8 << 20):  # 8M buffer
+                w.write(chunk)

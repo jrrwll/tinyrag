@@ -6,6 +6,7 @@ from app.core.dataset.api import PreviewChunk, PreviewChunkPublic
 from app.core.dataset.process_rule import get_text_splitter
 from app.core.file.enums import FileType
 from app.core.file.service.load import load_document_file
+from app.core.file.service.upload import get_file_path
 from app.core.model.default_model import get_default_model_provider
 from app.core.model.enums import ModelType
 from app.entities.file import File
@@ -22,7 +23,8 @@ def preview_file_chunk(params: PreviewChunk) -> PreviewChunkPublic:
     if not FileType.is_document(file.type):
         raise BizException.new(ErrorCode.file_not_a_document, file.typ)
 
-    docs = load_document_file(file)
+    file_path = get_file_path(file.id)
+    docs = load_document_file(file_path, file.type)
 
     text_splitter = get_text_splitter(params.process_rule)
     all_splits = text_splitter.split_documents(take_limit(docs, 1))

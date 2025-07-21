@@ -20,6 +20,7 @@ class FileEntry(BaseModel):
 
     size: int = 0
     last_modified: datetime | None = None
+    mime_type: str | None = None
 
 
 class StorageProvider(ABC):
@@ -52,6 +53,7 @@ class StorageProvider(ABC):
         pass
 
     def upload_dir(self, prefix: str, local_dir: str) -> int:
+        logger.info(f"Storage upload dir {local_dir} to {prefix}")
         file_count = 0
         for root, _, files in os.walk(local_dir):
             for file in files:
@@ -59,10 +61,10 @@ class StorageProvider(ABC):
                 relative_path = os.path.relpath(local_path, local_dir)
                 key = os.path.join(prefix, relative_path).replace("\\", "/")
 
-                logger.info("upload {local_path} to {key}")
                 self.upload_file(key, local_path)
                 file_count += 1
 
+        logger.info(f"Finish storage upload dir {local_dir} to {prefix}, total={file_count}")
         return file_count
 
 

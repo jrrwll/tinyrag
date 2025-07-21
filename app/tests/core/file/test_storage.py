@@ -1,5 +1,7 @@
 import os
 import os.path
+import tempfile
+from uuid import uuid4
 
 from app.config import settings
 from app.core.file.storage.base import get_storage_provider
@@ -20,15 +22,29 @@ def test_upload_dir():
     print(f"\nc={c}")
 
 
+def test_download_file():
+    storage_provider = get_storage_provider()
+
+    temp_path = f"{tempfile.gettempdir()}/{uuid4()}"
+    print(f"\ntemp_path=\n{temp_path}")
+    for file in storage_provider.list_files("/", recursive=True):
+        if file.is_dir:
+            continue
+        print(f"download {file.key}")
+        storage_provider.download_file(file.key, temp_path)
+        break
+    print(f"exists {os.path.exists(temp_path)} {os.path.getsize(temp_path)}")
+
+
 def test_list_files():
     storage_provider = get_storage_provider()
     print("\nprepare to list_files /")
-    files = storage_provider.list_files("")
+    files = storage_provider.list_files("/")
     for file in files:
         print(file)
 
     print("\nprepare to recursive list_files /")
-    files = storage_provider.list_files("", recursive=True)
+    files = storage_provider.list_files("/", recursive=True)
     first_key = None
     for file in files:
         print(file)

@@ -66,3 +66,14 @@ Content-Type: application/json
     ]
   }
 }
+
+###
+POST http://{{origin}}{{api_prefix}}/dataset/import
+Content-Type: application/json
+
+{
+  "id": 1,
+  "remote_file": {
+    "file_path": "chinese-poetry/quantangshi/"
+  }
+}

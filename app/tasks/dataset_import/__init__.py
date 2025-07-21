@@ -1,7 +1,9 @@
+from typing import Iterator
 from uuid import uuid4
 
 import orjson
 from langchain_core.documents import Document
+from langchain_text_splitters import TextSplitter
 from pydantic import BaseModel
 
 from app.common.db import open_session
@@ -62,7 +64,7 @@ def dataset_import_task(task_id: str, task_params_json: bytes):
     elif params.remote_file:
         from app.tasks.dataset_import.remote_file import import_remote_files
 
-        import_remote_files(task_id, params.remote_file, dataset, remote_files)
+        import_remote_files(task_id, dataset, remote_files)
     elif params.website:
         from app.tasks.dataset_import.website import import_website
 
@@ -71,12 +73,13 @@ def dataset_import_task(task_id: str, task_params_json: bytes):
 
 
 # FIXME
-def save_documents(dataset: DatasetPublic):
+def save_documents(docs: Iterator[Document], text_splitter: TextSplitter,
+        dataset: DatasetPublic, file_id: str | None = None):
     position = 0
     for doc in docs:
         doc_entity = DocumentEntity(
-            dataset_id=dataset_id,
-            position=position, file_id=file_ids)
+            dataset_id=dataset.id,
+            position=position, file_id=file_id)
         doc_entity = save_document(doc_entity)
 
         documents = text_splitter.split_documents([doc])
