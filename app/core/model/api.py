@@ -15,13 +15,13 @@ class ModelPublic(BaseModel):
     model_name: str
     base_url: str | None = None
     api_key: str | None = None
-    settings: dict | None = None  # type: ignore[type-arg]
+    config: dict | None = None  # type: ignore[type-arg]
 
     @staticmethod
     def new(item: Model) -> "ModelPublic":
         item_dict = item.model_dump(exclude_none=True)
-        if item.settings:
-            item_dict["settings"] = json.loads(item.settings)
+        if item.config:
+            item_dict["config"] = json.loads(item.config)
         return ModelPublic(**item_dict)
 
     def __hash__(self) -> int:
@@ -39,15 +39,12 @@ class ModelCreate(BaseModel):
     model_name: str
     base_url: str | None = None
     api_key: str | None = None
-    settings: dict = {}  # type: ignore[type-arg]
+    config: dict = {}  # type: ignore[type-arg]
 
     def to_entity(self) -> Model:
-        return Model.model_validate(
-            self,
-            update={
-                "settings": json.dumps(self.settings),
-            },
-        )
+        entity_dict = self.model_dump(exclude_none=True)
+        entity_dict["config"] = json.dumps(self.config)
+        return Model(**entity_dict)
 
 
 class ModelUpdate(BaseModel):
@@ -55,13 +52,13 @@ class ModelUpdate(BaseModel):
     model_name: str
     base_url: str | None = None
     api_key: str | None = None
-    settings: dict  # type: ignore[type-arg]
+    config: dict  # type: ignore[type-arg]
 
     def update_entity(self, entity: Model) -> None:
         update_dict = self.model_dump(exclude_none=True)
         update_dict.update(
             {
-                "settings": json.dumps(self.settings),
+                "config": json.dumps(self.config),
             }
         )
         entity.sqlmodel_update(update_dict)

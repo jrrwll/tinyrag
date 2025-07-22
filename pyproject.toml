@@ -22,6 +22,7 @@ dependencies = [
     "langgraph>=0.5.0",
     "mypy-boto3-s3>=1.39.5",
     "opendal>=0.46.0",
+    "psycopg[python]>=3.2.9",
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
     "pymysql>=1.1.1",

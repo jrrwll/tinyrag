@@ -4,15 +4,16 @@ GET http://{{origin}}{{api_prefix}}/model/list
 GET http://{{origin}}{{api_prefix}}/model?id=1
 
 ###
+# llm text_embedding
 POST http://{{origin}}{{api_prefix}}/model
 Content-Type: application/json
 
 {
-  "type": "llm",
+  "type": "text_embedding",
   "provider_name": "ollama",
   "model_name": "qwen3:4b",
   "base_url": "http://{{OLLAMA_HOST}}:11434",
-  "settings": {
+  "config": {
     "function_calling": true
   }
 }
@@ -40,4 +41,18 @@ Content-Type: application/json
 {
   "id": 1,
   "prompt": "Who are you?"
+}
+
+###
+GET http://{{origin}}{{api_prefix}}/model/default_model?model_type=llm
+
+###
+GET http://{{origin}}{{api_prefix}}/model/default_model?model_type=text_embedding
+
+###
+POST http://{{origin}}{{api_prefix}}/model/default_model
+Content-Type: application/json
+
+{
+  "model_id": 2
 }

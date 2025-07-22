@@ -1,18 +1,12 @@
-from langchain_chroma import Chroma
+from cachetools import TTLCache
+from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
-from langchain_milvus import Milvus
-from langchain_postgres import PGEngine, PGVectorStore
-from langchain_qdrant import QdrantVectorStore
-from qdrant_client import QdrantClient
 
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.dataset.enums import VectorStoreType
 from app.core.model.default_model import get_default_model_provider
 from app.core.model.enums import ModelType
-from langchain_core.embeddings import Embeddings
-from cachetools import TTLCache
-
 
 # TODO broadcast to clear caches
 _cache: TTLCache[VectorStoreType, VectorStore] = TTLCache(maxsize=1, ttl=10 * 60) # 10min
@@ -42,6 +36,8 @@ def get_vector_store() -> VectorStore:
 
 
 def create_chroma_vector_store(embeddings: Embeddings) -> VectorStore:
+    from langchain_chroma import Chroma
+
     return Chroma(
         collection_name=settings.VECTOR_STORE_COLLECTION_NAME,
         persist_directory=settings.vector_store_persist_directory,
@@ -49,6 +45,9 @@ def create_chroma_vector_store(embeddings: Embeddings) -> VectorStore:
     )
 
 def create_qdrant_vector_store(embeddings: Embeddings) -> VectorStore:
+    from langchain_qdrant import QdrantVectorStore
+    from qdrant_client import QdrantClient
+
     client = QdrantClient(
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
@@ -62,6 +61,8 @@ def create_qdrant_vector_store(embeddings: Embeddings) -> VectorStore:
 
 
 def create_pg_vector_store(embeddings: Embeddings) -> VectorStore:
+    from langchain_postgres import PGEngine, PGVectorStore
+
     engine = PGEngine.from_connection_string(url=settings.PGVECTOR_URL)
 
     return PGVectorStore.create_sync(
@@ -71,6 +72,8 @@ def create_pg_vector_store(embeddings: Embeddings) -> VectorStore:
     )
 
 def create_milvus_vector_store(embeddings: Embeddings) -> VectorStore:
+    from langchain_milvus import Milvus
+
     return Milvus(
         collection_name=settings.VECTOR_STORE_COLLECTION_NAME,
         connection_args={

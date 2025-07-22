@@ -24,6 +24,7 @@ uv add --dev pytest mypy ruff coverage
 # langchain
 uv add langchain langgraph langchain_community 
 uv add langchain_ollama langchain_openai
+# Note that: langchain-postgres need libpg in the os path
 uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
 
 # utility

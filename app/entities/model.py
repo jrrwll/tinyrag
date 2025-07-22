@@ -11,7 +11,7 @@ class Model(TableBase, table=True):
     model_name: str = Field(unique=True, index=True, max_length=100)
     base_url: str | None = Field(max_length=1000)
     api_key: str | None = Field(default=None, max_length=1000)
-    settings: str | None = Field(default=None)
+    config: str | None = Field(default=None)
 
 
 class DefaultModel(TableBase, table=True):

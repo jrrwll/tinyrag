@@ -71,8 +71,6 @@ def dataset_import_task(task_id: str, task_params_json: bytes):
         import_website(task_id, params.website, dataset)
 
 
-
-# FIXME
 def save_documents(docs: Iterator[Document], text_splitter: TextSplitter,
         dataset: DatasetPublic, file_id: str | None = None):
     position = 0

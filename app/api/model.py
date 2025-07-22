@@ -1,9 +1,8 @@
-from typing import Any
+from typing import Any, Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 from sqlmodel import select
 
-from app.util.api import ApiResult, IdResult, PageResult
 from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
@@ -18,6 +17,7 @@ from app.core.model.enums import ModelType
 from app.core.model.privoder.base import get_model_provider
 from app.entities.dao.model import page_and_count_models
 from app.entities.model import DefaultModel, Model
+from app.util.api import ApiResult, IdResult, PageResult
 
 router = APIRouter(prefix="/model", tags=["model"])
 
@@ -25,9 +25,8 @@ router = APIRouter(prefix="/model", tags=["model"])
 @router.get("/list", response_model=ApiResult[PageResult[ModelPublic]])
 def list(
     session: SessionDep,
-    page_no: int = Query(default=1, ge=1, le=settings.DEFAULT_MAX_PAGE_NO),
-    page_size: int = Query(default=settings.DEFAULT_PAGE_SIZE,
-                           ge=1, le=settings.DEFAULT_MAX_PAGE_SIZE),
+    page_no: int = settings.page_no_query,
+    page_size: int = settings.page_size_query,
 ) -> Any:
     entities, count = page_and_count_models(session, page_no, page_size)
     res = PageResult[ModelPublic](
@@ -111,7 +110,7 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     return ApiResult.new(ModelTestRunPublic(result=result))
 
 
-@router.get("/default_model", response_model=ApiResult[ModelPublic])
+@router.get("/default_model", response_model=ApiResult[Optional[ModelPublic]])
 def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
     default_model = _find_default_model(session, model_type)
     if default_model and default_model.model_id:
@@ -152,7 +151,7 @@ def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -
     if entity:
         entity.model_id = model_id
     else:
-        entity = DefaultModel(model_type=model_entity, model_id=model_id)
+        entity = DefaultModel(model_type=model_type, model_id=model_id)
 
     session.add(entity)
     session.commit()
@@ -164,4 +163,4 @@ def _find_default_model(session: SessionDep, model_type: ModelType
 ) -> DefaultModel | None:
     select_statement = select(DefaultModel).where(
         DefaultModel.model_type == model_type)
-    return session.exec(select_statement).one()
+    return session.exec(select_statement).one_or_none()

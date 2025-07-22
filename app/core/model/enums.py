@@ -3,7 +3,7 @@ from enum import StrEnum
 
 class ModelType(StrEnum):
     LLM = "llm"
-    TextEmbedding = "text-embedding"
+    TextEmbedding = "text_embedding"
     TTS = "tts"
     STT = "stt"
 

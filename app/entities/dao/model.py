@@ -43,7 +43,7 @@ def get_default_models() -> dict[ModelType, Model]:
             return {}
 
         select_in_statement = select(Model).where(
-            Model.id in model_ids,
+            Model.id.in_(model_ids),
             Model.deleted == False
         )
         models = session.exec(select_in_statement).all()

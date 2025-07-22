@@ -9,7 +9,17 @@ create table model (
     enable        tinyint      not null default 1,
     base_url      varchar(1000)         default null,
     api_key       varchar(1000)         default null,
-    settings      longtext
+    config      longtext
+) default charset utf8mb4;
+
+create table default_model(
+    id            bigint       not null auto_increment primary key,
+    created_at    timestamp    not null default current_timestamp,
+    updated_at    timestamp    not null default current_timestamp on update current_timestamp,
+    deleted       tinyint      not null default 0,
+    model_type varchar(32)  not null,
+    model_id    bigint                default null,
+    unique key uk_model_type(model_type)
 ) default charset utf8mb4;
 
 create table workflow (
