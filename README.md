@@ -33,8 +33,9 @@ uv add beautifulsoup4 pypdf
 
 # middleware
 #uv add celery celery-stubs flower 
-uv add rq rq-scheduler redis boto3 mypy-boto3-s3
+uv add rq rq-scheduler redis boto3 "boto3-stubs[s3]"
 ```
+
 
 ### run the project
 

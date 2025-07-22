@@ -7,6 +7,7 @@ requires-python = ">=3.12,<4.0"
 dependencies = [
     "beautifulsoup4>=4.13.4",
     "boto3>=1.39.6",
+    "boto3-stubs[s3]>=1.39.10",
     "cachetools>=6.1.0",
     "fastapi>=0.115.14",
     "filetype>=1.2.0",
@@ -20,9 +21,7 @@ dependencies = [
     "langchain-postgres>=0.0.15",
     "langchain-qdrant>=0.2.0",
     "langgraph>=0.5.0",
-    "mypy-boto3-s3>=1.39.5",
     "opendal>=0.46.0",
-    "psycopg[python]>=3.2.9",
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
     "pymysql>=1.1.1",
