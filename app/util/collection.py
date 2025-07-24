@@ -1,10 +1,10 @@
-from typing import Callable, Iterator
 import os
+from typing import Callable, Iterable
 
 
-def take_limit[T](iterator: Iterator[T], limit: int) -> list[T]:
+def take_limit[T](iterable: Iterable[T], limit: int) -> list[T]:
     output = []
-    for doc in iterator:
+    for doc in iterable:
         if limit == 0:
             break
         limit -= 1
@@ -29,8 +29,9 @@ def partition_list[T](a: list[T], size: int | None = None) -> list[list[T]]:
     return output
 
 
-def any_match[T](iterator: Iterator[T], predicate: Callable[[T], bool]) -> T | None:
-    for i in iterator:
+def any_match[T](iterable: Iterable[T],
+        predicate: Callable[[T], bool]) -> T | None:
+    for i in iterable:
         if predicate(i):
             return i
     return None

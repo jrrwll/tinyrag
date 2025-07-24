@@ -1,6 +1,5 @@
-import hashlib
-import os
 import codecs
+import os
 
 __boms = (codecs.BOM_UTF8, codecs.BOM_UTF16_BE, codecs.BOM_UTF16_LE,
           codecs.BOM_UTF32_BE, codecs.BOM_UTF32_LE)
@@ -24,16 +23,6 @@ def is_binary_file(file_path: str) -> bool:
         # unprintable chars threshold
         non_text = sum(byte not in __text_chars for byte in chunk)
         return (non_text / len(chunk)) > 0.3
-
-
-def get_file_md5(file_path: str) -> str:
-    hash_md5 = hashlib.md5()
-
-    with open(file_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            hash_md5.update(chunk)
-
-    return hash_md5.hexdigest()
 
 
 def mkdirs(dir_path: str) -> None:

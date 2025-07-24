@@ -28,29 +28,29 @@ class StorageProvider(ABC):
     @staticmethod
     @abstractmethod
     def get_storage_type() -> StorageType:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def test_connect(self) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def exists(self, key_or_prefix: str) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def list_files(self, prefix: str, recursive: bool = False,
             limit: int | None = None) -> Generator[
         FileEntry, None, None]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def download_file(self, key: str, local_path: str) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def upload_file(self, key: str, local_path: str) -> None:
-        pass
+        raise NotImplementedError
 
     def upload_dir(self, prefix: str, local_dir: str) -> int:
         logger.info(f"Storage upload dir {local_dir} to {prefix}")

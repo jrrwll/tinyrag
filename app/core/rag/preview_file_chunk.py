@@ -2,8 +2,8 @@ from langchain_core.vectorstores import InMemoryVectorStore
 
 from app.common.db import open_session
 from app.common.error_code import BizException, ErrorCode
-from app.core.dataset.api import PreviewChunk, PreviewChunkPublic
-from app.core.dataset.process_rule import get_text_splitter
+from app.core.rag.api import PreviewChunk, PreviewChunkPublic
+from app.core.rag.text_process.base import get_text_processor
 from app.core.file.enums import FileType
 from app.core.file.service.load import load_document_file
 from app.core.file.service.upload import get_file_path
@@ -24,12 +24,13 @@ def preview_file_chunk(params: PreviewChunk) -> PreviewChunkPublic:
         raise BizException.new(ErrorCode.file_not_a_document, file.typ)
 
     file_path = get_file_path(file.id)
-    docs = load_document_file(file_path, file.type)
 
-    text_splitter = get_text_splitter(params.process_rule)
-    all_splits = text_splitter.split_documents(take_limit(docs, 1))
+    text_processor = get_text_processor(params.process_rule)
+    docs = text_processor.load_documents(file_path, file.type)
 
-    contents = [all_split.page_content for all_split in all_splits]
+    all_splits = text_processor.split_documents(take_limit(docs, 1))
+
+    contents = [all_split.content for all_split in all_splits]
     return PreviewChunkPublic(content=contents)
 
 

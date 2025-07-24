@@ -13,7 +13,7 @@ from app.core.file.api import FilePublic
 from app.core.file.service.file_type import detect_file_type
 from app.entities.file import File
 from app.util.datetme import format_date_compact
-from app.util.file import get_file_md5
+from app.util.codec import get_file_md5
 
 
 def upload_file(file: UploadFile) -> FilePublic:

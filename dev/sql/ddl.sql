@@ -7,19 +7,17 @@ create table model (
     model_name    varchar(100) not null,
     type          varchar(32)  not null,
     enable        tinyint      not null default 1,
-    base_url      varchar(1000)         default null,
-    api_key       varchar(1000)         default null,
-    config      longtext
+    config        longtext
 ) default charset utf8mb4;
 
-create table default_model(
-    id            bigint       not null auto_increment primary key,
-    created_at    timestamp    not null default current_timestamp,
-    updated_at    timestamp    not null default current_timestamp on update current_timestamp,
-    deleted       tinyint      not null default 0,
-    model_type varchar(32)  not null,
-    model_id    bigint                default null,
-    unique key uk_model_type(model_type)
+create table default_model (
+    id         bigint      not null auto_increment primary key,
+    created_at timestamp   not null default current_timestamp,
+    updated_at timestamp   not null default current_timestamp on update current_timestamp,
+    deleted    tinyint     not null default 0,
+    model_type varchar(32) not null,
+    model_id   bigint               default null,
+    unique key uk_model_type (model_type)
 ) default charset utf8mb4;
 
 create table workflow (
@@ -67,26 +65,30 @@ create table dataset (
 ) default charset utf8mb4;
 
 create table document (
-    id         bigint    not null auto_increment primary key,
-    created_at timestamp not null default current_timestamp,
-    updated_at timestamp not null default current_timestamp on update current_timestamp,
-    deleted    tinyint   not null default 0,
-    dataset_id bigint    not null,
-    position   int       not null,
-    file_id    char(32)           default null,
-    word_count int                default 0
+    id          bigint    not null auto_increment primary key,
+    created_at  timestamp not null default current_timestamp,
+    updated_at  timestamp not null default current_timestamp on update current_timestamp,
+    deleted     tinyint   not null default 0,
+    dataset_id  bigint    not null,
+    position    int       not null,
+    word_count  int                default 0,
+    source_type varchar(32),
+    source_info text,
+    indexing    tinyint   not null default 0
 ) default charset utf8mb4;
 
 create table document_chunk (
-    id          bigint        not null auto_increment primary key,
-    created_at  timestamp     not null default current_timestamp,
-    updated_at  timestamp     not null default current_timestamp on update current_timestamp,
-    deleted     tinyint       not null default 0,
-    dataset_id  bigint        not null,
-    document_id bigint        not null,
-    position    int           not null,
-    content     varchar(1024) not null,
-    word_count  int                    default 0
+    id           bigint        not null auto_increment primary key,
+    created_at   timestamp     not null default current_timestamp,
+    updated_at   timestamp     not null default current_timestamp on update current_timestamp,
+    deleted      tinyint       not null default 0,
+    dataset_id   bigint        not null,
+    document_id  bigint        not null,
+    position     int           not null,
+    content      varchar(1024) not null,
+    word_count   int                    default 0,
+    keywords     text,
+    index_doc_id varchar(100)  null     default null
 ) default charset utf8mb4;
 
 create table async_task (

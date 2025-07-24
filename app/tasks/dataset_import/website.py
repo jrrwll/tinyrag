@@ -1,4 +1,4 @@
-from app.core.dataset.api import DatasetImportWebsite, DatasetPublic
+from app.core.rag.api import DatasetImportWebsite, DatasetPublic
 
 
 def import_website(

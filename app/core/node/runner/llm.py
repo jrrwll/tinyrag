@@ -34,11 +34,11 @@ class LLMNodeRunner(NodeRunner):
         model = get_model(model_id)
         model_provider = get_model_provider(model)
 
-        if config.structured_output:
+        if self.config.structured_output:
             structured_output_type = create_structured_output_type(
-                self.node.id, config.structured_output)
+                self.node.id, self.config.structured_output)
             return model_provider.run_structured_output(
                 model_params, messages, structured_output_type)
         else:
             content = model_provider.run(model_params, messages)
-            return [Variable(name=config.output_variable, value=content)]
+            return [Variable(name=self.config.output_variable, value=content)]

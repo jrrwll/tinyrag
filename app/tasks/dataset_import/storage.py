@@ -1,31 +1,38 @@
+import json
 import logging
 import os
 import os.path
 from uuid import uuid4
 
 from app.config import settings
-from app.core.dataset.api import DatasetPublic
-from app.core.dataset.process_rule import get_text_splitter
-from app.core.file.enums import FileType
 from app.core.file.service.file_type import detect_file_type
 from app.core.file.service.load import load_document_file
 from app.core.file.storage.base import get_storage_provider
+from app.core.rag.api import DatasetPublic
+from app.core.rag.enums import DocumentSourceType
+from app.core.rag.text_process.base import get_text_splitter
+from app.core.rag.vectorstores import create_vector_store
 from app.core.task.service import update_task_progress
-from app.tasks.dataset_import import save_documents
+from app.entities.dataset import Dataset
+from app.tasks.dataset_import import import_documents
 from app.util.datetme import format_date_compact
 
 logger = logging.getLogger(__name__)
 
 
-def import_remote_files(
-        task_id: str, dataset: DatasetPublic, remote_files: list[str]):
+def import_storage_files(
+        task_id: str, dataset: DatasetPublic, storage_files: list[str]):
     process_rule = dataset.process_rule
     text_splitter = get_text_splitter(process_rule)
+
+    collection_name = Dataset.get_collection_name(dataset.id)
+    vector_store = create_vector_store(collection_name)
+
     storage_provider = get_storage_provider()
 
-    task_raito, task_raito_step = 0.0, 1 / len(remote_files)
+    task_raito, task_raito_step = 0.0, 1 / len(storage_files)
     file_dir = _get_local_dir()
-    for file_key in remote_files:
+    for file_key in storage_files:
         local_path = f"{file_dir}/{uuid4()}"
         storage_provider.download_file(file_key, local_path)
 
@@ -35,9 +42,14 @@ def import_remote_files(
             task_raito += task_raito_step
             continue
         file_type, _ = file_type
+        source_info = json.dumps({
+            "file_key": file_key,
+            "file_type": file_type,
+        })
 
         docs = load_document_file(local_path, file_type)
-        save_documents(docs, text_splitter, dataset)
+        import_documents(docs, text_splitter, dataset,
+                         DocumentSourceType.Storage, source_info)
 
         task_raito += task_raito_step
         progress = int(task_raito * 100)

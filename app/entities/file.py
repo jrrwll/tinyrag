@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlmodel import Field, SQLModel
 
 from app.core.file.enums import FileType
+from app.entities.base import enum_field_info
 
 
 class File(SQLModel, table=True):
@@ -10,7 +11,7 @@ class File(SQLModel, table=True):
     created_at: datetime
     deleted: bool = False
 
-    type: FileType
+    type: FileType = enum_field_info(FileType)
     name: str
     size: int
     mime_type: str

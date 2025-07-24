@@ -1,7 +1,8 @@
 import json
+from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.model.enums import ModelType
 from app.entities.model import Model
@@ -9,13 +10,14 @@ from app.entities.model import Model
 
 class ModelPublic(BaseModel):
     id: int
+    created_at: datetime
+    updated_at: datetime
+
     type: ModelType
     enable: bool
     provider_name: str
     model_name: str
-    base_url: str | None = None
-    api_key: str | None = None
-    config: dict | None = None  # type: ignore[type-arg]
+    config: dict # type: ignore[arg-type]
 
     @staticmethod
     def new(item: Model) -> "ModelPublic":
@@ -28,7 +30,7 @@ class ModelPublic(BaseModel):
         return hash(self.id)
 
     def __eq__(self, other: Any):
-        if not isinstance(other, Model):
+        if not isinstance(other, ModelPublic):
             return False
         return self.id == other.id
 
@@ -37,9 +39,7 @@ class ModelCreate(BaseModel):
     type: ModelType
     provider_name: str
     model_name: str
-    base_url: str | None = None
-    api_key: str | None = None
-    config: dict = {}  # type: ignore[type-arg]
+    config: dict = Field(min_length=1) # type: ignore[type-arg]
 
     def to_entity(self) -> Model:
         entity_dict = self.model_dump(exclude_none=True)
@@ -50,15 +50,16 @@ class ModelCreate(BaseModel):
 class ModelUpdate(BaseModel):
     id: int
     model_name: str
-    base_url: str | None = None
-    api_key: str | None = None
-    config: dict  # type: ignore[type-arg]
+    config: dict = Field(min_length=1)  # type: ignore[type-arg]
 
     def update_entity(self, entity: Model) -> None:
+        config_dict = json.loads(entity.config)
+        config_dict.update(self.config)
+
         update_dict = self.model_dump(exclude_none=True)
         update_dict.update(
             {
-                "config": json.dumps(self.config),
+                "config": json.dumps(config_dict),
             }
         )
         entity.sqlmodel_update(update_dict)

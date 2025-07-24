@@ -4,7 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.config import settings
-from app.core.dataset.base import EmbeddingModelConfig, ProcessRule, \
+from app.core.rag.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
 from app.entities.dataset import Dataset
 from app.util.json import load_and_update_dict
@@ -41,7 +41,7 @@ class DatasetImportFile(BaseModel):
     file_ids: list[str]
 
 
-class DatasetImportRemoteFile(BaseModel):
+class DatasetImportStorage(BaseModel):
     file_path: str
 
 
@@ -53,7 +53,7 @@ class DatasetImport(BaseModel):
     id: int
 
     file: DatasetImportFile | None = None
-    remote_file: DatasetImportRemoteFile | None = None
+    storage: DatasetImportStorage | None = None
     website: DatasetImportWebsite | None = None
 
 

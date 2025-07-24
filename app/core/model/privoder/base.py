@@ -1,3 +1,4 @@
+import logging
 from abc import ABCMeta, abstractmethod
 from typing import Callable, MutableMapping, Type
 
@@ -16,6 +17,14 @@ from app.core.variable.base import Variable
 from app.util.codec import md5
 from app.util.langchain.callbacks import CompleteResponseHandler
 
+logger = logging.getLogger(__name__)
+
+
+class BaseModelConfig(BaseModel):
+    base_url: str | None = None
+    api_key: str | None = None
+    timeout: int | None = None
+
 
 class ModelProviderRegistry(ABCMeta):
 
@@ -27,26 +36,33 @@ class ModelProviderRegistry(ABCMeta):
             cls.implements.append(cls)
 
 
-class ModelProvider(metaclass=ModelProviderRegistry):
-    model: ModelPublic
+class ModelProvider[T: BaseModelConfig](metaclass=ModelProviderRegistry):
+    model_name: str
+    model_config: T
     _model_footprint: str
 
     def __init__(self, model: ModelPublic):
-        self.model = model
+        self.model_name = model.model_name
+        self.model_config = self.get_config_type().model_validate(model.config)
         self._model_footprint = md5(model.model_dump_json())
 
     @staticmethod
     @abstractmethod
     def get_provider_name() -> str:
-        pass
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def get_config_type() -> Type[T]:
+        raise NotImplementedError
 
     @abstractmethod
     def _create_chat_model(self) -> BaseChatModel:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def _create_text_embedding(self) -> Embeddings:
-        pass
+        raise NotImplementedError
 
     def _get_or_create[T](self, cache: MutableMapping[str, T],
             creator: Callable[[], T]) -> T:
@@ -72,6 +88,7 @@ class ModelProvider(metaclass=ModelProviderRegistry):
         if not prompt:
             prompt = settings.DEFAULT_TEST_PROMPT
 
+        logger.info(f"Test run with prompt: {prompt}")
         msg = self.chat_model.invoke(prompt)
         return msg.model_dump()
 
@@ -97,6 +114,12 @@ class ModelProvider(metaclass=ModelProviderRegistry):
 
         return [Variable(name=name, value=value) for name, value
                 in dict(structured_output).items()]
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embeddings_model.embed_query(text)
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return self.embeddings_model.embed_documents(texts)
 
 
 def get_model_provider(model: ModelPublic) -> ModelProvider:

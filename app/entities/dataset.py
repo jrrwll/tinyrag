@@ -1,23 +1,31 @@
 from sqlmodel import Field
 
-from app.entities.base import TableBase
+from app.core.rag.enums import DocumentSourceType
+from app.entities.base import TableBase, enum_field_info
 
 
 class Dataset(TableBase, table=True):
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
-    enable: bool = Field(default=True)
+    enable: bool = True
 
     process_rule: str | None = None
     embedding_model: str | None = None
     retrieval_model: str | None = None
 
+    @staticmethod
+    def get_collection_name(dataset_id: int) -> str:
+        return f"dataset_{dataset_id}"
+
 
 class Document(TableBase, table=True):
     dataset_id: int
     position: int
-    file_id: str | None = None
     word_count: int = 0
+
+    source_type: DocumentSourceType = enum_field_info(DocumentSourceType)
+    source_info: str | None = None
+    indexing: bool = False
 
 
 class DocumentChunk(TableBase, table=True):
@@ -29,4 +37,5 @@ class DocumentChunk(TableBase, table=True):
     position: int
     content: str = Field(max_length=10000)
     word_count: int = 0
-
+    keywords: str | None = None
+    index_doc_id: str | None = None

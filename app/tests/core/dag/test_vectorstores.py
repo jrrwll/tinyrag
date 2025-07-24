@@ -1,6 +1,6 @@
 from app.config import settings
-from app.core.dataset.process_rule import get_text_splitter
-from app.core.dataset.vectorstores import get_vector_store
+from app.core.rag.text_process.base import get_text_processor
+from app.core.rag.vectorstores import create_vector_store
 from app.core.file.enums import FileType
 from app.core.file.service.load import load_document_file
 from app.tests.test_base import _find_first_file
@@ -9,19 +9,23 @@ from app.tests.test_base import _find_first_file
 def test_add_documents():
     local_path = _find_first_file()
     print(f"\nlocal_path={local_path}")
+    if not local_path:
+        return
 
-    docs = list(load_document_file(local_path, FileType.TXT))
+    text_processor = get_text_processor(settings.dataset_default_process_rule)
 
-    text_splitter = get_text_splitter(settings.dataset_default_process_rule)
-    documents = text_splitter.split_documents(docs)
+    docs = list(text_processor.load_documents(local_path, FileType.TXT))
+    print(f"\ndocs={len(docs)}")
 
-    vector_store = get_vector_store()
+    documents = text_processor.split_documents(docs)
+
+    vector_store = create_vector_store("test")
     doc_ids = vector_store.add_documents(documents)
     print(f"doc_ids={doc_ids}")
 
 
 def test_search():
-    vector_store = get_vector_store()
+    vector_store = create_vector_store("test")
     matched_dcos = vector_store.similarity_search("流沙", k=10)
     for d in matched_dcos:
         print(f"{d}")

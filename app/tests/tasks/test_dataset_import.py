@@ -2,7 +2,7 @@ from sqlmodel import select
 
 from app.common.db import open_session
 from app.config import settings
-from app.core.dataset.process_rule import get_text_splitter
+from app.core.rag.process_rule import get_text_splitter
 from app.core.file.service.file_type import detect_file_type
 from app.core.file.service.load import load_document_file
 from app.entities.dao.dataset import save_document_chucks

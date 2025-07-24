@@ -19,6 +19,7 @@ from app.entities.model import Model
 from app.util.model import create_model_type
 
 
+# TODO use redis cache
 @lru_cache(maxsize=1000)
 def get_model(id: int) -> ModelPublic:
     with Session(engine) as session:

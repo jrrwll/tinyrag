@@ -15,7 +15,7 @@ def get_upload_rule() -> FileUploadPublic:
     )
 
 
-def get_remote_files(file_path: str) -> list[str]:
+def get_storage_files(file_path: str) -> list[str]:
     storage_provider = get_storage_provider()
     if not storage_provider.exists(file_path):
         raise BizException.new(ErrorCode.remote_file_not_found, file_path)

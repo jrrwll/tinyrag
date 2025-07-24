@@ -26,6 +26,8 @@ uv add langchain langgraph langchain_community
 uv add langchain_ollama langchain_openai
 # Note that: langchain-postgres need libpg in the os path
 uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
+# token and keywords
+uv add nltk jieba tiktoken
 
 # utility
 uv add cachetools types-cachetools requests types-requests filetype pytz types-pytz

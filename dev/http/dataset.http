@@ -4,6 +4,7 @@ GET http://{{origin}}{{api_prefix}}/dataset/list
 GET http://{{origin}}{{api_prefix}}/dataset?id=1
 
 ###
+# 全唐诗
 POST http://{{origin}}{{api_prefix}}/dataset
 Content-Type: application/json
 
@@ -18,8 +19,8 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "name": "空白知识库",
-  "description": "some description2",
+  "name": "全唐诗",
+  "description": "资源来源：https://github.com/chinese-poetry/chinese-poetry",
   "process_rule": {
     "text_splitter": {
       "chunk_overlap": 50,
@@ -28,7 +29,8 @@ Content-Type: application/json
         "\n\n",
         "\n",
         " ",
-        ""
+        "",
+        "}"
       ]
     }
   }
@@ -73,7 +75,7 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "remote_file": {
+  "storage": {
     "file_path": "chinese-poetry/quantangshi/"
   }
 }

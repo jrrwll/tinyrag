@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings
 from pydantic import model_validator, PositiveInt, NonNegativeInt
 
 from app.common.constants import APP_NAME
-from app.core.dataset.base import ProcessRule
-from app.core.dataset.enums import VectorStoreType
+from app.core.rag.base import ProcessRule
+from app.core.rag.enums import VectorStoreType
 from app.config.base import _singleton_workdir
 
 _dataset_default_process_rule = {
@@ -44,29 +44,35 @@ class FileUploadConfig(BaseSettings):
 class VectorStoreConfig(BaseSettings):
 
     VECTOR_STORE_TYPE: VectorStoreType = VectorStoreType.Chroma
-    VECTOR_STORE_COLLECTION_NAME: str = APP_NAME
 
     CHROMA_PERSIST_DIRECTORY: str | None = None
+    CHROMA_HOST: str | None = None
+    CHROMA_PORT: PositiveInt | None = None
+    CHROMA_TENANT: str | None = None
+    CHROMA_DATABASE: str | None = None
+    CHROMA_AUTH_PROVIDER: str | None = None
+    CHROMA_AUTH_CREDENTIALS: str | None = None
 
+    QDRANT_LOCAL_PATH: str | None = None
     QDRANT_URL: str | None = None
     QDRANT_API_KEY: str | None = None
+    QDRANT_HTTPS: bool | None = None
     QDRANT_GRPC_PORT: PositiveInt | None = None
+    QDRANT_GRPC_ENABLED: bool = False
 
+    # postgresql+psycopg://user:password@host:port/database
     PGVECTOR_URL: str | None = None
-    PGVECTOR_MIN_CONNECTION: PositiveInt = 1
-    PGVECTOR_MAX_CONNECTION: PositiveInt = 10
-    PGVECTOR_PG_BIGM: bool = False # use pg_bigm for full text search
+    PGVECTOR_POOL_SIZE: PositiveInt | None = None
+    PGVECTOR_POOL_TIMEOUT: PositiveInt | None = None
 
     # pymilvus.milvus_client.milvus_client.MilvusClient.__init__
-    MILVUS_URI: str = "http://localhost:19530"
-    MILVUS_TOKEN: str | None = None
+    MILVUS_URI: str | None = None
     MILVUS_USER: str | None = None
     MILVUS_PASSWORD: str | None = None
     MILVUS_DB_NAME: str = APP_NAME
+    MILVUS_TOKEN: str | None = None
     MILVUS_TIMEOUT: float | None = None
 
-    @property
+    @cached_property
     def vector_store_persist_directory(self) -> str:
-        if self.CHROMA_PERSIST_DIRECTORY:
-            return self.CHROMA_PERSIST_DIRECTORY
         return f"{_singleton_workdir}/vectorstore"

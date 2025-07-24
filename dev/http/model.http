@@ -12,8 +12,8 @@ Content-Type: application/json
   "type": "text_embedding",
   "provider_name": "ollama",
   "model_name": "qwen3:4b",
-  "base_url": "http://{{OLLAMA_HOST}}:11434",
   "config": {
+    "base_url": "http://{{OLLAMA_HOST}}:11434",
     "function_calling": true
   }
 }
@@ -23,11 +23,10 @@ PUT http://{{origin}}{{api_prefix}}/model
 Content-Type: application/json
 
 {
-  "id": 1,
+  "id": 2,
   "model_name": "qwen3:4b",
-  "base_url": "http://{{OLLAMA_HOST}}:11434",
-  "settings": {
-    "function_calling": true
+  "config": {
+    "timeout": 20
   }
 }
 
