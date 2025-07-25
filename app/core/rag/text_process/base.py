@@ -24,7 +24,7 @@ class DocumentModel(BaseModel):
     @staticmethod
     def create(document: Document) -> "DocumentModel":
         return DocumentModel(
-            id=document.id if document.id else uuid4(),
+            id=document.id if document.id else str(uuid4()),
             content=document.page_content,
             metadata=document.metadata
         )

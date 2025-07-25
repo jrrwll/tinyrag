@@ -33,7 +33,7 @@ def list(
         page_no=page_no,
         page_size=page_size,
         total=count,
-        items=[ModelPublic.new(entity) for entity in entities],
+        items=[ModelPublic.create(entity) for entity in entities],
     )
     return ApiResult.new(res)
 
@@ -44,7 +44,7 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.model_not_found, id)
 
-    return ApiResult.new(ModelPublic.new(entity))
+    return ApiResult.new(ModelPublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
@@ -104,7 +104,7 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.model_not_found, params.id)
 
-    model = ModelPublic.new(entity)
+    model = ModelPublic.create(entity)
     provider = get_model_provider(model)
     result = provider.test_run(params.prompt)
     return ApiResult.new(ModelTestRunPublic(result=result))
@@ -118,7 +118,7 @@ def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
         model_entity = session.get(Model, model_id)
         if not model_entity:
             raise BizException.new(ErrorCode.model_not_found, model_id)
-        return ApiResult.new(ModelPublic.new(model_entity))
+        return ApiResult.new(ModelPublic.create(model_entity))
     return ApiResult.new()
 
 

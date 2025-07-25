@@ -1,5 +1,5 @@
+from pydantic import BaseModel
 
 
-
-class Embedding():
-    pass
+class EmbeddingConfig(BaseModel):
+    vector_size: int

@@ -1,12 +1,12 @@
+from chromadb import Client, DEFAULT_DATABASE, DEFAULT_TENANT, HttpClient
+from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore
 
 from app.config import settings
-from app.core.model.privoder.base import ModelProvider, get_model_provider
+from app.core.model.privoder.base import ModelProvider
 from app.core.rag.vector.vectorstores import BaseVectorStore
-from app.entities.model import Model
-from chromadb.config import Settings
-from chromadb import Client, DEFAULT_TENANT, DEFAULT_DATABASE, HttpClient
+
 
 class ChromaVector(BaseVectorStore):
 
@@ -15,11 +15,7 @@ class ChromaVector(BaseVectorStore):
     client: Client
     vector_store: Chroma
 
-    def __init__(self, collection_name: str, model: Model):
-        super().__init__(collection_name)
-
-        self.model_provider = get_model_provider(model)
-
+    def _init(self) -> None:
         if not settings.CHROMA_HOST:
             persist_directory = settings.CHROMA_PERSIST_DIRECTORY
             if not persist_directory:
@@ -48,7 +44,7 @@ class ChromaVector(BaseVectorStore):
                 client=self.client,
             )
 
-        self.vector_store._client.get_or_create_collection()
+        # self.vector_store._client.get_or_create_collection(self.collection_name)
 
     def get_vector_store(self) -> VectorStore:
         return self.vector_store

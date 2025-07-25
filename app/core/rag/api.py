@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -21,7 +20,7 @@ class DatasetCreate(BaseModel):
         if not process_rule:
             process_rule = settings.dataset_default_process_rule
         return Dataset(name=self.name, description=self.description,
-                process_rule=process_rule.model_dump_json())
+                       process_rule=process_rule.model_dump_json())
 
 
 class DatasetUpdate(DatasetCreate):
@@ -72,10 +71,11 @@ class DatasetPublic(SimpleDatasetPublic):
     retrieval_model: RetrievalModelConfig | None = None
 
     @staticmethod
-    def new(entity: Dataset) -> "DatasetPublic":
+    def create(entity: Dataset) -> "DatasetPublic":
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
-            entity_dict, "process_rule", "embedding_model", "retrieval_model")
+            entity_dict,
+            "process_rule", "embedding_model", "retrieval_model")
         return DatasetPublic(**entity_dict)
 
 

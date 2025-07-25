@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from app.core.model.enums import ModelType
 from app.entities.model import Model
+from app.util.json import dump_and_update_dict, load_and_update_dict
 
 
 class ModelPublic(BaseModel):
@@ -18,12 +19,12 @@ class ModelPublic(BaseModel):
     provider_name: str
     model_name: str
     config: dict # type: ignore[arg-type]
+    embedding_config:  dict # type: ignore[arg-type]
 
     @staticmethod
-    def new(item: Model) -> "ModelPublic":
+    def create(item: Model) -> "ModelPublic":
         item_dict = item.model_dump(exclude_none=True)
-        if item.config:
-            item_dict["config"] = json.loads(item.config)
+        load_and_update_dict(item_dict, "config", "embedding_config")
         return ModelPublic(**item_dict)
 
     def __hash__(self) -> int:
@@ -39,18 +40,20 @@ class ModelCreate(BaseModel):
     type: ModelType
     provider_name: str
     model_name: str
-    config: dict = Field(min_length=1) # type: ignore[type-arg]
+    config: dict = {} # type: ignore[type-arg]
+    embedding_config: dict = {}
 
     def to_entity(self) -> Model:
         entity_dict = self.model_dump(exclude_none=True)
-        entity_dict["config"] = json.dumps(self.config)
+        dump_and_update_dict(entity_dict, "config", "embedding_config")
         return Model(**entity_dict)
 
 
 class ModelUpdate(BaseModel):
     id: int
     model_name: str
-    config: dict = Field(min_length=1)  # type: ignore[type-arg]
+    config: dict = {}  # type: ignore[type-arg]
+    embedding_config: dict = {}
 
     def update_entity(self, entity: Model) -> None:
         config_dict = json.loads(entity.config)

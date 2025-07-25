@@ -15,7 +15,7 @@ from app.core.rag.vectorstores import create_vector_store
 from app.core.task.service import update_task_progress
 from app.entities.dataset import Dataset
 from app.tasks.dataset_import import import_documents
-from app.util.datetme import format_date_compact
+from app.util.datetime import format_date_compact
 
 logger = logging.getLogger(__name__)
 

@@ -75,4 +75,4 @@ class VectorStoreConfig(BaseSettings):
 
     @cached_property
     def vector_store_persist_directory(self) -> str:
-        return f"{_singleton_workdir}/vectorstore"
+        return f"{_singleton_workdir}/vectorstore/{self.VECTOR_STORE_TYPE.value}"

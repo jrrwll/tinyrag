@@ -46,7 +46,7 @@ def get(session: SessionDep, id: int) -> Any:
     if not entity:
         raise BizException.new(ErrorCode.dataset_not_found, id)
 
-    return ApiResult.new(DatasetPublic.new(entity))
+    return ApiResult.create(DatasetPublic.new(entity))
 
 
 @router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic],
@@ -61,7 +61,7 @@ def create(session: SessionDep, params: DatasetCreate) -> Any:
     session.add(entity)
     session.commit()
     session.refresh(entity)
-    return ApiResult.new(DatasetPublic.new(entity))
+    return ApiResult.create(DatasetPublic.new(entity))
 
 
 @router.put("", response_model=ApiResult[Any], dependencies=[LogDep])
@@ -114,6 +114,6 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
         storage_files = get_storage_files(params.storage.file_path)
 
     # import task
-    dataset = DatasetPublic.new(entity)
+    dataset = DatasetPublic.create(entity)
     task = send_dataset_import_task(params, dataset, files, storage_files)
     return ApiResult.new(task)

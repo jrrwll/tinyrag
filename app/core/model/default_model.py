@@ -35,4 +35,4 @@ def get_default_model_provider(model_type: ModelType) -> ModelProvider | None:
     if not model:
         return None
 
-    return get_model_provider(ModelPublic.new(model))
+    return get_model_provider(ModelPublic.create(model))

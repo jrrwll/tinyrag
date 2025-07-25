@@ -1,12 +1,15 @@
+import logging
+
 from langchain_core.vectorstores import VectorStore
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
 
 from app.config import settings
 from app.core.model.privoder import ModelProvider
-from app.core.model.privoder.base import get_model_provider
 from app.core.rag.vector.vectorstores import BaseVectorStore
-from app.entities.model import Model
+
+logger = logging.getLogger(__name__)
 
 
 class QdrantVector(BaseVectorStore):
@@ -16,11 +19,10 @@ class QdrantVector(BaseVectorStore):
     client: QdrantClient
     vector_store: QdrantVectorStore
 
-    def __init__(self, collection_name: str, model: Model):
-        super().__init__(collection_name)
+    def get_vector_store(self) -> VectorStore:
+        return self.vector_store
 
-        self.model_provider = get_model_provider(model)
-
+    def _init(self) -> None:
         if not settings.QDRANT_URL:
             local_path = settings.QDRANT_LOCAL_PATH
             if not local_path:
@@ -42,13 +44,23 @@ class QdrantVector(BaseVectorStore):
                 **optional_params
             )
 
+        # must create collection before using it
+        self.create_collection_if_absent()
+
         self.vector_store = QdrantVectorStore(
             self.client,
             collection_name=self.collection_name,
             embedding=self.model_provider.embeddings_model,
         )
 
-        self.client.create_collection(self.collection_name)
+    def create_collection_if_absent(self):
+        if self.client.collection_exists(self.collection_name):
+            return
 
-    def get_vector_store(self) -> VectorStore:
-        return self.vector_store
+        vectors_config = VectorParams(
+            size=2560,
+            distance=Distance.COSINE
+        )
+
+        logger.info(f"vector create collection {self.collection_name}")
+        self.client.create_collection(self.collection_name, vectors_config=vectors_config)

@@ -7,7 +7,8 @@ create table model (
     model_name    varchar(100) not null,
     type          varchar(32)  not null,
     enable        tinyint      not null default 1,
-    config        longtext
+    config        longtext,
+    embedding_config longtext
 ) default charset utf8mb4;
 
 create table default_model (

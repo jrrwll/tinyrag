@@ -10,6 +10,7 @@ class Model(TableBase, table=True):
     provider_name: str = Field(max_length=100)
     model_name: str = Field(unique=True, index=True, max_length=100)
     config: str
+    embedding_config: str
 
 
 class DefaultModel(TableBase, table=True):

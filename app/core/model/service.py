@@ -27,7 +27,7 @@ def get_model(id: int) -> ModelPublic:
         if not entity:
             raise BizException.new(ErrorCode.model_not_found, id)
 
-        return ModelPublic.new(entity)
+        return ModelPublic.create(entity)
 
 
 def process_prompt(prompt: LLMPrompt, input_variables: list[Variable]) -> BaseMessage:

@@ -23,3 +23,7 @@ class BaseVectorStore(Vector, ABC):
         metadatas = [d.metadata for d in documents]
 
         self.get_vector_store().add_texts(ids=ids, texts=texts, metadatas=metadatas)
+
+    def similarity_search(self, query: str, k: int = 4) -> list[DocumentModel]:
+        docs = self.get_vector_store().similarity_search(query, k)
+        return [DocumentModel.create(doc) for doc in docs]
