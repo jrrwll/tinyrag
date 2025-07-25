@@ -25,7 +25,7 @@ def get_model(id: int) -> ModelPublic:
     with Session(engine) as session:
         entity = session.get(Model, id)
         if not entity:
-            raise BizException.new(ErrorCode.model_not_found, id)
+            raise BizException.create(ErrorCode.model_not_found, id)
 
         return ModelPublic.create(entity)
 

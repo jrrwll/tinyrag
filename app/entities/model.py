@@ -19,4 +19,3 @@ class DefaultModel(TableBase, table=True):
 
     model_type: ModelType
     model_id: int | None = None
-

@@ -9,10 +9,10 @@ from app.util.lang import enum_values
 
 
 class TableBase(SQLModel):
-    id: int = Field(primary_key=True)
+    id: str = Field(primary_key=True)
     created_at: datetime
     updated_at: datetime
-    deleted: bool = Field(default=False)
+    deleted: bool = False
 
 
 def enum_field_info[T: enum.Enum](enum_type: Type[T],

@@ -27,7 +27,7 @@ def upload_file(file: UploadFile) -> FilePublic:
 
     file_type = detect_file_type(file_path)
     if not file_type:
-        raise BizException.new(ErrorCode.file_type_not_supported)
+        raise BizException.create(ErrorCode.file_type_not_supported)
     else:
         file_type, mime_type = file_type
 

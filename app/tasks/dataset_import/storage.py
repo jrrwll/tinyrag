@@ -2,35 +2,24 @@ import json
 import logging
 import os
 import os.path
+from typing import Iterable, Optional
 from uuid import uuid4
 
 from app.config import settings
 from app.core.file.service.file_type import detect_file_type
-from app.core.file.service.load import load_document_file
 from app.core.file.storage.base import get_storage_provider
-from app.core.rag.api import DatasetPublic
+from app.core.rag.api import DatasetImportStorage
 from app.core.rag.enums import DocumentSourceType
-from app.core.rag.text_process.base import get_text_splitter
-from app.core.rag.vectorstores import create_vector_store
-from app.core.task.service import update_task_progress
-from app.entities.dataset import Dataset
-from app.tasks.dataset_import import import_documents
+from app.tasks.dataset_import import FileTaskParams
 from app.util.datetime import format_date_compact
 
 logger = logging.getLogger(__name__)
 
 
-def import_storage_files(
-        task_id: str, dataset: DatasetPublic, storage_files: list[str]):
-    process_rule = dataset.process_rule
-    text_splitter = get_text_splitter(process_rule)
-
-    collection_name = Dataset.get_collection_name(dataset.id)
-    vector_store = create_vector_store(collection_name)
-
+def list_storage_files(
+        storage_files: list[str]) -> Iterable[Optional[FileTaskParams]]:
     storage_provider = get_storage_provider()
 
-    task_raito, task_raito_step = 0.0, 1 / len(storage_files)
     file_dir = _get_local_dir()
     for file_key in storage_files:
         local_path = f"{file_dir}/{uuid4()}"
@@ -39,23 +28,16 @@ def import_storage_files(
         file_type = detect_file_type(local_path)
         if not file_type:
             logger.warning(f"skip {file_key} since file_type={file_type}")
-            task_raito += task_raito_step
-            continue
-        file_type, _ = file_type
-        source_info = json.dumps({
-            "file_key": file_key,
-            "file_type": file_type,
-        })
-
-        docs = load_document_file(local_path, file_type)
-        import_documents(docs, text_splitter, dataset,
-                         DocumentSourceType.Storage, source_info)
-
-        task_raito += task_raito_step
-        progress = int(task_raito * 100)
-        if not update_task_progress(task_id, progress):
-            logger.warning(f"async_task={task_id}, "
-                           f"update task progress={progress} failed")
+            yield None
+        else:
+            file_type, _ = file_type
+            source_info = json.dumps({
+                "file_key": file_key,
+                "file_type": file_type,
+            })
+            yield FileTaskParams(
+                file_path=local_path, file_type=file_type,
+                source_info=source_info, source_type=DocumentSourceType.Storage)
 
 
 def _get_local_dir() -> str:

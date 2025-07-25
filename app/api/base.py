@@ -20,7 +20,7 @@ if settings.IS_TEST_ENV:
 # exception_handler
 def exception_handler(_: Request, e: Exception) -> Response:
     if isinstance(e, RequestValidationError):
-        exc = BizException.new(ErrorCode.request_validation_error, e.errors())
+        exc = BizException.create(ErrorCode.request_validation_error, e.errors())
     elif isinstance(e, BizException):
         exc = e
     else:

@@ -27,7 +27,7 @@ def queue_stat() -> Any:
         "queue_count": queue.count,
         "scheduler_pid": queue.scheduler_pid,
     }
-    return ApiResult.new(stat_dict)
+    return ApiResult.create(stat_dict)
 
 
 @router.get("/queue_jobs", response_model=ApiResult[PageResult[dict[str, Any]]])
@@ -49,4 +49,4 @@ def queue_stat(page_no: int = settings.page_no_query,
         page_no=page_no, page_size=page_size,
         total=total, items=jobs)
 
-    return ApiResult.new(res)
+    return ApiResult.create(res)

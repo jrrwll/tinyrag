@@ -6,23 +6,24 @@ from app.common.db import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import LogDep
 from app.config import settings
-from app.core.rag.api import DatasetCreate, \
+from app.core.rag.api import DatasetChat, DatasetChatPublic, DatasetCreate, \
     DatasetImport, DatasetPublic, \
-    DatasetUpdate, PreviewChunk, PreviewChunkPublic, SimpleDatasetPublic
+    DatasetStreamChatPublic, DatasetUpdate, PreviewChunk, PreviewChunkPublic, \
+    SimpleDatasetPublic
 from app.core.rag.preview_file_chunk import preview_file_chunk
 from app.core.file.service.base import get_storage_files
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.dataset import page_and_count_datasets
 from app.entities.dao.file import get_files
-from app.entities.dataset import Dataset
+from app.entities.dataset import Dataset, DatasetConversation
+from app.entities.workflow_run import Conversation
 from app.tasks.dataset_import import send_dataset_import_task
-from app.util.api import ApiResult, PageResult
+from app.util.api import ApiResult, IdResult, PageResult
 
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
 
-@router.get("/list", response_model=ApiResult[PageResult[SimpleDatasetPublic]],
-            dependencies=[LogDep])
+@router.get("/list", response_model=ApiResult[PageResult[SimpleDatasetPublic]])
 def list(
         session: SessionDep,
         page_no: int = settings.page_no_query,
@@ -37,14 +38,14 @@ def list(
         total=count,
         items=[SimpleDatasetPublic(**entity) for entity in entities],
     )
-    return ApiResult.new(res)
+    return ApiResult.create(res)
 
 
 @router.get("", response_model=ApiResult[DatasetPublic])
-def get(session: SessionDep, id: int) -> Any:
+def get(session: SessionDep, id: str) -> Any:
     entity = session.get(Dataset, id)
     if not entity:
-        raise BizException.new(ErrorCode.dataset_not_found, id)
+        raise BizException.create(ErrorCode.dataset_not_found, id)
 
     return ApiResult.create(DatasetPublic.new(entity))
 
@@ -52,7 +53,7 @@ def get(session: SessionDep, id: int) -> Any:
 @router.post("/preview_chunk", response_model=ApiResult[PreviewChunkPublic],
              dependencies=[LogDep])
 def preview_chunk(params: PreviewChunk) -> Any:
-    return ApiResult.new(preview_file_chunk(params))
+    return ApiResult.create(preview_file_chunk(params))
 
 
 @router.post("", response_model=ApiResult[DatasetPublic], dependencies=[LogDep])
@@ -69,21 +70,21 @@ def update(session: SessionDep, params: DatasetUpdate) -> Any:
     id = params.id
     entity = session.get(Dataset, id)
     if not entity:
-        raise BizException.new(ErrorCode.dataset_not_found, id)
+        raise BizException.create(ErrorCode.dataset_not_found, id)
 
     params.update_entity(entity)
 
     session.add(entity)
     session.commit()
 
-    return ApiResult.new()
+    return ApiResult.create()
 
 
 @router.post("/import", response_model=ApiResult[AsyncTaskPublic],
              dependencies=[LogDep])
 def import_document(session: SessionDep, params: DatasetImport) -> Any:
     if not params.file and not params.storage and not params.website:
-        raise BizException.new(
+        raise BizException.create(
             ErrorCode.request_validation_error_detail,
             "neither file or storage or website is unset"
         )
@@ -91,7 +92,7 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
     dataset_id = params.id
     entity = session.get(Dataset, dataset_id)
     if not entity:
-        raise BizException.new(ErrorCode.dataset_not_found, dataset_id)
+        raise BizException.create(ErrorCode.dataset_not_found, dataset_id)
 
     files = {}
     storage_files = []
@@ -99,7 +100,7 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
     if params.file:
         file_ids = params.file.file_ids
         if not file_ids:
-            raise BizException.new(
+            raise BizException.create(
                 ErrorCode.request_validation_error_detail,
                 "file_ids is empty"
             )
@@ -107,7 +108,7 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
         missing_file_ids = [file_id for file_id in file_ids
                             if file_id not in files]
         if missing_file_ids:
-            raise BizException.new(
+            raise BizException.create(
                 ErrorCode.file_not_found, missing_file_ids
             )
     elif params.storage:
@@ -116,4 +117,39 @@ def import_document(session: SessionDep, params: DatasetImport) -> Any:
     # import task
     dataset = DatasetPublic.create(entity)
     task = send_dataset_import_task(params, dataset, files, storage_files)
-    return ApiResult.new(task)
+    return ApiResult.create(task)
+
+
+@router.post("/conversation", response_model=ApiResult[IdResult])
+def start_conversation(session: SessionDep, id: str):
+    dataset_entity = session.get(Dataset, id)
+    if not dataset_entity:
+        raise BizException.create(ErrorCode.dataset_not_found, id)
+
+    entity = DatasetConversation(dataset_id=id)
+    session.add(entity)
+    session.commit()
+    session.refresh(entity)
+    return ApiResult.create(IdResult(id=entity.id))
+
+
+@router.post("/chat", response_model=ApiResult[DatasetChatPublic])
+def chat(session: SessionDep, params: DatasetChat):
+    conversation_id = params.conversation_id
+    dataset_entity = session.get(Conversation, conversation_id)
+    if not dataset_entity:
+        raise BizException.create(ErrorCode.dataset_not_found, id)
+
+    chat_dataset(params)
+    raise NotImplementedError()
+
+
+@router.post("/stream_chat", response_model=ApiResult[DatasetStreamChatPublic])
+def chat(session: SessionDep, params: DatasetChat):
+    conversation_id = params.conversation_id
+    dataset_entity = session.get(Conversation, conversation_id)
+    if not dataset_entity:
+        raise BizException.create(ErrorCode.dataset_not_found, id)
+
+    chat_dataset(params)
+    raise NotImplementedError()

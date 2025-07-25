@@ -35,16 +35,16 @@ def list(
         total=count,
         items=[ModelPublic.create(entity) for entity in entities],
     )
-    return ApiResult.new(res)
+    return ApiResult.create(res)
 
 
 @router.get("", response_model=ApiResult[ModelPublic])
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, id)
+        raise BizException.create(ErrorCode.model_not_found, id)
 
-    return ApiResult.new(ModelPublic.create(entity))
+    return ApiResult.create(ModelPublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
@@ -55,35 +55,35 @@ def create(session: SessionDep, params: ModelCreate) -> Any:
     session.commit()
     session.refresh(entity)
 
-    return ApiResult.new(IdResult(id=entity.id))
+    return ApiResult.create(IdResult(id=entity.id))
 
 
 @router.put("", response_model=ApiResult[Any])
 def update(session: SessionDep, params: ModelUpdate) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, params.id)
+        raise BizException.create(ErrorCode.model_not_found, params.id)
 
     params.update_entity(entity)
 
     session.add(entity)
     session.commit()
 
-    return ApiResult.new()
+    return ApiResult.create()
 
 
 @router.post("/update_enable", response_model=ApiResult[ModelUpdateEnablePublic])
 def update_enable(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, id)
+        raise BizException.create(ErrorCode.model_not_found, id)
 
     entity.enable = not entity.enable
     session.add(entity)
     session.commit()
     session.refresh(entity)
 
-    return ApiResult.new(ModelUpdateEnablePublic(
+    return ApiResult.create(ModelUpdateEnablePublic(
         id=id, enable=entity.enable))
 
 
@@ -91,23 +91,23 @@ def update_enable(session: SessionDep, id: int) -> Any:
 def delete(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, id)
+        raise BizException.create(ErrorCode.model_not_found, id)
 
     session.delete(entity)
     session.commit()
-    return ApiResult.new()
+    return ApiResult.create()
 
 
 @router.post("/test_run", response_model=ApiResult[ModelTestRunPublic])
 def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
-        raise BizException.new(ErrorCode.model_not_found, params.id)
+        raise BizException.create(ErrorCode.model_not_found, params.id)
 
     model = ModelPublic.create(entity)
     provider = get_model_provider(model)
     result = provider.test_run(params.prompt)
-    return ApiResult.new(ModelTestRunPublic(result=result))
+    return ApiResult.create(ModelTestRunPublic(result=result))
 
 
 @router.get("/default_model", response_model=ApiResult[Optional[ModelPublic]])
@@ -117,34 +117,34 @@ def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
         model_id = default_model.model_id
         model_entity = session.get(Model, model_id)
         if not model_entity:
-            raise BizException.new(ErrorCode.model_not_found, model_id)
-        return ApiResult.new(ModelPublic.create(model_entity))
-    return ApiResult.new()
+            raise BizException.create(ErrorCode.model_not_found, model_id)
+        return ApiResult.create(ModelPublic.create(model_entity))
+    return ApiResult.create()
 
 
 @router.post("/default_model", response_model=ApiResult[Any])
 def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -> Any:
     model_id, model_type = params.model_id, params.model_type
     if not model_id and not model_type:
-        raise BizException.new(ErrorCode.request_validation_error_detail,
+        raise BizException.create(ErrorCode.request_validation_error_detail,
                                'neither model_id or model_type is unset')
 
     # unset case
     if model_type:
         entity = _find_default_model(session, model_type)
         if not entity:
-            return ApiResult.new()
+            return ApiResult.create()
 
         entity.model_id = None
         session.add(entity)
         session.commit()
         session.refresh(entity)
-        return ApiResult.new()
+        return ApiResult.create()
 
     # set case
     model_entity = session.get(Model, model_id)
     if not model_entity:
-        raise BizException.new(ErrorCode.model_not_found, model_id)
+        raise BizException.create(ErrorCode.model_not_found, model_id)
 
     model_type = model_entity.type
     entity = _find_default_model(session, model_type)
@@ -156,7 +156,7 @@ def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -
     session.add(entity)
     session.commit()
     session.refresh(entity)
-    return ApiResult.new()
+    return ApiResult.create()
 
 
 def _find_default_model(session: SessionDep, model_type: ModelType

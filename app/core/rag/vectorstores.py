@@ -20,7 +20,7 @@ def create_vector_store(collection_name: str) -> VectorStore:
 
     model_provider = get_default_model_provider(ModelType.TextEmbedding)
     if not model_provider:
-        raise BizException.new(ErrorCode.default_model_not_set, ModelType.TextEmbedding)
+        raise BizException.create(ErrorCode.default_model_not_set, ModelType.TextEmbedding)
     embeddings = model_provider.embeddings_model
 
     if typ == VectorStoreType.Qdrant:

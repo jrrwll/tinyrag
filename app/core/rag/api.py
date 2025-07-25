@@ -24,7 +24,7 @@ class DatasetCreate(BaseModel):
 
 
 class DatasetUpdate(DatasetCreate):
-    id: int
+    id: str
 
     def update_entity(self, entity: Dataset) -> None:
         update_dict = self.model_dump(exclude_none=True)
@@ -49,7 +49,7 @@ class DatasetImportWebsite(BaseModel):
 
 
 class DatasetImport(BaseModel):
-    id: int
+    id: str
 
     file: DatasetImportFile | None = None
     storage: DatasetImportStorage | None = None
@@ -57,7 +57,7 @@ class DatasetImport(BaseModel):
 
 
 class SimpleDatasetPublic(BaseModel):
-    id: int
+    id: str
     created_at: datetime
     updated_at: datetime
 
@@ -86,3 +86,17 @@ class PreviewChunk(BaseModel):
 
 class PreviewChunkPublic(BaseModel):
     content: list[str]
+
+
+class DatasetChat(BaseModel):
+    conversation_id: str
+    query: str
+
+
+class DatasetChatPublic(BaseModel):
+    answer: str
+
+
+class DatasetStreamChatPublic(BaseModel):
+    answer: str
+    done: bool | None = None

@@ -34,7 +34,7 @@ class GraphRunner:
             traversal: bool = False) -> None:
         node = self.nodes.get(node_id)
         if not node:
-            raise BizException.new(ErrorCode.model_not_found, node_id)
+            raise BizException.create(ErrorCode.model_not_found, node_id)
 
         node.input_variables = input_variables
 

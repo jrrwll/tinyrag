@@ -2,12 +2,15 @@ from pydantic import BaseModel, JsonValue
 
 
 class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
+    class Config:
+        exclude_none = True
+
     code: int = 0
     msg: str | None = None
     data: T = None
 
     @classmethod
-    def new[R: BaseModel | JsonValue | None](cls, data: R = None) -> "ApiResult[R]":
+    def create[R: BaseModel | JsonValue | None](cls, data: R = None) -> "ApiResult[R]":
         return ApiResult(data=data)
 
 

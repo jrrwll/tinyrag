@@ -1,8 +1,8 @@
-from sqlmodel import Field
+from sqlmodel import Field, SQLModel
 
 from app.core.rag.enums import DocumentSourceType
 from app.entities.base import TableBase, enum_field_info
-
+from datetime import datetime
 
 class Dataset(TableBase, table=True):
     name: str = Field(min_length=1, max_length=100)
@@ -14,7 +14,7 @@ class Dataset(TableBase, table=True):
     retrieval_model: str | None = None
 
     @staticmethod
-    def get_collection_name(dataset_id: int) -> str:
+    def get_collection_name(dataset_id: str) -> str:
         return f"dataset_{dataset_id}"
 
 
@@ -39,3 +39,17 @@ class DocumentChunk(TableBase, table=True):
     word_count: int = 0
     keywords: str | None = None
     index_doc_id: str | None = None
+
+
+class DatasetConversation(TableBase, table=True):
+
+    __tablename__ = 'dataset_conversation'
+
+    dataset_id: int
+
+
+class DatasetMessage(TableBase, table=True):
+    conversation_id: int
+    query: str
+    answer: str | None = None
+    error: str | None = None

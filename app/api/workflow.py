@@ -35,16 +35,16 @@ def list(
         total=count,
         items=[SimpleWorkflowPublic(**entity) for entity in entities],
     )
-    return ApiResult.new(res)
+    return ApiResult.create(res)
 
 
 @router.get("", response_model=ApiResult[WorkflowPublic])
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(Workflow, id)
     if not entity:
-        raise BizException.new(ErrorCode.workflow_not_found, id)
+        raise BizException.create(ErrorCode.workflow_not_found, id)
 
-    return ApiResult.new(WorkflowPublic.new(entity))
+    return ApiResult.create(WorkflowPublic.new(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
@@ -55,21 +55,21 @@ def create(session: SessionDep, params: WorkflowCreate) -> Any:
     session.commit()
     session.refresh(entity)
 
-    return ApiResult.new(IdResult(id=entity.id))
+    return ApiResult.create(IdResult(id=entity.id))
 
 
 @router.put("", response_model=ApiResult[Any])
 def update(session: SessionDep, params: WorkflowUpdate) -> Any:
     entity = session.get(Workflow, params.id)
     if not entity:
-        raise BizException.new(ErrorCode.workflow_not_found, params.id)
+        raise BizException.create(ErrorCode.workflow_not_found, params.id)
 
     params.update_entity(entity)
 
     session.add(entity)
     session.commit()
 
-    return ApiResult.new()
+    return ApiResult.create()
 
 
 @router.api_route(
@@ -79,7 +79,7 @@ def update(session: SessionDep, params: WorkflowUpdate) -> Any:
 def check_list(session: SessionDep, id: int) -> Any:
     entity = session.get(Workflow, id)
     if not entity:
-        raise BizException.new(ErrorCode.workflow_not_found, id)
+        raise BizException.create(ErrorCode.workflow_not_found, id)
 
     res = workflow_check_list(session, entity)
-    return ApiResult.new(res)
+    return ApiResult.create(res)

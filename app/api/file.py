@@ -17,29 +17,29 @@ router = APIRouter(prefix="/file", tags=["file"])
 @router.get("/upload", response_model=ApiResult[FileUploadPublic])
 def get_upload() -> Any:
     res = get_upload_rule()
-    return ApiResult.new(res)
+    return ApiResult.create(res)
 
 
 @router.post("/upload", response_model=ApiResult[FilePublic])
 def upload(file: UploadFile = File(...)) -> Any:
     res = upload_file(file)
-    return ApiResult.new(res)
+    return ApiResult.create(res)
 
 
 @router.get("", response_model=ApiResult[FilePublic])
 def get(session: SessionDep, id: str) -> Any:
     entity = session.get(FileEntity, id)
     if not entity:
-        raise BizException.new(ErrorCode.file_not_found, id)
+        raise BizException.create(ErrorCode.file_not_found, id)
 
-    return ApiResult.new(FilePublic(**entity.model_dump()))
+    return ApiResult.create(FilePublic(**entity.model_dump()))
 
 
 @router.delete("", response_model=ApiResult[Any])
 def delete(session: SessionDep, id: str) -> Any:
     entity = session.get(FileEntity, id)
     if not entity:
-        raise BizException.new(ErrorCode.file_not_found, id)
+        raise BizException.create(ErrorCode.file_not_found, id)
 
     delete_file(entity)
-    return ApiResult.new()
+    return ApiResult.create()

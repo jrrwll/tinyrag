@@ -10,7 +10,7 @@ from app.util.json import dump_and_update_dict, load_and_update_dict
 
 
 class ModelPublic(BaseModel):
-    id: int
+    id: str
     created_at: datetime
     updated_at: datetime
 
@@ -27,13 +27,13 @@ class ModelPublic(BaseModel):
         load_and_update_dict(item_dict, "config", "embedding_config")
         return ModelPublic(**item_dict)
 
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    def __eq__(self, other: Any):
-        if not isinstance(other, ModelPublic):
-            return False
-        return self.id == other.id
+    # def __hash__(self) -> int:
+    #     return hash(self.id)
+    #
+    # def __eq__(self, other: Any):
+    #     if not isinstance(other, ModelPublic):
+    #         return False
+    #     return self.id == other.id
 
 
 class ModelCreate(BaseModel):
@@ -50,7 +50,7 @@ class ModelCreate(BaseModel):
 
 
 class ModelUpdate(BaseModel):
-    id: int
+    id: str
     model_name: str
     config: dict = {}  # type: ignore[type-arg]
     embedding_config: dict = {}
@@ -69,12 +69,12 @@ class ModelUpdate(BaseModel):
 
 
 class ModelUpdateEnablePublic(BaseModel):
-    id: int
+    id: str
     enable: bool
 
 
 class ModelTestRun(BaseModel):
-    id: int
+    id: str
     prompt: str | None = None
 
 
@@ -84,4 +84,4 @@ class ModelTestRunPublic(BaseModel):
 
 class SetupDefaultModel(BaseModel):
     model_type: ModelType | None = None
-    model_id: int | None = None
+    model_id: str | None = None

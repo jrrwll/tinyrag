@@ -29,6 +29,17 @@ def partition_list[T](a: list[T], size: int | None = None) -> list[list[T]]:
     return output
 
 
+def partition_iterable[T](a: Iterable[T], size: int) -> Iterable[list[T]]:
+    output = []
+    for i in a:
+        output.append(i)
+        if len(output) == size:
+            yield output
+            output = []
+    if output:
+        yield output
+
+
 def any_match[T](iterable: Iterable[T],
         predicate: Callable[[T], bool]) -> T | None:
     for i in iterable:

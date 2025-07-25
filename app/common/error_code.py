@@ -73,7 +73,7 @@ class BizException(Exception):
         self.status_code = status_code
 
     @staticmethod
-    def new(error_code: ErrorCode, *args) -> "BizException":  # type: ignore[no-untyped-def]
+    def create(error_code: ErrorCode, *args) -> "BizException":  # type: ignore[no-untyped-def]
         status_code, message = error_code.get_status_code_and_message()
         try:
             message = message.format(*args)

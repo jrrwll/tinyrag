@@ -1,26 +1,33 @@
 import json
-from typing import Iterator
+import logging
+from typing import Iterable, Optional
 from uuid import uuid4
 
 import orjson
-from langchain_core.documents import Document
-from langchain_text_splitters import TextSplitter
 from pydantic import BaseModel
 
 from app.common.db import open_session
 from app.common.rq import send_rq_task
-from app.core.rag.api import DatasetImport, DatasetPublic
-from app.core.rag.enums import DocumentSourceType
+from app.core.model.api import ModelPublic
+from app.core.model.default_model import get_default_model
+from app.core.model.enums import ModelType
+from app.core.rag.api import Datase
+tImport, DatasetPublic
+from app.core.rag.text_process.base import DocumentModel, get_text_processor
 from app.core.rag.text_process.keywords import extract_keywords
 from app.core.rag.text_process.tokens import get_word_count
-from app.core.rag.vectorstores import create_vector_store
+from app.core.rag.vector.base import Vector, VectorFactory
 from app.core.task.api import AsyncTaskPublic
+from app.core.task.service import update_task_progress
 from app.entities.dao.dataset import save_document, save_document_chucks
 from app.entities.dataset import Dataset, Document as DocumentEntity, \
     DocumentChunk
 from app.entities.file import File
 from app.entities.task import AsyncTask
-from app.util.collection import partition_list
+from app.tasks.dataset_import.base import FileTaskParams
+from app.util.collection import partition_iterable
+
+logger = logging.getLogger(__name__)
 
 
 class _ImportTaskParams(BaseModel):
@@ -65,59 +72,81 @@ def dataset_import_task(task_id: str, task_params_json: bytes):
     storage_files = task_params.storage_files
 
     if params.file:
-        from app.tasks.dataset_import.file import import_files
+        from app.tasks.dataset_import.file import list_files
 
-        import_files(task_id, params.file, dataset, files)
+        file_params = list_files(params.file, files)
+        import_from_files(file_params, len(files), task_id, dataset)
     elif params.storage:
-        from app.tasks.dataset_import.storage import import_storage_files
+        from app.tasks.dataset_import.storage import list_storage_files
 
-        import_storage_files(task_id, dataset, storage_files)
+        file_params = list_storage_files(storage_files)
+        import_from_files(file_params, len(files), task_id, dataset)
     elif params.website:
         from app.tasks.dataset_import.website import import_website
 
         import_website(task_id, params.website, dataset)
 
 
-def import_documents(docs: Iterator[Document], text_splitter: TextSplitter,
-        dataset: DatasetPublic,
-        source_type: DocumentSourceType, source_info: str):
-    position = 0
-    for doc in docs:
-        doc_entity = DocumentEntity(
-            dataset_id=dataset.id, position=position,
-            source_type=source_type, source_info=source_info)
-        doc_entity = save_document(doc_entity)
+def import_from_files(
+        file_params: Iterable[Optional[FileTaskParams]], file_count: int,
+        task_id: str, dataset: DatasetPublic):
+    process_rule = dataset.process_rule
+    text_processor = get_text_processor(process_rule)
 
-        documents = text_splitter.split_documents([doc])
+    collection_name = Dataset.get_collection_name(dataset.id)
+    model = get_default_model(ModelType.TextEmbedding)
+    vector = VectorFactory.create_vector(
+        collection_name, ModelPublic.create(model))
 
-        partition_documents = partition_list(documents)
-        offset = 0
-        for documents in partition_documents:
-            import_document_chucks(documents, doc_entity, offset, dataset)
-            offset += len(documents)
+    task_raito, task_raito_step = 0.0, 1 / file_count
+    for params in file_params:
+        if not params:
+            continue
 
-        # update stat fields
-        doc_entity.indexing = True
-        save_document(doc_entity)
-        position += 1
+        docs = text_processor.load_documents(params.file_path, params.file_type)
+
+        position = 0
+        for doc in docs:
+            doc_entity = DocumentEntity(
+                dataset_id=dataset.id, position=position,
+                source_type=params.source_type, source_info=params.source_info)
+            doc_entity = save_document(doc_entity)
+
+            documents = text_processor.split_documents([doc])
+
+            partition_documents = partition_iterable(documents, 100)
+            offset = 0
+            for documents in partition_documents:
+                import_document_chucks(documents, doc_entity, offset, vector)
+                offset += len(documents)
+
+            # update stat fields
+            doc_entity.indexing = True
+            save_document(doc_entity)
+            position += 1
+
+        task_raito += task_raito_step
+        progress = int(task_raito * 100)
+        if not update_task_progress(task_id, progress):
+            logger.warning(f"async_task={task_id}, "
+                           f"update task progress={progress} failed")
 
 
-def import_document_chucks(documents: list[Document],
-        doc_entity: DocumentEntity, offset: int, dataset: DatasetPublic):
+def import_document_chucks(
+        documents: list[DocumentModel], doc_entity: DocumentEntity,
+        offset: int, vector: Vector):
     for i in range(len(documents)):
         if not documents[i].id:
             documents[i].id = uuid4()
 
-    collection_name = Dataset.get_collection_name(dataset.id)
-    vector_store = create_vector_store(collection_name)
-    vector_store.add_documents(documents)
+    vector.add_documents(documents)
 
     chucks = [to_document_chuck(i + offset, d, doc_entity)
                   for i, d in enumerate(documents)]
     save_document_chucks(chucks)
 
 
-def to_document_chuck(index: int, doc: Document,
+def to_document_chuck(index: int, doc: DocumentModel,
         doc_entity: DocumentEntity) -> DocumentChunk:
     word_count = get_word_count(doc.page_content)
     keywords = extract_keywords(doc.page_content)
