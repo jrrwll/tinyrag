@@ -16,7 +16,7 @@ class MilvusVector(BaseVectorStore):
 
     def _init(self) -> None:
         connection_args={
-            "uri": settings.MILVUS_URL,
+            "uri": settings.MILVUS_URI,
             "user": settings.MILVUS_USER,
             "password": settings.MILVUS_PASSWORD,
             "db_name": settings.MILVUS_DB_NAME,

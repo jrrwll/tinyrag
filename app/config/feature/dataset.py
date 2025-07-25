@@ -69,7 +69,7 @@ class VectorStoreConfig(BaseSettings):
     MILVUS_URI: str | None = None
     MILVUS_USER: str | None = None
     MILVUS_PASSWORD: str | None = None
-    MILVUS_DB_NAME: str = APP_NAME
+    MILVUS_DB_NAME: str = f"{APP_NAME}_vector"
     MILVUS_TOKEN: str | None = None
     MILVUS_TIMEOUT: float | None = None
 
