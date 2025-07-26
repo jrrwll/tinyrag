@@ -1,43 +1,31 @@
 from sqlmodel import select
 
 from app.common.db import open_session
-from app.config import settings
-from app.core.rag.process_rule import get_text_splitter
-from app.core.file.service.file_type import detect_file_type
-from app.core.file.service.load import load_document_file
-from app.entities.dao.dataset import save_document_chucks
-from app.entities.dataset import DocumentChunk
-from app.tests.test_base import _find_first_file
+from app.core.file.service.base import get_storage_files
+from app.entities.file import File
+from app.tasks.dataset_import.file import list_files
+from app.tasks.dataset_import.storage import list_storage_files
 
 
-def test_split_documents():
-    local_path = _find_first_file()
-    print(f"\nlocal_path={local_path}")
-
-    process_rule = settings.dataset_default_process_rule
-    text_splitter = get_text_splitter(process_rule)
-
-    file_type, _ = detect_file_type(local_path)
-    docs = load_document_file(local_path, file_type)
-    doc = next(docs)
-
-    documents = text_splitter.split_documents([doc])
-    for document in documents[0:3]:
-        print(f"{document}")
-
-    document = documents[0]
-    chunk = DocumentChunk(
-        dataset_id=0,
-        document_id=0,
-        position=0,
-        content=document.page_content,
-        word_count=0,
-    )
-    save_document_chucks([chunk])
-
+def test_list_files():
+    print("\ntest_list_files")
     with open_session() as session:
-        select_sql = select(DocumentChunk).where(DocumentChunk.document_id == 0)
-        chunks = session.exec(select_sql).all()
-        print("\nchunks")
-        for c in chunks:
-            print(f"chunk={c}")
+        select_stmt = select(File).where(File.deleted == False).limit(10)
+
+        files = session.exec(select_stmt).all()
+        file_dict = {file.id: file for file in files}
+
+    for params in list_files(file_dict):
+        print(params.model_dump_json())
+
+
+def test_list_storage_files():
+    print("\ntest_list_storage_files")
+    storage_files = get_storage_files("chinese-poetry/quantangshi/")
+
+    limit = 10
+    for params in list_storage_files(storage_files):
+        print(params.model_dump_json())
+        limit -= 1
+        if limit == 0:
+            break

@@ -8,16 +8,15 @@ from uuid import uuid4
 from app.config import settings
 from app.core.file.service.file_type import detect_file_type
 from app.core.file.storage.base import get_storage_provider
-from app.core.rag.api import DatasetImportStorage
 from app.core.rag.enums import DocumentSourceType
-from app.tasks.dataset_import import FileTaskParams
+from app.tasks.dataset_import import _FileTaskParams
 from app.util.datetime import format_date_compact
 
 logger = logging.getLogger(__name__)
 
 
 def list_storage_files(
-        storage_files: list[str]) -> Iterable[Optional[FileTaskParams]]:
+        storage_files: list[str]) -> Iterable[Optional[_FileTaskParams]]:
     storage_provider = get_storage_provider()
 
     file_dir = _get_local_dir()
@@ -35,7 +34,7 @@ def list_storage_files(
                 "file_key": file_key,
                 "file_type": file_type,
             })
-            yield FileTaskParams(
+            yield _FileTaskParams(
                 file_path=local_path, file_type=file_type,
                 source_info=source_info, source_type=DocumentSourceType.Storage)
 

@@ -30,6 +30,7 @@ except KeyError:
 
 
 class ErrorCode(Enum):
+    ok = auto()
     unknown_error = auto()
     request_validation_error = auto()
     request_validation_error_detail = auto()
@@ -53,6 +54,7 @@ class ErrorCode(Enum):
     remote_file_not_found = auto()
 
     dataset_not_found = auto()
+    dataset_conversation_not_found = auto()
 
     def get_status_code_and_message(self) -> tuple[int, str]:
         for status_code, kv in _config.items():
@@ -97,10 +99,10 @@ class BizException(Exception):
         )
 
     def to_response(self) -> Response:
+        from app.util.api import ApiResult
+
+        content = ApiResult(code=self.error_code, msg=self.message)
         return JSONResponse(
-            content={
-                "error_code": self.error_code,
-                "message": self.message,
-            },
+            content=content,
             status_code=self.status_code,
         )

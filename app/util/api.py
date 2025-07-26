@@ -1,11 +1,10 @@
 from pydantic import BaseModel, JsonValue
 
+from app.common.error_code import ErrorCode
+
 
 class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
-    class Config:
-        exclude_none = True
-
-    code: int = 0
+    code: str = ErrorCode.ok
     msg: str | None = None
     data: T = None
 

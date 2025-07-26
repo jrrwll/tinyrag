@@ -1,8 +1,8 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
 
 from app.core.rag.enums import DocumentSourceType
 from app.entities.base import TableBase, enum_field_info
-from datetime import datetime
+
 
 class Dataset(TableBase, table=True):
     name: str = Field(min_length=1, max_length=100)

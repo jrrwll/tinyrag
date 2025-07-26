@@ -16,7 +16,7 @@ class RerankingModelConfig(BaseModel):
 
 
 class EmbeddingModelConfig(BaseModel):
-    pass
+    model_id: int
 
 
 class RetrievalModelConfig(BaseModel):

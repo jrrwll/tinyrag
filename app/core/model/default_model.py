@@ -1,9 +1,7 @@
 from cachetools import TTLCache
 
-from app.core.model.api import ModelPublic
+from app.common.error_code import BizException, ErrorCode
 from app.core.model.enums import ModelType
-from app.core.model.privoder import ModelProvider
-from app.core.model.privoder.base import get_model_provider
 from app.entities.dao.model import get_default_models
 from app.entities.model import Model
 from app.util.data import OptionalValue
@@ -14,7 +12,7 @@ _default_model_cache: TTLCache[
     maxsize=10, ttl=10 * 60)  # 10min
 
 
-def get_default_model(model_type: ModelType) -> Model | None:
+def get_default_model(model_type: ModelType) -> Model:
     model = _default_model_cache.get(model_type)
     if model:
         return model.value
@@ -27,12 +25,6 @@ def get_default_model(model_type: ModelType) -> Model | None:
         if m and member == model_type:
             model = m
 
-    return model
-
-
-def get_default_model_provider(model_type: ModelType) -> ModelProvider | None:
-    model = get_default_model(model_type)
     if not model:
-        return None
-
-    return get_model_provider(ModelPublic.create(model))
+        raise BizException.create(ErrorCode.default_model_not_set, model_type)
+    return model

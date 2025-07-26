@@ -10,8 +10,10 @@ from app.core.rag.api import DatasetChat, DatasetChatPublic, DatasetCreate, \
     DatasetImport, DatasetPublic, \
     DatasetStreamChatPublic, DatasetUpdate, PreviewChunk, PreviewChunkPublic, \
     SimpleDatasetPublic
-from app.core.rag.preview_file_chunk import preview_file_chunk
+from app.core.rag.service.chat import chat_dataset
+from app.core.rag.service.preview_file_chunk import preview_file_chunk
 from app.core.file.service.base import get_storage_files
+from app.core.rag.service.stream_chat import stream_chat_dataset
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.dataset import page_and_count_datasets
 from app.entities.dao.file import get_files
@@ -136,20 +138,30 @@ def start_conversation(session: SessionDep, id: str):
 @router.post("/chat", response_model=ApiResult[DatasetChatPublic])
 def chat(session: SessionDep, params: DatasetChat):
     conversation_id = params.conversation_id
-    dataset_entity = session.get(Conversation, conversation_id)
+    entity = session.get(Conversation, conversation_id)
+    if not entity:
+        raise BizException.create(ErrorCode.dataset_conversation_not_found, id)
+
+    dataset_id = entity.dataset_id
+    dataset_entity = session.get(Dataset, dataset_id)
     if not dataset_entity:
         raise BizException.create(ErrorCode.dataset_not_found, id)
 
-    chat_dataset(params)
-    raise NotImplementedError()
+    res = chat_dataset(entity, dataset_entity)
+    return ApiResult.create(res)
 
 
 @router.post("/stream_chat", response_model=ApiResult[DatasetStreamChatPublic])
-def chat(session: SessionDep, params: DatasetChat):
+def stream_chat(session: SessionDep, params: DatasetChat):
     conversation_id = params.conversation_id
-    dataset_entity = session.get(Conversation, conversation_id)
+    entity = session.get(Conversation, conversation_id)
+    if not entity:
+        raise BizException.create(ErrorCode.dataset_conversation_not_found, id)
+
+    dataset_id = entity.dataset_id
+    dataset_entity = session.get(Dataset, dataset_id)
     if not dataset_entity:
         raise BizException.create(ErrorCode.dataset_not_found, id)
 
-    chat_dataset(params)
-    raise NotImplementedError()
+    res = stream_chat_dataset(entity, dataset_entity)
+    return ApiResult.create(res)
