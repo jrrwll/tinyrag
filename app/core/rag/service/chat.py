@@ -5,8 +5,7 @@ from app.entities.dataset import Dataset, DatasetConversation
 from app.entities.workflow_run import Conversation
 
 
-def chat_dataset(entity: Conve
-    rsation, dataset_entity: Dataset) -> DatasetChatPublic:
+def chat_dataset(entity: Conversation, dataset_entity: Dataset) -> DatasetChatPublic:
     pass
 
 
