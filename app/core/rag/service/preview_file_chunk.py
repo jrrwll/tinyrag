@@ -2,13 +2,13 @@ from app.common.db import open_session
 from app.common.error_code import BizException, ErrorCode
 from app.core.file.enums import FileType
 from app.core.file.service.upload import get_file_path
-from app.core.rag.api import PreviewChunk, PreviewChunkPublic
+from app.core.rag.api import DocumentPreviewChunk, DocumentPreviewChunkPublic
 from app.core.rag.text_process.base import get_text_processor
 from app.entities.file import File
 from app.util.collection import take_limit
 
 
-def preview_file_chunk(params: PreviewChunk) -> PreviewChunkPublic:
+def preview_file_chunk(params: DocumentPreviewChunk) -> DocumentPreviewChunkPublic:
     file_id = params.file_id
     with open_session() as session:
         file = session.get(File, file_id)
@@ -26,4 +26,4 @@ def preview_file_chunk(params: PreviewChunk) -> PreviewChunkPublic:
     all_splits = text_processor.split_documents(take_limit(docs, 1))
 
     contents = [all_split.content for all_split in all_splits]
-    return PreviewChunkPublic(content=contents)
+    return DocumentPreviewChunkPublic(content=contents)

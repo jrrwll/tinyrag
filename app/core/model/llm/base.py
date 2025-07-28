@@ -1,0 +1,77 @@
+import logging
+from abc import ABC
+from typing import Any, MutableMapping, Type
+
+from cachetools import TTLCache
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import BaseMessage
+from pydantic import BaseModel
+
+from app.common.error_code import BizException, ErrorCode
+from app.config import settings
+from app.core.model.api import ModelPublic
+from app.core.model.base import ModelParams
+from app.core.model.enums import ModelType
+from app.core.model.provider import BaseModelProvider, ModelProviderFactory
+from app.core.model.service import process_model_config
+from app.core.variable.base import Variable
+from app.util.langchain.callbacks import CompleteResponseHandler
+
+logger = logging.getLogger(__name__)
+
+
+class BaseModelConfig(BaseModel):
+    timeout: int | None = None
+
+
+class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel]):
+
+    @staticmethod
+    def get_model_type() -> ModelType:
+        return ModelType.LLM
+
+    @staticmethod
+    def _model_cache() -> MutableMapping[str, BaseChatModel]:
+        return _model_cache
+
+    def test_run(self,
+            prompt: str | None = None) -> dict:  # type: ignore[type-arg]
+        if not prompt:
+            prompt = settings.DEFAULT_TEST_PROMPT
+
+        logger.info(f"Test run with prompt: {prompt}")
+        msg = self.model.invoke(prompt)
+        return msg.model_dump()
+
+    def run(self, model_params: ModelParams,
+            messages: list[BaseMessage]) -> str:
+        model_config = process_model_config(model_params)
+
+        response = self.model.invoke(messages, config=model_config)
+        return response.content
+
+    def run_structured_output(self, model_params: ModelParams,
+            messages: list[BaseMessage],
+            structured_output_type: Type[BaseModel]) -> list[Variable]:
+        model_config = process_model_config(model_params)
+
+        structured_chat = self.model.with_structured_output(
+            structured_output_type)
+
+        handler = CompleteResponseHandler()
+        model_config["callbacks"] = [handler]
+        structured_output = structured_chat.invoke(
+            messages, config=model_config)
+
+        return [Variable(name=name, value=value) for name, value
+                in dict(structured_output).items()]
+
+
+_model_cache: TTLCache[str, BaseChatModel] = TTLCache(
+    maxsize=1000, ttl=10 * 60)  # 10min
+
+
+def get_llm_provider(model: ModelPublic) -> LLMProvider[Any]:
+    provider_name = model.provider_name
+    cls = ModelProviderFactory.get_provider_class(ModelType.LLM, provider_name)
+    return cls(model)

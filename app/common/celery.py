@@ -136,10 +136,10 @@
 # """
 # # task define demo
 #
-# send_celery_task(task_id, dataset_import_task.__name__,
+# send_celery_task(task_id, knowledge_import_task.__name__,
 #                  task_id, task_params_json)
 #
-# @celery.task(queue="dataset", bind=True, track_started=True)
-# def dataset_import_task(task_id: str, task_params_json: bytes):
+# @celery.task(queue="knowledge", bind=True, track_started=True)
+# def knowledge_import_task(task_id: str, task_params_json: bytes):
 #     pass
 # """

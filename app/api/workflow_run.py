@@ -1,9 +1,7 @@
 from typing import Any
 
-from fastapi import APIRouter
-
-from app.util.api import ApiResult, IdResult
-from app.common.db import SessionDep
+from app.api import CustomAPIRouter
+from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.workflow_run.api import (WorkflowRunCreate, WorkflowRunExecute,
                                        WorkflowRunExecutePublic,
@@ -14,8 +12,9 @@ from app.core.workflow_run.service.run_step import workflow_run_execute, \
     workflow_run_execute_step
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
+from app.util.api import ApiResult, IdResult
 
-router = APIRouter(prefix="/workflow/run", tags=["workflow", "workflow_run"])
+router = CustomAPIRouter(prefix="/workflow/run", tags=["workflow", "workflow_run"])
 
 
 @router.get("", response_model=ApiResult[WorkflowRunPublic])
@@ -60,7 +59,7 @@ def execute(session: SessionDep, params: WorkflowRunExecute) -> Any:
     return ApiResult.create(res)
 
 
-@router.post("/execute_step", response_model=ApiResult[WorkflowRunExecuteStepPublic])
+@router.post("/execute-step", response_model=ApiResult[WorkflowRunExecuteStepPublic])
 def execute_step(session: SessionDep, params: WorkflowRunExecuteStep) -> Any:
     entity = session.get(WorkflowRun, params.id)
     if not entity:

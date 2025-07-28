@@ -10,7 +10,7 @@ from app.core.rag.base import ProcessRule
 from app.core.rag.enums import VectorStoreType
 from app.config.base import _singleton_workdir
 
-_dataset_default_process_rule = {
+_knowledge_default_process_rule = {
     "text_splitter": {
         "chunk_overlap": 50,
         "chunk_size": 1024,
@@ -18,22 +18,22 @@ _dataset_default_process_rule = {
     }
 }
 
-class DatasetConfig(BaseSettings):
-    DATASET_DEFAULT_PROCESS_RULE: str = json.dumps(_dataset_default_process_rule)
+class KnowledgeSettings(BaseSettings):
+    DATASET_DEFAULT_PROCESS_RULE: str = json.dumps(_knowledge_default_process_rule)
 
     @cached_property
-    def dataset_default_process_rule(self) -> ProcessRule:
+    def knowledge_default_process_rule(self) -> ProcessRule:
         return ProcessRule.model_validate_json(
             self.DATASET_DEFAULT_PROCESS_RULE)
 
     @model_validator(mode="after")
     def _validate_process_rule(self) -> Self:
-        process_rule = self.dataset_default_process_rule
+        process_rule = self.knowledge_default_process_rule
         assert process_rule
         return self
 
 
-class FileUploadConfig(BaseSettings):
+class FileUploadSettings(BaseSettings):
 
     UPLOAD_FILE_SIZE_LIMIT: NonNegativeInt = 20
     UPLOAD_IMAGE_FILE_SIZE_LIMIT: NonNegativeInt = 20
@@ -41,7 +41,7 @@ class FileUploadConfig(BaseSettings):
     UPLOAD_VIDEO_FILE_SIZE_LIMIT: NonNegativeInt = 100
 
 
-class VectorStoreConfig(BaseSettings):
+class VectorStoreSettings(BaseSettings):
 
     VECTOR_STORE_TYPE: VectorStoreType = VectorStoreType.Chroma
 

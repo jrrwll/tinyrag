@@ -7,3 +7,6 @@ class AsyncTaskStatus(StrEnum):
     Success = "success"
     Failure = "failure"
 
+
+class AsyncTaskType(StrEnum):
+    KnowledgeImport = "knowledge_import"

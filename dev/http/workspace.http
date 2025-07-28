@@ -1,0 +1,23 @@
+GET http://{{origin}}{{api_prefix}}/workspace/list
+
+###
+GET http://{{origin}}{{api_prefix}}/workspace?id=1
+
+###
+POST http://{{origin}}{{api_prefix}}/workspace
+Content-Type: application/json
+
+{
+  "name": "tuke",
+  "description": "test workspace"
+}
+
+###
+PUT http://{{origin}}{{api_prefix}}/workspace
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "tuke",
+  "description": "test workspace!"
+}

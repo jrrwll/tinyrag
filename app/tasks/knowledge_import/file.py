@@ -5,7 +5,7 @@ from typing import Iterable, Optional
 from app.core.file.service.upload import get_file_path
 from app.core.rag.enums import DocumentSourceType
 from app.entities.file import File
-from app.tasks.dataset_import.base import _FileTaskParams
+from app.tasks.knowledge_import.base import _FileTaskParams
 
 logger = logging.getLogger(__name__)
 

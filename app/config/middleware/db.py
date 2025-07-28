@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 from app.common.constants import APP_NAME
 
 
-class DatabaseConfig(BaseSettings):
+class DatabaseSettings(BaseSettings):
 
     DB_URI_SCHEME: str = "mysql+pymysql" # or postgresql
     DB_HOST: str = 'locahost'

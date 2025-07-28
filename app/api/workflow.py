@@ -1,9 +1,7 @@
 from typing import Any
 
-from fastapi import APIRouter, Query
-
-from app.util.api import ApiResult, IdResult, PageResult
-from app.common.db import SessionDep
+from app.api import CustomAPIRouter
+from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.workflow.api import (
@@ -17,15 +15,16 @@ from app.core.workflow.check_list import workflow_check_list
 from app.core.workflow.enums import WorkflowStatus
 from app.entities.dao.workflow import page_and_count_workflows
 from app.entities.workflow import Workflow
+from app.util.api import ApiResult, IdResult, PageResult
 
-router = APIRouter(prefix="/workflow", tags=["workflow"])
+router = CustomAPIRouter(prefix="/workflow", tags=["workflow"])
 
 
 @router.get("/list", response_model=ApiResult[PageResult[SimpleWorkflowPublic]])
 def list(
     session: SessionDep,
-    page_no: int = Query(default=1, ge=1, le=100000),
-    page_size: int = Query(default=settings.DEFAULT_PAGE_SIZE, ge=1, le=1000),
+    page_no: int = settings.page_no_query,
+    page_size: int = settings.page_size_query,
     status: WorkflowStatus | None = None,
 ) -> Any:
     entities, count = page_and_count_workflows(session, page_no, page_size, status)
@@ -73,7 +72,7 @@ def update(session: SessionDep, params: WorkflowUpdate) -> Any:
 
 
 @router.api_route(
-    "/check_list", methods=["GET", "POST"],
+    "/check-list", methods=["GET", "POST"],
     response_model=ApiResult[WorkflowCheckListPublic]
 )
 def check_list(session: SessionDep, id: int) -> Any:

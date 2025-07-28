@@ -12,12 +12,12 @@ router = APIRouter(tags=["inner"], prefix="/inner")
 logger = logging.getLogger(__name__)
 
 
-@router.get("/test_log")
+@router.get("/test-log")
 def test_log() -> Any:
     logger.info(f"test log is: {logger}")
-    
 
-@router.get("/queue_stat", response_model=ApiResult[dict[str, Any]])
+
+@router.get("/queue-stat", response_model=ApiResult[dict[str, Any]])
 def queue_stat() -> Any:
     rq_manager = RQManager()
     queue = rq_manager.queue
@@ -30,7 +30,7 @@ def queue_stat() -> Any:
     return ApiResult.create(stat_dict)
 
 
-@router.get("/queue_jobs", response_model=ApiResult[PageResult[dict[str, Any]]])
+@router.get("/queue-jobs", response_model=ApiResult[PageResult[dict[str, Any]]])
 def queue_stat(page_no: int = settings.page_no_query,
         page_size: int = settings.page_size_query) -> Any:
     queue = RQManager().queue

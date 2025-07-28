@@ -3,7 +3,7 @@ from pydantic import PositiveInt, Field, NonNegativeInt
 from pydantic_settings import BaseSettings
 
 
-class RedisConfig(BaseSettings):
+class RedisSettings(BaseSettings):
 
     REDIS_HOST: str = 'localhost'
     REDIS_PORT: PositiveInt = 6379

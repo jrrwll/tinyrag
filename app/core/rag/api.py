@@ -5,28 +5,28 @@ from pydantic import BaseModel
 from app.config import settings
 from app.core.rag.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
-from app.entities.dataset import Dataset
+from app.entities.knowledge import Knowledge
 from app.util.json import load_and_update_dict
 
 
-class DatasetCreate(BaseModel):
+class KnowledgeCreate(BaseModel):
     name: str
     description: str | None = None
 
     process_rule: ProcessRule | None = None
 
-    def to_entity(self) -> Dataset:
+    def to_entity(self) -> Knowledge:
         process_rule = self.process_rule
         if not process_rule:
-            process_rule = settings.dataset_default_process_rule
-        return Dataset(name=self.name, description=self.description,
+            process_rule = settings.knowledge_default_process_rule
+        return Knowledge(name=self.name, description=self.description,
                        process_rule=process_rule.model_dump_json())
 
 
-class DatasetUpdate(DatasetCreate):
+class KnowledgeUpdate(KnowledgeCreate):
     id: str
 
-    def update_entity(self, entity: Dataset) -> None:
+    def update_entity(self, entity: Knowledge) -> None:
         update_dict = self.model_dump(exclude_none=True)
         update_dict.update(
             {
@@ -36,27 +36,27 @@ class DatasetUpdate(DatasetCreate):
         entity.sqlmodel_update(update_dict)
 
 
-class DatasetImportFile(BaseModel):
+class KnowledgeImportFile(BaseModel):
     file_ids: list[str]
 
 
-class DatasetImportStorage(BaseModel):
+class KnowledgeImportStorage(BaseModel):
     file_path: str
 
 
-class DatasetImportWebsite(BaseModel):
-    file_ids: list[str]
+class KnowledgeImportWebsite(BaseModel):
+    pass
 
 
-class DatasetImport(BaseModel):
+class KnowledgeImport(BaseModel):
     id: str
 
-    file: DatasetImportFile | None = None
-    storage: DatasetImportStorage | None = None
-    website: DatasetImportWebsite | None = None
+    file: KnowledgeImportFile | None = None
+    storage: KnowledgeImportStorage | None = None
+    website: KnowledgeImportWebsite | None = None
 
 
-class SimpleDatasetPublic(BaseModel):
+class SimpleKnowledgePublic(BaseModel):
     id: str
     created_at: datetime
     updated_at: datetime
@@ -65,38 +65,38 @@ class SimpleDatasetPublic(BaseModel):
     description: str | None = None
 
 
-class DatasetPublic(SimpleDatasetPublic):
+class KnowledgePublic(SimpleKnowledgePublic):
     process_rule: ProcessRule | None = None
     embedding_model: EmbeddingModelConfig | None = None
     retrieval_model: RetrievalModelConfig | None = None
 
     @staticmethod
-    def create(entity: Dataset) -> "DatasetPublic":
+    def create(entity: Knowledge) -> "KnowledgePublic":
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
             entity_dict,
             "process_rule", "embedding_model", "retrieval_model")
-        return DatasetPublic(**entity_dict)
+        return KnowledgePublic(**entity_dict)
 
 
-class PreviewChunk(BaseModel):
+class DocumentPreviewChunk(BaseModel):
     file_id: str
     process_rule: ProcessRule
 
 
-class PreviewChunkPublic(BaseModel):
+class DocumentPreviewChunkPublic(BaseModel):
     content: list[str]
 
 
-class DatasetChat(BaseModel):
+class KnowledgeChat(BaseModel):
     conversation_id: str
     query: str
 
 
-class DatasetChatPublic(BaseModel):
+class KnowledgeChatPublic(BaseModel):
     answer: str
 
 
-class DatasetStreamChatPublic(BaseModel):
+class KnowledgeStreamChatPublic(BaseModel):
     answer: str
     done: bool | None = None

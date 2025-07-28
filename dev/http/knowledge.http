@@ -1,11 +1,11 @@
-GET http://{{origin}}{{api_prefix}}/dataset/list
+GET http://{{origin}}{{api_prefix}}/knowledge/list
 
 ###
-GET http://{{origin}}{{api_prefix}}/dataset?id=1
+GET http://{{origin}}{{api_prefix}}/knowledge?id=1
 
 ###
 # 全唐诗
-POST http://{{origin}}{{api_prefix}}/dataset
+POST http://{{origin}}{{api_prefix}}/knowledge
 Content-Type: application/json
 
 {
@@ -26,10 +26,6 @@ Content-Type: application/json
       "chunk_overlap": 50,
       "chunk_size": 256,
       "separators": [
-        "\n\n",
-        "\n",
-        " ",
-        "",
         "}"
       ]
     }

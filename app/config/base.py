@@ -6,12 +6,12 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings
 
-_root_dir = str(Path(__file__).resolve().parents[2])
+_root_dir = Path(__file__).resolve().parents[2]
 
-_singleton_workdir = f"{_root_dir}/workdir"
+_singleton_workdir = _root_dir / "workdir"
 
 
-class DeploymentConfig(BaseSettings):
+class DeploymentSettings(BaseSettings):
     PROJECT_NAME: str
     DEBUG: bool = False
 
@@ -27,14 +27,14 @@ class DeploymentConfig(BaseSettings):
         return self.ENVIRONMENT == "test"
 
     @classmethod
-    def ROOT_DIR(cls) -> str:
+    def ROOT_DIR(cls) -> Path:
         return _root_dir
 
 
 _log_format_prefix = "%(asctime)s %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]"
 
 
-class LoggingConfig(BaseSettings):
+class LoggingSettings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = f"{_log_format_prefix}: %(message)s"

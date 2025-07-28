@@ -9,7 +9,7 @@ from app.config import settings
 from app.core.file.service.file_type import detect_file_type
 from app.core.file.storage.base import get_storage_provider
 from app.core.rag.enums import DocumentSourceType
-from app.tasks.dataset_import import _FileTaskParams
+from app.tasks.knowledge_import import _FileTaskParams
 from app.util.datetime import format_date_compact
 
 logger = logging.getLogger(__name__)

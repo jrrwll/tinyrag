@@ -4,7 +4,7 @@ from app.common.error_code import ErrorCode
 
 
 class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
-    code: str = ErrorCode.ok
+    code: str = ErrorCode.ok.name
     msg: str | None = None
     data: T = None
 

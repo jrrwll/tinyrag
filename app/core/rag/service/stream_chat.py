@@ -1,8 +1,8 @@
-from app.core.rag.api import DatasetStreamChatPublic
-from app.entities.dataset import Dataset
-from app.entities.workflow_run import Conversation
+from app.core.rag.api import KnowledgeStreamChatPublic
+from app.entities.knowledge import Knowledge
+from app.entities.knowledge import KnowledgeConversation
 
 
-def stream_chat_dataset(entity: Conversation,
-        dataset_entity: Dataset) -> DatasetStreamChatPublic:
+def stream_chat_knowledge(entity: KnowledgeConversation,
+        knowledge_entity: Knowledge) -> KnowledgeStreamChatPublic:
     pass

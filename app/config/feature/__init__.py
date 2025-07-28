@@ -1,7 +1,11 @@
-from app.config.feature.dataset import DatasetConfig, FileUploadConfig, \
-    VectorStoreConfig
-from app.config.feature.model import ModelConfig
+from app.config.feature.knowledge import FileUploadSettings, KnowledgeSettings, \
+    VectorStoreSettings
+from app.config.feature.model import ModelSettings
 
 
-class FeatureConfig(ModelConfig, FileUploadConfig, DatasetConfig, VectorStoreConfig):
+class FeatureSettings(
+    ModelSettings,
+    FileUploadSettings,
+    KnowledgeSettings,
+    VectorStoreSettings):
     pass

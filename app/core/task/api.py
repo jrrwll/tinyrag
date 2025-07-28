@@ -1,14 +1,15 @@
-from uuid import UUID
+from datetime import datetime
 
 from pydantic import BaseModel
-from datetime import datetime
-from app.core.task.enums import AsyncTaskStatus
+
+from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
 from app.entities.task import AsyncTask
 
 
 class AsyncTaskPublic(BaseModel):
-    id: UUID
-    name: str
+    id: str
+    type: AsyncTaskType
+    ref_id: str | None = None
     payload: str
     status: AsyncTaskStatus
 

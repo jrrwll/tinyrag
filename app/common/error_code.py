@@ -35,6 +35,21 @@ class ErrorCode(Enum):
     request_validation_error = auto()
     request_validation_error_detail = auto()
 
+    # auth
+    email_or_password_incorrect = auto()
+    same_new_password = auto()
+    user_inactive = auto()
+    user_email_already_exists = auto()
+    super_user_cannot_delete = auto()
+    invalid_email_domain = auto()
+    user_not_found = auto()
+    user_email_not_found = auto()
+    invalid_token = auto()
+    invalid_credentials = auto()
+    insufficient_permissions = auto()
+
+    # feature
+    workspace_not_found = auto()
     model_not_found = auto()
     model_provider_not_supported = auto()
     default_model_not_set = auto()
@@ -51,10 +66,10 @@ class ErrorCode(Enum):
     file_type_not_supported = auto()
     file_not_found = auto()
     file_not_a_document = auto()
-    remote_file_not_found = auto()
+    storage_file_not_found = auto()
 
-    dataset_not_found = auto()
-    dataset_conversation_not_found = auto()
+    knowledge_not_found = auto()
+    knowledge_conversation_not_found = auto()
 
     def get_status_code_and_message(self) -> tuple[int, str]:
         for status_code, kv in _config.items():
@@ -103,6 +118,6 @@ class BizException(Exception):
 
         content = ApiResult(code=self.error_code, msg=self.message)
         return JSONResponse(
-            content=content,
+            content=content.model_dump(exclude_none=True),
             status_code=self.status_code,
         )

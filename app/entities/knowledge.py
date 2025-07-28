@@ -4,7 +4,7 @@ from app.core.rag.enums import DocumentSourceType
 from app.entities.base import TableBase, enum_field_info
 
 
-class Dataset(TableBase, table=True):
+class Knowledge(TableBase, table=True):
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
@@ -14,12 +14,12 @@ class Dataset(TableBase, table=True):
     retrieval_model: str | None = None
 
     @staticmethod
-    def get_collection_name(dataset_id: str) -> str:
-        return f"dataset_{dataset_id}"
+    def get_collection_name(knowledge_id: str) -> str:
+        return f"Knowledge_{knowledge_id}"
 
 
-class Document(TableBase, table=True):
-    dataset_id: int
+class KnowledgeDocument(TableBase, table=True):
+    knowledge_id: int
     position: int
     word_count: int = 0
 
@@ -28,11 +28,9 @@ class Document(TableBase, table=True):
     indexing: bool = False
 
 
-class DocumentChunk(TableBase, table=True):
+class KnowledgeDocumentChunk(TableBase, table=True):
 
-    __tablename__ = 'document_chunk'
-
-    dataset_id: int
+    knowledge_id: int
     document_id: int
     position: int
     content: str = Field(max_length=10000)
@@ -41,14 +39,13 @@ class DocumentChunk(TableBase, table=True):
     index_doc_id: str | None = None
 
 
-class DatasetConversation(TableBase, table=True):
+class KnowledgeConversation(TableBase, table=True):
 
-    __tablename__ = 'dataset_conversation'
-
-    dataset_id: int
+    knowledge_id: int
 
 
-class DatasetMessage(TableBase, table=True):
+class KnowledgeMessage(TableBase, table=True):
+    knowledge_id: int
     conversation_id: int
     query: str
     answer: str | None = None

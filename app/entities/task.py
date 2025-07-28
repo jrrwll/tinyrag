@@ -1,19 +1,12 @@
 from datetime import datetime
 
-from sqlmodel import Field, SQLModel
-
-from app.core.task.enums import AsyncTaskStatus
-from app.entities.base import enum_field_info
+from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
+from app.entities.base import LogTableBase, enum_field_info
 
 
-class AsyncTask(SQLModel, table=True):
-    __tablename__ = "async_task"
-
-    id: str = Field(primary_key=True)
-    created_at: datetime
-    updated_at: datetime
-
-    name: str = Field(min_length=1, max_length=100)
+class AsyncTask(LogTableBase, table=True):
+    type: AsyncTaskType = enum_field_info(AsyncTaskType)
+    ref_id: str | None = None
     payload: str
     status: AsyncTaskStatus = enum_field_info(
         AsyncTaskStatus, AsyncTaskStatus.Pending)

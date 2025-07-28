@@ -4,13 +4,14 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from app.core.model.enums import ModelType
+from app.common.constants import MIN_UTC_DATETIME
+from app.core.model.enums import ModelType, SYSTEM_MODEL_PROVIDER_NAME
 from app.entities.model import Model
 from app.util.json import dump_and_update_dict, load_and_update_dict
 
 
 class ModelPublic(BaseModel):
-    id: str
+    id: int
     created_at: datetime
     updated_at: datetime
 
@@ -19,13 +20,25 @@ class ModelPublic(BaseModel):
     provider_name: str
     model_name: str
     config: dict # type: ignore[arg-type]
-    embedding_config:  dict # type: ignore[arg-type]
 
     @staticmethod
     def create(item: Model) -> "ModelPublic":
         item_dict = item.model_dump(exclude_none=True)
         load_and_update_dict(item_dict, "config", "embedding_config")
         return ModelPublic(**item_dict)
+
+    @staticmethod
+    def from_system_provider(model_type: ModelType, model_name: str) -> "ModelPublic":
+        return ModelPublic(
+            id=0,
+            created_at=MIN_UTC_DATETIME,
+            updated_at=MIN_UTC_DATETIME,
+            type=model_type,
+            enable=True,
+            provider_name=SYSTEM_MODEL_PROVIDER_NAME,
+            model_name=model_name,
+            config={},
+        )
 
     # def __hash__(self) -> int:
     #     return hash(self.id)

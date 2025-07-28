@@ -1,13 +1,13 @@
 # ruff: noqa: E712
 from collections.abc import Sequence
 
-from sqlmodel import Session
-from sqlmodel import func, select
+from sqlmodel import Session, func, select
 
 from app.common.db import engine
 from app.common.db import SessionDep
+from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
-from app.entities.model import DefaultModel, Model
+from app.entities.model import Model
 
 
 def page_and_count_models(
@@ -30,6 +30,12 @@ def page_and_count_models(
     )
     models = session.exec(page_statement).all()
     return models, count
+
+def get_model_by_id(session: Session, id: int) -> ModelPublic | None:
+    entity = session.get(Model, id)
+    if not entity:
+        return None
+    return ModelPublic.create(entity)
 
 
 def get_default_models() -> dict[ModelType, Model]:

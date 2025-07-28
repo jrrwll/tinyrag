@@ -1,13 +1,13 @@
-from app.config.middleware.db import DatabaseConfig
-from app.config.middleware.redis import RedisConfig
-from app.config.middleware.rq import RqConfig
-from app.config.middleware.storage import StorageConfig
+from app.config.middleware.db import DatabaseSettings
+from app.config.middleware.redis import RedisSettings
+from app.config.middleware.rq import RqSettings
+from app.config.middleware.storage import StorageSettings
 
 
-class MiddlewareConfig(
-    DatabaseConfig,
-    RedisConfig,
-    RqConfig,
-    StorageConfig,
+class MiddlewareSettings(
+    DatabaseSettings,
+    RedisSettings,
+    RqSettings,
+    StorageSettings,
 ):
     pass

@@ -50,7 +50,7 @@ def run_add_documents(vector_store_type: VectorStoreType):
     if not local_path:
         return
 
-    text_processor = get_text_processor(settings.dataset_default_process_rule)
+    text_processor = get_text_processor(settings.knowledge_default_process_rule)
 
     docs = list(text_processor.load_documents(local_path, FileType.TXT))
     print(f"\ndocs len {len(docs)}")

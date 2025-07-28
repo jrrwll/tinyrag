@@ -18,7 +18,7 @@ def get_upload_rule() -> FileUploadPublic:
 def get_storage_files(file_path: str) -> list[str]:
     storage_provider = get_storage_provider()
     if not storage_provider.exists(file_path):
-        raise BizException.create(ErrorCode.remote_file_not_found, file_path)
+        raise BizException.create(ErrorCode.storage_file_not_found, file_path)
 
     if not file_path.endswith("/"):
         return [file_path]
@@ -30,6 +30,6 @@ def get_storage_files(file_path: str) -> list[str]:
     keys = [file.key for file in files if not file.is_dir]
     if not keys:
         raise BizException.create(
-            ErrorCode.remote_file_not_found, file_path
+            ErrorCode.storage_file_not_found, file_path
         )
     return keys

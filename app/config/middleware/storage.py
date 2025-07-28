@@ -5,7 +5,7 @@ from app.config.base import _singleton_workdir
 from app.core.file.enums import StorageType
 
 
-class StorageConfig(BaseSettings):
+class StorageSettings(BaseSettings):
     STORAGE_TYPE: StorageType = StorageType.Opendal
     STORAGE_LIST_FILE_MAX_COUNT: int = 1000
 

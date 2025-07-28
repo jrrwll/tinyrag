@@ -3,8 +3,8 @@ from sqlmodel import select
 from app.common.db import open_session
 from app.core.file.service.base import get_storage_files
 from app.entities.file import File
-from app.tasks.dataset_import.file import list_files
-from app.tasks.dataset_import.storage import list_storage_files
+from app.tasks.knowledge_import.file import list_files
+from app.tasks.knowledge_import.storage import list_storage_files
 
 
 def test_list_files():

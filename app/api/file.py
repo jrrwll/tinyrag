@@ -1,17 +1,17 @@
 from typing import Any
 
-from fastapi import APIRouter
 from fastapi import File, UploadFile
 
-from app.core.file.service.base import get_upload_rule
-from app.util.api import ApiResult
-from app.common.db import SessionDep
+from app.api import CustomAPIRouter
+from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.core.file.api import FilePublic, FileUploadPublic
+from app.core.file.service.base import get_upload_rule
 from app.core.file.service.upload import delete_file, upload_file
 from app.entities.file import File as FileEntity
+from app.util.api import ApiResult
 
-router = APIRouter(prefix="/file", tags=["file"])
+router = CustomAPIRouter(prefix="/file", tags=["file"])
 
 
 @router.get("/upload", response_model=ApiResult[FileUploadPublic])

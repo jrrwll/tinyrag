@@ -1,9 +1,7 @@
 from typing import Any, Optional
 
-from fastapi import APIRouter
-from sqlmodel import select
-
-from app.common.db import SessionDep
+from app.api import CustomAPIRouter
+from app.common.deps import SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.model.api import (
@@ -16,10 +14,10 @@ from app.core.model.api import (
 from app.core.model.enums import ModelType
 from app.core.model.privoder.base import get_model_provider
 from app.entities.dao.model import page_and_count_models
-from app.entities.model import DefaultModel, Model
+from app.entities.model import Model
 from app.util.api import ApiResult, IdResult, PageResult
 
-router = APIRouter(prefix="/model", tags=["model"])
+router = CustomAPIRouter(prefix="/model", tags=["model"])
 
 
 @router.get("/list", response_model=ApiResult[PageResult[ModelPublic]])
@@ -72,7 +70,7 @@ def update(session: SessionDep, params: ModelUpdate) -> Any:
     return ApiResult.create()
 
 
-@router.post("/update_enable", response_model=ApiResult[ModelUpdateEnablePublic])
+@router.post("/update-enable", response_model=ApiResult[ModelUpdateEnablePublic])
 def update_enable(session: SessionDep, id: int) -> Any:
     entity = session.get(Model, id)
     if not entity:
@@ -98,7 +96,7 @@ def delete(session: SessionDep, id: int) -> Any:
     return ApiResult.create()
 
 
-@router.post("/test_run", response_model=ApiResult[ModelTestRunPublic])
+@router.post("/test-run", response_model=ApiResult[ModelTestRunPublic])
 def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     entity = session.get(Model, params.id)
     if not entity:
@@ -110,7 +108,7 @@ def test_run(session: SessionDep, params: ModelTestRun) -> Any:
     return ApiResult.create(ModelTestRunPublic(result=result))
 
 
-@router.get("/default_model", response_model=ApiResult[Optional[ModelPublic]])
+@router.get("/default-model", response_model=ApiResult[Optional[ModelPublic]])
 def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
     default_model = _find_default_model(session, model_type)
     if default_model and default_model.model_id:
@@ -122,7 +120,7 @@ def get_default_model(session: SessionDep, model_type: ModelType) -> Any:
     return ApiResult.create()
 
 
-@router.post("/default_model", response_model=ApiResult[Any])
+@router.post("/default-model", response_model=ApiResult[Any])
 def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -> Any:
     model_id, model_type = params.model_id, params.model_type
     if not model_id and not model_type:
@@ -159,8 +157,8 @@ def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel) -
     return ApiResult.create()
 
 
-def _find_default_model(session: SessionDep, model_type: ModelType
-) -> DefaultModel | None:
-    select_statement = select(DefaultModel).where(
-        DefaultModel.model_type == model_type)
-    return session.exec(select_statement).one_or_none()
+# def _find_default_model(session: SessionDep, model_type: ModelType
+# ) -> DefaultModel | None:
+#     select_statement = select(DefaultModel).where(
+#         DefaultModel.model_type == model_type)
+#     return session.exec(select_statement).one_or_none()

@@ -1,20 +1,21 @@
 # ruff: noqa: E712
 from sqlmodel import and_, func, select
 
-from app.common.db import open_session
 from app.common.db import SessionDep
-from app.entities.dataset import Dataset, Document, DocumentChunk
+from app.common.db import open_session
+from app.entities.knowledge import Knowledge, KnowledgeDocument, \
+    KnowledgeDocumentChunk
 
 
-def page_and_count_datasets(
+def page_and_count_knowledges(
         session: SessionDep, page_no: int, page_size: int, enable: bool | None
 ) -> tuple[list[dict], int]:  # type: ignore[type-arg]
-    conditions = [Dataset.deleted == False]
+    conditions = [Knowledge.deleted == False]
     if enable:
-        conditions.append(Dataset.enable == enable)
+        conditions.append(Knowledge.enable == enable)
 
     count_statement = (
-        select(func.count()).select_from(Dataset).where(and_(*conditions))
+        select(func.count()).select_from(Knowledge).where(and_(*conditions))
     )
     count = session.exec(count_statement).one()
 
@@ -23,14 +24,14 @@ def page_and_count_datasets(
 
     page_statement = (
         select(  # type: ignore[call-overload]
-            Dataset.id,
-            Dataset.name,
-            Dataset.description,
-            Dataset.enable,
-            Dataset.created_at,
-            Dataset.updated_at,
+            Knowledge.id,
+            Knowledge.name,
+            Knowledge.description,
+            Knowledge.enable,
+            Knowledge.created_at,
+            Knowledge.updated_at,
         )
-        .select_from(Dataset)
+        .select_from(Knowledge)
         .where(and_(*conditions))
         .offset(offset)
         .limit(limit)
@@ -39,7 +40,7 @@ def page_and_count_datasets(
     return [dict(i) for i in models], count
 
 
-def save_document(entity: Document) -> Document:
+def save_knowledge_document(entity: KnowledgeDocument) -> KnowledgeDocument:
     with open_session() as session:
         session.add(entity)
         session.commit()
@@ -47,7 +48,8 @@ def save_document(entity: Document) -> Document:
     return entity
 
 
-def save_document_chucks(entities: list[DocumentChunk]) -> None:
+def save_knowledge_document_chucks(
+        entities: list[KnowledgeDocumentChunk]) -> None:
     with open_session() as session:
         session.add_all(entities)
         session.commit()

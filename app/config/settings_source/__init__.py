@@ -9,5 +9,5 @@ class SettingsSourceName(StrEnum):
     APOLLO = "apollo"
 
 
-class SettingsSourceConfig(BaseSettings):
+class SettingsSourceSettings(BaseSettings):
     SOURCE_NAME: SettingsSourceName = SettingsSourceName.File

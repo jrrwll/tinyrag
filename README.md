@@ -16,6 +16,8 @@ A Tiny Agent Workflow AI Application
 uv init
 uv add fastapi sqlmodel pydantic pydantic-settings "granian[reload]"
 uv add python-multipart pymysql
+# auth
+uv add "passlib[bcrypt]" pyjwt emails
 
 # mypy: static type check
 # ruff: code smell check
@@ -26,6 +28,7 @@ uv add langchain langgraph langchain_community
 uv add langchain_ollama langchain_openai
 # Note that: langchain-postgres need libpg in the os path
 uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
+
 # token and keywords
 uv add nltk jieba tiktoken
 
