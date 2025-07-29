@@ -1,10 +1,10 @@
 # ruff: noqa: E712
-from collections.abc import Sequence
+from typing import Sequence
 
 from sqlmodel import Session, func, select
 
-from app.common.db import engine
-from app.common.db import SessionDep
+from app.common.deps import engine
+from app.common.deps import SessionDep
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.entities.model import Model

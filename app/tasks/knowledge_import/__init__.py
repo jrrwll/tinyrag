@@ -3,7 +3,7 @@ from uuid import uuid4
 import orjson
 from pydantic import BaseModel
 
-from app.common.db import open_session
+from app.common.deps import open_session
 from app.common.rq import send_rq_task
 from app.core.rag.api import KnowledgeImport, KnowledgePublic
 from app.core.task.api import AsyncTaskPublic

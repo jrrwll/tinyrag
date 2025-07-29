@@ -3,7 +3,7 @@ from typing import Any
 
 from sqlmodel import update
 
-from app.common.db import open_session
+from app.common.deps import open_session
 from app.core.task.enums import AsyncTaskStatus
 from app.entities.task import AsyncTask
 

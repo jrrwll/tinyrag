@@ -1,8 +1,7 @@
 # ruff: noqa: E712
 from sqlmodel import and_, func, select
 
-from app.common.db import SessionDep
-from app.common.db import open_session
+from app.common.deps import SessionDep, open_session
 from app.entities.knowledge import Knowledge, KnowledgeDocument, \
     KnowledgeDocumentChunk
 

@@ -1,0 +1,27 @@
+POST http://{{origin}}{{api_prefix}}/auth/access-token
+Content-Type: application/x-www-form-urlencoded
+
+username=tinyrag@dreamcat.org&password=tinyrag
+
+> {% client.global.set("auth_token", response.body.data.access_token); %}
+
+###
+#
+GET http://{{origin}}{{api_prefix}}/user/list
+Authorization: Bearer {{auth_token}}
+
+###
+#
+GET http://{{origin}}{{api_prefix}}/user?email=tinyrag@dreamcat.org
+Authorization: Bearer {{auth_token}}
+
+###
+#
+POST http://{{origin}}{{api_prefix}}/user
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "email": "tuke@dreamcat.org",
+  "password": "tuke"
+}

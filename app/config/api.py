@@ -3,16 +3,16 @@ from typing import Literal, Self
 
 from fastapi.params import Query
 from pydantic_settings import BaseSettings
-from pydantic import EmailStr, model_validator
+from pydantic import EmailStr, model_validator, computed_field
 
 
 class ApiSettings(BaseSettings):
     PROJECT_NAME: str
     API_PREFIX_STR: str = "/api/v1"
 
-    SECRET_KEY: str
-    SECRET_ALGORITHM: Literal["RS256", "HS256"] = "RS256"
-    ACCESS_TOKEN_TYPE: str = "bearer"
+    ACCESS_TOKEN_ALGORITHM: Literal["RS256", "HS256"] = "RS256"
+    ACCESS_TOKEN_PUBLIC_KEY: str | None = None
+    ACCESS_TOKEN_PRIVATE_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
     ACCESS_TOKEN_RESET_EXPIRE_HOURS: int = 24
 
@@ -50,6 +50,12 @@ class ApiSettings(BaseSettings):
     def page_size_query(self) -> Query:
         return Query(default=self.DEFAULT_PAGE_SIZE,
                      ge=1, le=self.DEFAULT_MAX_PAGE_SIZE)
+
+    @model_validator(mode="after")
+    def _set_default_public_key(self) -> Self:
+        if not self.ACCESS_TOKEN_PUBLIC_KEY:
+            self.ACCESS_TOKEN_PUBLIC_KEY = self.ACCESS_TOKEN_PRIVATE_KEY
+        return self
 
     @model_validator(mode="after")
     def _set_default_emails_from(self) -> Self:

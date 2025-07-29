@@ -5,7 +5,7 @@
 # from celery import Celery
 # from celery.signals import task_postrun, task_prerun
 #
-# from app.common.db import open_session
+# from app.common.deps import open_session
 # from app.config import settings
 # from app.entities.task import AsyncTask, AsyncTaskStatus
 #

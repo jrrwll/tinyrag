@@ -9,7 +9,7 @@ from langchain_core.messages.ai import AIMessage
 from pydantic import BaseModel, Field
 from sqlmodel import Session
 
-from app.common.db import engine
+from app.common.deps import engine
 from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelPublic
 from app.core.model.base import LLMPrompt, ModelParams, StructuredOutput

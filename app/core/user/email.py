@@ -1,6 +1,6 @@
 import logging
 from typing import Any, Tuple
-
+from pydantic import EmailStr
 import emails  # type: ignore
 from jinja2 import Template
 
@@ -17,7 +17,7 @@ def render_email_template(template_name: str, context: dict[str, Any]) -> str:
     return html_content
 
 
-def send_email(email_to: str, subject: str, html_content: str) -> None:
+def send_email(email_to: EmailStr | str, subject: str, html_content: str) -> None:
     if not settings.emails_enabled:
         raise RuntimeError("no provided configuration for email variables")
 
@@ -35,12 +35,12 @@ def send_email(email_to: str, subject: str, html_content: str) -> None:
         smtp_options["user"] = settings.SMTP_USER
     if settings.SMTP_PASSWORD:
         smtp_options["password"] = settings.SMTP_PASSWORD
-    response = message.send(to=email_to, smtp=smtp_options)
+    response = message.send(to=str(email_to), smtp=smtp_options)
     logger.info(f"send email result: {response}")
 
 
 def generate_new_account_email(
-        email_to: str, username: str, password: str
+        email_to: EmailStr | str, username: str, password: str
 ) -> Tuple[str, str]:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - New account for user {username}"
@@ -58,7 +58,7 @@ def generate_new_account_email(
 
 
 def generate_reset_password_email(
-        email_to: str, email: str, token: str
+        email_to: EmailStr | str, email: str, token: str
 ) -> Tuple[str, str]:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Password recovery for user {email}"
@@ -72,5 +72,15 @@ def generate_reset_password_email(
             "valid_hours": settings.ACCESS_TOKEN_RESET_EXPIRE_HOURS,
             "link": link,
         },
+    )
+    return subject, html_content
+
+
+def generate_test_email(email_to: EmailStr | str) -> Tuple[str, str]:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Test email"
+    html_content = render_email_template(
+        template_name="test_email.html",
+        context={"project_name": settings.PROJECT_NAME, "email": email_to},
     )
     return subject, html_content

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def create_user(session: Session, params: UserCreate,
         current_user: User) -> UserPublic:
-    user = get_user_by_email(session, str(params.email))
+    user = get_user_by_email(session, params.email)
     if user:
         raise BizException.create(ErrorCode.user_email_already_exists)
     if params.email_domain != current_user.email_domain:
@@ -37,15 +37,15 @@ def create_user(session: Session, params: UserCreate,
 
     if settings.emails_enabled:
         subject, html_content = generate_new_account_email(
-            email_to=str(params.email), username=params.name,
+            email_to=params.email, username=params.name,
             password=params.password
         )
         send_email(
-            email_to=str(params.email),
+            email_to=params.email,
             subject=subject,
             html_content=html_content,
         )
-    return UserPublic(entity)
+    return UserPublic.create(entity)
 
 
 def update_user(session: Session, params: UserUpdate) -> UserPublic:
@@ -58,7 +58,7 @@ def update_user(session: Session, params: UserUpdate) -> UserPublic:
     session.add(entity)
     session.commit()
 
-    return UserPublic(entity)
+    return UserPublic.create(entity)
 
 
 def update_my_password(session: Session, params: UserUpdatePassword,
@@ -108,7 +108,7 @@ def generate_access_token(session: Session, username: str,
         raise BizException.create(ErrorCode.user_inactive)
 
     return AccessTokenPublic(
-        access_token=create_access_token(user.id)
+        access_token=create_access_token(user.email)
     )
 
 

@@ -17,7 +17,7 @@ uv init
 uv add fastapi sqlmodel pydantic pydantic-settings "granian[reload]"
 uv add python-multipart pymysql
 # auth
-uv add "passlib[bcrypt]" pyjwt emails
+uv add passlib bcrypt cryptography pyjwt emails email-validator
 
 # mypy: static type check
 # ruff: code smell check

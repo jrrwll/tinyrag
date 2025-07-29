@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -36,3 +36,8 @@ async def exception_handler(_: Request, e: Exception) -> Response:
     else:
         exc = BizException.unknown(e)
     return exc.to_response()
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_: Request, e: HTTPException) -> Response:
+    return BizException.unknown(e).to_response()

@@ -1,4 +1,4 @@
-from app.common.db import open_session
+from app.common.deps import open_session
 from app.common.error_code import BizException, ErrorCode
 from app.core.file.enums import FileType
 from app.core.file.service.upload import get_file_path

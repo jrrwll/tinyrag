@@ -1,6 +1,6 @@
 from sqlmodel import func, select
 
-from app.common.db import SessionDep, open_session
+from app.common.deps import SessionDep, open_session
 from app.core.model.api import ModelPublic
 from app.core.model.enums import EmbeddingType, ModelType
 from app.core.workspace.api import WorkspacePublic

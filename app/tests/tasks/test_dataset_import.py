@@ -1,6 +1,6 @@
 from sqlmodel import select
 
-from app.common.db import open_session
+from app.common.deps import open_session
 from app.core.file.service.base import get_storage_files
 from app.entities.file import File
 from app.tasks.knowledge_import.file import list_files

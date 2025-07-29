@@ -1,5 +1,5 @@
 from app.api import CustomAPIRouter, file, inner, knowledge, \
-    model, workflow, workflow_run, workspace, user, auth
+    model, workflow, workflow_run, workspace, auth, user
 from app.config import settings
 
 api_router = CustomAPIRouter()

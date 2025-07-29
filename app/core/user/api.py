@@ -1,11 +1,12 @@
-from pydantic import BaseModel, Field, EmailStr
-
-from app.config import settings
+from pydantic import BaseModel, EmailStr, Field
+from datetime import datetime
 from app.core.user.enums import UserRole, UserStatus
+from app.entities.user import User
 
 
 class UserCreate(BaseModel):
     email: EmailStr
+    password: str = Field(min_length=4, max_length=40)
     role: UserRole
 
     @property
@@ -27,6 +28,9 @@ class UserUpdate(UserUpdateMe):
 
 
 class UserPublic(BaseModel):
+    created_at: datetime
+    updated_at: datetime
+
     tenant_id: int
     name: str
     email: str
@@ -37,6 +41,10 @@ class UserPublic(BaseModel):
     role: UserRole
     status: UserStatus
 
+    @staticmethod
+    def create(entity: User) -> "UserPublic":
+        return UserPublic(**entity.model_dump())
+
 
 class UserUpdatePassword(BaseModel):
 
@@ -46,7 +54,7 @@ class UserUpdatePassword(BaseModel):
 
 class AccessTokenPublic(BaseModel):
     access_token: str
-    token_type: str = settings.ACCESS_TOKEN_TYPE
+    token_type: str = "bearer"
 
 
 class UserResetPassword(BaseModel):

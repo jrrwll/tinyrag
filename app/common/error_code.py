@@ -3,7 +3,7 @@ import os.path
 from enum import Enum, auto
 from pathlib import Path
 
-from fastapi import Response
+from fastapi import Response, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.config import settings
@@ -103,14 +103,21 @@ class BizException(Exception):
 
     @staticmethod
     def unknown(exc: Exception) -> "BizException":
-        message = _unknown_message
+
+        if isinstance(exc, HTTPException):
+            message = exc.detail
+            status_code=exc.status_code
+        else:
+            message = _unknown_message
+            status_code=_unknown_status_code
+
         if settings.IS_TEST_ENV:
             message = str(exc)
 
         return BizException(
             error_code=ErrorCode.unknown_error.name,
             message=message,
-            status_code=_unknown_status_code,
+            status_code=status_code,
         )
 
     def to_response(self) -> Response:

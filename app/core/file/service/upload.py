@@ -4,16 +4,15 @@ import shutil
 from uuid import uuid4
 
 from fastapi import UploadFile
-from sqlmodel import Session
 
-from app.common.db import engine
+from app.common.deps import open_session
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.file.api import FilePublic
 from app.core.file.service.file_type import detect_file_type
 from app.entities.file import File
-from app.util.datetime import format_date_compact
 from app.util.codec import get_file_md5
+from app.util.datetime import format_date_compact
 
 
 def upload_file(file: UploadFile) -> FilePublic:
@@ -32,7 +31,7 @@ def upload_file(file: UploadFile) -> FilePublic:
         file_type, mime_type = file_type
 
     md5 = get_file_md5(file_path)
-    with Session(engine) as session:
+    with open_session() as session:
         existing_entity = session.get(File, md5)
 
     if existing_entity:
@@ -48,7 +47,7 @@ def upload_file(file: UploadFile) -> FilePublic:
     shutil.move(file_path, save_path) # maybe very slow
 
     ex: Exception | None = None
-    with Session(engine) as session:
+    with open_session() as session:
         try:
             session.add(entity)
             session.commit()
