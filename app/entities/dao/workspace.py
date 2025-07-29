@@ -5,7 +5,7 @@ from app.core.model.api import ModelPublic
 from app.core.model.enums import EmbeddingType, ModelType
 from app.core.workspace.api import WorkspacePublic
 from app.core.workspace.base import WorkspaceDetail
-from app.entities.dao.model import get_model_by_id
+from app.entities.dao.model import get_model
 from app.entities.workspace import Workspace
 
 
@@ -45,6 +45,7 @@ def get_workspace_detail(workspace_id: int) -> WorkspaceDetail | None:
         workspace_entity = session.get(Workspace, workspace_id)
         if not workspace_entity:
             return None
+        tenant_id = workspace_entity.tenant_id
 
         workspace = WorkspacePublic.create(workspace_entity)
         llm_model_config = workspace.llm_model_config
@@ -55,14 +56,14 @@ def get_workspace_detail(workspace_id: int) -> WorkspaceDetail | None:
 
         if llm_model_config:
             model_id = llm_model_config.model_id
-            workspace_detail.llm_model = get_model_by_id(session, model_id)
+            workspace_detail.llm_model = get_model(session, model_id, tenant_id)
         if embedding_model_config:
             if embedding_model_config.embedding_type == EmbeddingType.Provider:
                 model_id = embedding_model_config.model_id
-                workspace_detail.embedding_model = get_model_by_id(session,
-                                                                   model_id)
+                workspace_detail.embedding_model = get_model(
+                    session, model_id, tenant_id)
             else:
-                workspace_detail.embedding_model = ModelPublic.from_system_provider(
+                workspace_detail.embedding_model = ModelPublic.from_builtin(
                     ModelType.TextEmbedding, embedding_model_config.model_name)
 
         return workspace_detail

@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-SYSTEM_MODEL_PROVIDER_NAME = "system"
+BUILTIN_MODEL_PROVIDER_NAME = "builtin"
 
 
 class ModelType(StrEnum):
@@ -16,12 +16,14 @@ class PromptRoleType(StrEnum):
     User = "user"
 
 
-_TRANSFORMER_MODELS = [
-    "all-MiniLM-L6-v2",
-    "all-MiniLM-L12-v2",
-    "nomic-embed-text-v1",
-    "multilingual-e5-small"
-]
+builtin_models = {
+    ModelType.TextEmbedding: [
+        "all-MiniLM-L6-v2",
+        "all-MiniLM-L12-v2",
+        "nomic-embed-text-v1",
+        "multilingual-e5-small"
+    ]
+}
 
 
 class EmbeddingType(StrEnum):
@@ -30,4 +32,4 @@ class EmbeddingType(StrEnum):
 
     @classmethod
     def is_valid_model_name(cls, model_name: str) -> bool:
-        return model_name in _TRANSFORMER_MODELS
+        return model_name in builtin_models[ModelType.TextEmbedding]

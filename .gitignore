@@ -29,5 +29,3 @@ celerybeat.pid
 /workdir/
 
 templates/build/
-
-

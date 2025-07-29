@@ -14,33 +14,48 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
-uv add fastapi sqlmodel pydantic pydantic-settings "granian[reload]"
-uv add python-multipart pymysql
-# auth
-uv add passlib bcrypt cryptography pyjwt emails email-validator
 
 # mypy: static type check
 # ruff: code smell check
 uv add --dev pytest mypy ruff coverage
 
-# langchain
-uv add langchain langgraph langchain_community 
-uv add langchain_ollama langchain_openai
-# Note that: langchain-postgres need libpg in the os path
-uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
-
-# token and keywords
-uv add nltk jieba tiktoken
+# web
+uv add fastapi sqlmodel pydantic pydantic-settings "granian[reload]"
+uv add python-multipart pymysql
+# auth
+uv add passlib bcrypt cryptography pyjwt emails email-validator
 
 # utility
 uv add cachetools types-cachetools requests types-requests filetype pytz types-pytz
-uv add beautifulsoup4 pypdf
 
 # middleware
 #uv add celery celery-stubs flower 
 uv add rq rq-scheduler redis boto3 "boto3-stubs[s3]"
 ```
 
+```shell
+# langchain
+uv add langchain langgraph langchain_community 
+uv add langchain_ollama langchain_openai
+# Note that: langchain-postgres need libpg in the os path
+uv add langchain-qdrant langchain-postgres langchain-chroma langchain-milvus
+
+# doc
+uv add beautifulsoup4 pypdf
+
+# token and keywords
+uv add nltk jieba tiktoken
+```
+
+```shell
+npm i -g mjml
+
+# -w --watch
+# --config.beautify true --config.minify false
+find templates/src -name '*.mjml' | while read i; do
+    mjml $i -o templates/build --config.beautify false --config.minify true
+done
+```
 
 ### run the project
 

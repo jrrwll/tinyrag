@@ -1,11 +1,10 @@
 import json
 from datetime import datetime
-from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.common.constants import MIN_UTC_DATETIME
-from app.core.model.enums import ModelType, SYSTEM_MODEL_PROVIDER_NAME
+from app.core.model.enums import ModelType, BUILTIN_MODEL_PROVIDER_NAME
 from app.entities.model import Model
 from app.util.json import dump_and_update_dict, load_and_update_dict
 
@@ -28,14 +27,14 @@ class ModelPublic(BaseModel):
         return ModelPublic(**item_dict)
 
     @staticmethod
-    def from_system_provider(model_type: ModelType, model_name: str) -> "ModelPublic":
+    def from_builtin(model_type: ModelType, model_name: str) -> "ModelPublic":
         return ModelPublic(
             id=0,
             created_at=MIN_UTC_DATETIME,
             updated_at=MIN_UTC_DATETIME,
             type=model_type,
             enable=True,
-            provider_name=SYSTEM_MODEL_PROVIDER_NAME,
+            provider_name=BUILTIN_MODEL_PROVIDER_NAME,
             model_name=model_name,
             config={},
         )
@@ -63,7 +62,7 @@ class ModelCreate(BaseModel):
 
 
 class ModelUpdate(BaseModel):
-    id: str
+    id: int
     model_name: str
     config: dict = {}  # type: ignore[type-arg]
     embedding_config: dict = {}
@@ -82,12 +81,12 @@ class ModelUpdate(BaseModel):
 
 
 class ModelUpdateEnablePublic(BaseModel):
-    id: str
+    id: int
     enable: bool
 
 
 class ModelTestRun(BaseModel):
-    id: str
+    id: int
     prompt: str | None = None
 
 
@@ -96,5 +95,6 @@ class ModelTestRunPublic(BaseModel):
 
 
 class SetupDefaultModel(BaseModel):
-    model_type: ModelType | None = None
-    model_id: str | None = None
+    model_type: ModelType
+    model_id: int | None = None
+    model_name: str | None = None

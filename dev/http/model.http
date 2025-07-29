@@ -1,15 +1,18 @@
 GET http://{{origin}}{{api_prefix}}/model/list
+Authorization: Bearer {{auth_token}}
 
 ###
 GET http://{{origin}}{{api_prefix}}/model?id=1
+Authorization: Bearer {{auth_token}}
 
 ###
 # llm text_embedding
 POST http://{{origin}}{{api_prefix}}/model
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "type": "text_embedding",
+  "type": "llm",
   "provider_name": "ollama",
   "model_name": "qwen3:4b",
   "config": {
@@ -20,6 +23,7 @@ Content-Type: application/json
 
 ###
 PUT http://{{origin}}{{api_prefix}}/model
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -32,9 +36,11 @@ Content-Type: application/json
 
 ###
 POST http://{{origin}}{{api_prefix}}/model/update_enable?id=1
+Authorization: Bearer {{auth_token}}
 
 ###
 POST http://{{origin}}{{api_prefix}}/model/test_run
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -43,15 +49,29 @@ Content-Type: application/json
 }
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default_model?model_type=llm
+GET http://{{origin}}{{api_prefix}}/model/default-model?model_type=llm
+Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default_model?model_type=text_embedding
+GET http://{{origin}}{{api_prefix}}/model/default-model?model_type=text_embedding
+Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/default_model
+POST http://{{origin}}{{api_prefix}}/model/default-model
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "model_id": 2
+  "model_type": "llm",
+  "model_id": 1
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/model/default-model
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "model_type": "text_embedding",
+  "model_name": "all-MiniLM-L6-v2"
 }

@@ -5,6 +5,7 @@ from app.entities.base import LogTableBase, enum_field_info
 
 
 class AsyncTask(LogTableBase, table=True):
+    tenant_id: int
     type: AsyncTaskType = enum_field_info(AsyncTaskType)
     ref_id: str | None = None
     payload: str

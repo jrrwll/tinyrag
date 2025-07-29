@@ -4,6 +4,7 @@ from app.entities.base import TableBase
 
 
 class Workspace(TableBase, table=True):
+    tenant_id: int
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     llm_model_config:  str | None = None

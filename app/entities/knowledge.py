@@ -5,6 +5,7 @@ from app.entities.base import TableBase, enum_field_info
 
 
 class Knowledge(TableBase, table=True):
+    tenant_id: int
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
@@ -19,6 +20,7 @@ class Knowledge(TableBase, table=True):
 
 
 class KnowledgeDocument(TableBase, table=True):
+    tenant_id: int
     knowledge_id: int
     position: int
     word_count: int = 0
@@ -30,6 +32,7 @@ class KnowledgeDocument(TableBase, table=True):
 
 class KnowledgeDocumentChunk(TableBase, table=True):
 
+    tenant_id: int
     knowledge_id: int
     document_id: int
     position: int
@@ -41,10 +44,12 @@ class KnowledgeDocumentChunk(TableBase, table=True):
 
 class KnowledgeConversation(TableBase, table=True):
 
+    tenant_id: int
     knowledge_id: int
 
 
 class KnowledgeMessage(TableBase, table=True):
+    tenant_id: int
     knowledge_id: int
     conversation_id: int
     query: str

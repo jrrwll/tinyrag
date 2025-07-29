@@ -20,6 +20,7 @@ def page_and_count_users(session: Session,
         page_no: int, page_size: int, tenant_id: int
 ) -> tuple[Sequence[User], int]:
     conditions = [User.tenant_id == tenant_id, User.deleted == False]
+
     count_statement = (
         select(func.count()).select_from(User).where(*conditions)
     )

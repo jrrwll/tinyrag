@@ -3,18 +3,19 @@ from typing import Sequence
 
 from sqlmodel import Session, func, select
 
-from app.common.deps import engine
-from app.common.deps import SessionDep
+from app.common.deps import SessionDep, open_session
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
-from app.entities.model import Model
+from app.entities.model import Model, TenantDefaultModel
 
 
 def page_and_count_models(
-    session: SessionDep, page_no: int, page_size: int
+        session: SessionDep, page_no: int, page_size: int, tenant_id: int
 ) -> tuple[Sequence[Model], int]:
+    conditions = [Model.tenant_id == tenant_id, Model.deleted == False]
+
     count_statement = (
-        select(func.count()).select_from(Model).where(Model.deleted == False)
+        select(func.count()).select_from(Model).where(*conditions)
     )
     count = session.exec(count_statement).one()
 
@@ -23,34 +24,56 @@ def page_and_count_models(
 
     page_statement = (
         select(Model)
-        .select_from(Model)
-        .where(Model.deleted == False)
+        .where(*conditions)
         .offset(offset)
         .limit(limit)
     )
     models = session.exec(page_statement).all()
     return models, count
 
-def get_model_by_id(session: Session, id: int) -> ModelPublic | None:
-    entity = session.get(Model, id)
-    if not entity:
-        return None
-    return ModelPublic.create(entity)
+
+def get_model(session: Session, id: int, tenant_id: int) -> Model | None:
+    stmt = select(Model).where(
+        Model.id == id, Model.tenant_id == tenant_id
+    ).limit(1)
+    return session.exec(stmt).one_or_none()
 
 
-def get_default_models() -> dict[ModelType, Model]:
-    with Session(engine) as session:
-        select_all_statement = select(DefaultModel)
-        default_models = session.exec(select_all_statement).all()
+def get_default_model(session: Session, model_type: ModelType, tenant_id: int
+) -> TenantDefaultModel | None:
+    stmt = select(TenantDefaultModel).where(
+        TenantDefaultModel.model_type == model_type,
+        TenantDefaultModel.tenant_id == tenant_id
+    )
+    return session.exec(stmt).one_or_none()
 
-        model_ids = [default_model.id
-                     for default_model in default_models]
-        if not model_ids:
-            return {}
 
-        select_in_statement = select(Model).where(
-            Model.id.in_(model_ids),
-            Model.deleted == False
-        )
-        models = session.exec(select_in_statement).all()
-        return {model.type: model for model in models}
+def get_default_models(tenant_id: int) -> dict[ModelType, ModelPublic]:
+    with open_session() as session:
+        stmt = select(TenantDefaultModel).where(
+            TenantDefaultModel.tenant_id == tenant_id)
+        default_models = session.exec(stmt).all()
+
+        model_type_names = {
+            default_model.model_type: default_model.model_name
+            for default_model in default_models
+            if default_model.model_name
+        }
+        system_models = [
+            ModelPublic.from_builtin(model_type, model_name)
+            for model_type, model_name in model_type_names.items()
+        ]
+
+        custom_models = []
+        model_ids = [default_model.model_id
+                     for default_model in default_models
+                     if default_model.model_id]
+        if model_ids:
+            select_in_statement = select(Model).where(
+                Model.id.in_(model_ids),
+                Model.deleted == False
+            )
+            models = session.exec(select_in_statement).all()
+            custom_models = [ModelPublic.create(model) for model in models]
+
+        return {model.type: model for model in system_models + custom_models}
