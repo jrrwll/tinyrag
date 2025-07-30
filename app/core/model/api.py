@@ -39,6 +39,9 @@ class ModelPublic(BaseModel):
             config={},
         )
 
+    def is_builtin(self) -> bool:
+        return self.provider_name == BUILTIN_MODEL_PROVIDER_NAME
+
     # def __hash__(self) -> int:
     #     return hash(self.id)
     #

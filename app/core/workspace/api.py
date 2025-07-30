@@ -44,3 +44,19 @@ class WorkspaceUpdate(WorkspaceCreate):
     def update_entity(self, entity: Workspace) -> None:
         update_dict = self.model_dump(exclude_none=True)
         entity.sqlmodel_update(update_dict)
+
+
+class WorkspaceUpdateConfig(BaseModel):
+    id: int
+
+    llm_model_config:  LlmModelConfig | None = None
+    embedding_model_config:  EmbeddingModelConfig | None = None
+    vector_store_config:  VectorStoreConfig | None = None
+
+
+class WorkspaceUnsetConfig(BaseModel):
+    id: int
+
+    llm_model_config: bool = False
+    embedding_model_config: bool = False
+    vector_store_config: bool = False

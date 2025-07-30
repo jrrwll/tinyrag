@@ -26,6 +26,7 @@ router = CustomAPIRouter(prefix="/knowledge", tags=["knowledge"])
 @router.get("/list", response_model=ApiResult[PageResult[SimpleKnowledgePublic]])
 def list(
         session: SessionDep,
+        workspace_id: str,
         page_no: int = settings.page_no_query,
         page_size: int = settings.page_size_query,
         enable: bool | None = None,

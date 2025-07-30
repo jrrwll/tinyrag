@@ -1,20 +1,25 @@
 GET http://{{origin}}{{api_prefix}}/knowledge/list
+Authorization: Bearer {{auth_token}}
 
 ###
 GET http://{{origin}}{{api_prefix}}/knowledge?id=1
+Authorization: Bearer {{auth_token}}
 
 ###
 # 全唐诗
 POST http://{{origin}}{{api_prefix}}/knowledge
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
+  "workspace_id": 1,
   "name": "空白知识库",
   "description": "some description"
 }
 
 ###
 PUT http://{{origin}}{{api_prefix}}/dataset
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -34,6 +39,7 @@ Content-Type: application/json
 
 ###
 POST http://{{origin}}{{api_prefix}}/dataset/preview_chunk
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -54,6 +60,7 @@ Content-Type: application/json
 
 ###
 POST http://{{origin}}{{api_prefix}}/dataset/import
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -67,6 +74,7 @@ Content-Type: application/json
 
 ###
 POST http://{{origin}}{{api_prefix}}/dataset/import
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {

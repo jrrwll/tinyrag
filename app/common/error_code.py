@@ -55,10 +55,17 @@ class ErrorCode(Enum):
     # feature
     workspace_not_found = auto()
     workspace_name_already_exists = auto()
+
     model_not_found = auto()
+    model_type_not_supported = auto()
     model_provider_not_supported = auto()
     default_model_not_set = auto()
     need_specific_type_model = auto()
+    model_name_not_supported = auto()
+    model_is_set_in_default = auto()
+
+    vector_store_not_found = auto()
+    vector_store_is_set_in_default = auto()
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()

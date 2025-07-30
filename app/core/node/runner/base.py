@@ -25,12 +25,9 @@ class NodeRunnerRegistry(ABCMeta):
 
 class NodeRunner[T: BaseModel](metaclass=NodeRunnerRegistry):
 
-    node: Node
-    config: T
-
     def __init__(self, node: Node):
-        self.node = node
-        self.config = self.get_config_type().model_validate(node.config)
+        self.node: Node = node
+        self.config: T = self.get_config_type().model_validate(node.config)
 
     @staticmethod
     @abstractmethod

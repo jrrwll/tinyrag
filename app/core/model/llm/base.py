@@ -11,7 +11,6 @@ from app.core.model.api import ModelPublic
 from app.core.model.base import ModelParams
 from app.core.model.enums import ModelType
 from app.core.model.provider import BaseModelProvider, ModelProviderFactory
-from app.core.model.service import process_model_config
 from app.core.variable.base import Variable
 from app.util.langchain.callbacks import CompleteResponseHandler
 
@@ -44,7 +43,7 @@ class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel]):
 
     def run(self, model_params: ModelParams,
             messages: list[BaseMessage]) -> str:
-        model_config = process_model_config(model_params)
+        model_config = _process_model_config(model_params)
 
         response = self.model.invoke(messages, config=model_config)
         return response.content
@@ -52,7 +51,7 @@ class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel]):
     def run_structured_output(self, model_params: ModelParams,
             messages: list[BaseMessage],
             structured_output_type: Type[BaseModel]) -> list[Variable]:
-        model_config = process_model_config(model_params)
+        model_config = _process_model_config(model_params)
 
         structured_chat = self.model.with_structured_output(
             structured_output_type)
@@ -74,3 +73,7 @@ def get_llm_provider(model: ModelPublic) -> LLMProvider[Any]:
     provider_name = model.provider_name
     cls = ModelProviderFactory.get_provider_class(ModelType.LLM, provider_name)
     return cls(model)
+
+
+def _process_model_config(params: ModelParams):
+    return {}

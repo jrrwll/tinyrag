@@ -41,6 +41,14 @@ def page_and_count_users(session: Session,
     return entities, count
 
 
+def get_workspace_permission(
+        session: Session, resource_id: int, user: User
+) -> Permission | None:
+    return get_permission(
+        session, PermissionResourceType.Workspace,
+        resource_id, user.name, user.tenant_id)
+
+
 def get_permission(session: Session,
         resource_type: PermissionResourceType, resource_id: int,
         user_identify: str, tenant_id: int

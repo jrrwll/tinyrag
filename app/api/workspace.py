@@ -8,9 +8,12 @@ from app.common.deps import CurrentUser, SessionDep, \
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.workspace.api import SimpleWorkspacePublic, WorkspaceCreate, \
-    WorkspacePublic, WorkspaceUpdate
-from app.entities.dao.workspace import get_workspace, get_workspace_by_name, \
-    page_and_count_workspaces
+    WorkspacePublic, WorkspaceUnsetConfig, WorkspaceUpdate, \
+    WorkspaceUpdateConfig
+from app.core.workspace.service import config_workspace, \
+    create_workspace, \
+    unset_config_workspace, update_workspace
+from app.entities.dao.workspace import get_workspace, page_and_count_workspaces
 from app.entities.user import User
 from app.util.api import ApiResult, IdResult, PageResult
 
@@ -48,43 +51,26 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
 @router.post("", response_model=ApiResult[IdResult])
 def _create(session: SessionDep, params: WorkspaceCreate,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
-    entity = get_workspace_by_name(session, params.name, current_user.tenant_id)
-    if entity:
-        raise BizException.create(
-            ErrorCode.workspace_name_already_exists, params.name)
-
-    entity = params.to_entity()
-    entity.tenant_id = current_user.tenant_id
-
-    session.add(entity)
-    session.commit()
-    session.refresh(entity)
-
-    return ApiResult.create(IdResult(id=entity.id))
+    workspace_id = create_workspace(session, params, current_user)
+    return ApiResult.create(IdResult(id=workspace_id))
 
 
 @router.put("", response_model=ApiResult[Any])
 def _update(session: SessionDep, current_user: CurrentUser,
         params: WorkspaceUpdate) -> Any:
-    entity = get_workspace(session, params.id, current_user.tenant_id)
-    if not entity:
-        raise BizException.create(ErrorCode.workspace_not_found, params.id)
-    # check name
-    if entity.name != params.name:
-        entity = get_workspace_by_name(
-            session, params.name, current_user.tenant_id)
-        if entity:
-            raise BizException.create(
-                ErrorCode.workspace_name_already_exists, params.name)
-
-    params.update_entity(entity)
-
-    session.add(entity)
-    session.commit()
-
+    update_workspace(session, params, current_user)
     return ApiResult.create()
 
 
-@router.post("", response_model=ApiResult[Any])
-def _config(session: SessionDep, ) -> Any:
-    pass
+@router.post("/config", response_model=ApiResult[Any])
+def _config(session: SessionDep, current_user: CurrentUser,
+        params: WorkspaceUpdateConfig) -> Any:
+    config_workspace(session, params, current_user)
+    return ApiResult.create()
+
+
+@router.delete("/config", response_model=ApiResult[Any])
+def _config(session: SessionDep, current_user: CurrentUser,
+        params: WorkspaceUnsetConfig) -> Any:
+    unset_config_workspace(session, params, current_user)
+    return ApiResult.create()

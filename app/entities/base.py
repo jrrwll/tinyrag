@@ -1,7 +1,6 @@
 import enum
 from datetime import datetime
 from typing import Type
-from uuid import uuid4
 
 from sqlalchemy.orm import declared_attr
 from sqlmodel import Column, Enum, Field, SQLModel
