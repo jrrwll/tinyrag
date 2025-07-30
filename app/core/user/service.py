@@ -185,7 +185,7 @@ def revoke_permission(session: Session, params: PermissionRevoke, current_user: 
     if not user.is_active:
         raise BizException.create(ErrorCode.user_inactive, user_identify)
 
-    check_revoke_permission(resource_type, resource_id, current_user)
+    check_revoke_permission(resource_type, resource_id, user, current_user)
 
     entity = get_permission(
         session, resource_type, resource_id,
@@ -209,6 +209,7 @@ def check_grant_permission(
 
     if resource_type == PermissionResourceType.Workspace:
         pass
+    raise NotImplementedError()
 
 
 def check_revoke_permission(
@@ -218,3 +219,4 @@ def check_revoke_permission(
         return
     if grant_user.is_superuser:
         raise BizException.create(ErrorCode.insufficient_permissions)
+    raise NotImplementedError()
