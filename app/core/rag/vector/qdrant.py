@@ -6,15 +6,12 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
 from app.config import settings
-from app.core.model.privoder import ModelProvider
 from app.core.rag.vector.vectorstores import BaseVectorStore
 
 logger = logging.getLogger(__name__)
 
 
 class QdrantVector(BaseVectorStore):
-
-    model_provider: ModelProvider
 
     client: QdrantClient
     vector_store: QdrantVectorStore
@@ -50,7 +47,7 @@ class QdrantVector(BaseVectorStore):
         self.vector_store = QdrantVectorStore(
             self.client,
             collection_name=self.collection_name,
-            embedding=self.model_provider.embeddings_model,
+            embedding=self.model_provider.model,
         )
 
     def create_collection_if_absent(self):

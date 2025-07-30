@@ -1,10 +1,10 @@
 from sqlmodel import Field
 
 from app.core.rag.enums import DocumentSourceType
-from app.entities.base import TableBase, enum_field_info
+from app.entities.base import BizTableBase, enum_field_info
 
 
-class Knowledge(TableBase, table=True):
+class Knowledge(BizTableBase, table=True):
     tenant_id: int
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
@@ -19,7 +19,7 @@ class Knowledge(TableBase, table=True):
         return f"Knowledge_{knowledge_id}"
 
 
-class KnowledgeDocument(TableBase, table=True):
+class KnowledgeDocument(BizTableBase, table=True):
     tenant_id: int
     knowledge_id: int
     position: int
@@ -30,7 +30,7 @@ class KnowledgeDocument(TableBase, table=True):
     indexing: bool = False
 
 
-class KnowledgeDocumentChunk(TableBase, table=True):
+class KnowledgeDocumentChunk(BizTableBase, table=True):
 
     tenant_id: int
     knowledge_id: int
@@ -42,13 +42,13 @@ class KnowledgeDocumentChunk(TableBase, table=True):
     index_doc_id: str | None = None
 
 
-class KnowledgeConversation(TableBase, table=True):
+class KnowledgeConversation(BizTableBase, table=True):
 
     tenant_id: int
     knowledge_id: int
 
 
-class KnowledgeMessage(TableBase, table=True):
+class KnowledgeMessage(BizTableBase, table=True):
     tenant_id: int
     knowledge_id: int
     conversation_id: int

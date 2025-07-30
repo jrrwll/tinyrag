@@ -1,16 +1,13 @@
 from langchain_core.vectorstores import VectorStore
 from langchain_postgres import PGEngine, PGVectorStore
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.inspection import inspect
 
 from app.config import settings
-from app.core.model.privoder.base import ModelProvider
 from app.core.rag.vector.vectorstores import BaseVectorStore
-from sqlalchemy.exc import ProgrammingError
-from sqlalchemy import create_engine
 
 
 class PostgresVector(BaseVectorStore):
-    model_provider: ModelProvider
 
     pg_engine: PGEngine
     vector_store: PGVectorStore
@@ -39,7 +36,7 @@ class PostgresVector(BaseVectorStore):
         self.vector_store = PGVectorStore.create_sync(
             engine=self.pg_engine,
             table_name=self.collection_name,
-            embedding_service=self.model_provider.embeddings_model,
+            embedding_service=self.model_provider.model,
             id_column="id", metadata_json_column="metadata"
         )
 

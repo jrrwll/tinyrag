@@ -8,7 +8,8 @@ create table workspace (
     description            varchar(1000) null     default null,
     llm_model_config       longtext,
     embedding_model_config longtext,
-    vector_store_config    longtext
+    vector_store_config    longtext,
+    unique key uk_tenant_id_name (tenant_id, name)
 ) default charset utf8mb4;
 
 

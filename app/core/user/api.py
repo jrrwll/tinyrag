@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from app.core.user.enums import UserRole, UserStatus
+from app.core.user.enums import PermissionResourceType, UserRole, UserStatus
 from app.entities.user import User
 
 
@@ -60,3 +60,20 @@ class AccessTokenPublic(BaseModel):
 class UserResetPassword(BaseModel):
     token: str
     new_password: str = Field(min_length=4, max_length=40)
+
+
+class PermissionPublic(BaseModel):
+    user_identify: str
+    resource_type: PermissionResourceType
+    resource_id: int
+    role: UserRole
+
+
+class PermissionRevoke(BaseModel):
+    user_identify: str
+    resource_type: PermissionResourceType
+    resource_id: int
+
+
+class PermissionGrant(PermissionRevoke):
+    role: UserRole

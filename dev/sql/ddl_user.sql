@@ -2,7 +2,6 @@ create table tenant (
     id           bigint       not null auto_increment primary key,
     created_at   timestamp    not null default current_timestamp,
     updated_at   timestamp    not null default current_timestamp on update current_timestamp,
-    deleted      tinyint      not null default 0,
     name         varchar(100) not null,
     email_domain varchar(100) not null,
     is_active    tinyint      not null default 1,
@@ -16,7 +15,6 @@ create table user (
     id              bigint       not null auto_increment primary key,
     created_at      timestamp    not null default current_timestamp,
     updated_at      timestamp    not null default current_timestamp on update current_timestamp,
-    deleted         tinyint      not null default 0,
     tenant_id       bigint       not null,
     email           varchar(255) not null,
     name            varchar(255)
@@ -28,4 +26,19 @@ create table user (
     status          varchar(50)  not null,
     unique key uk_tenant_id_name (tenant_id, name),
     unique key uk_email (email)
+) default charset utf8mb4;
+
+
+create table permission (
+    id            bigint       not null auto_increment primary key,
+    created_at    timestamp    not null default current_timestamp,
+    updated_at    timestamp    not null default current_timestamp on update current_timestamp,
+    tenant_id     bigint       not null,
+    resource_type varchar(100) not null,
+    resource_id   bigint       not null,
+    user_identify varchar(255) not null,
+    role          varchar(100) not null,
+    unique key uk_resource_user_identify (tenant_id, resource_type, resource_id, user_identify),
+    key idx_resource_type_user_identify(tenant_id, resource_type, user_identify),
+    key idx_resource_type_updated_at(tenant_id, resource_type, updated_at)
 ) default charset utf8mb4;

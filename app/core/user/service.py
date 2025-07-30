@@ -7,13 +7,15 @@ from app.common.security import create_access_token, \
     generate_password_reset_token, verify_password_reset_token
 from app.common.security import get_password_hash, verify_password
 from app.config import settings
-from app.core.user.api import AccessTokenPublic, UserCreate, UserPublic, \
+from app.core.user.api import AccessTokenPublic, PermissionGrant, \
+    PermissionRevoke, UserCreate, \
+    UserPublic, \
     UserResetPassword, UserUpdate, UserUpdatePassword
 from app.core.user.email import generate_new_account_email, \
     generate_reset_password_email, send_email
-from app.core.user.enums import UserRole
-from app.entities.dao.user import get_user_by_email
-from app.entities.user import User
+from app.core.user.enums import PermissionResourceType, UserRole
+from app.entities.dao.user import get_permission, get_user_by_email
+from app.entities.user import Permission, User
 
 logger = logging.getLogger(__name__)
 
@@ -143,3 +145,76 @@ def reset_user_password(session: Session, params: UserResetPassword):
     user.hashed_password = hashed_password
     session.add(user)
     session.commit()
+
+
+def grant_permission(session: Session, params: PermissionGrant, current_user: User):
+
+    resource_type, resource_id = params.resource_type, params.resource_id
+    user_identify, role = params.user_identify, params.role
+
+    user = get_user_by_email(session, user_identify)
+    if not user.is_active:
+        raise BizException.create(ErrorCode.user_inactive)
+
+    check_grant_permission(resource_type, resource_id, user, role, current_user)
+
+    entity = get_permission(
+        session, resource_type, resource_id,
+        user_identify, current_user.tenant_id)
+    if entity:
+        if entity.role and entity.role.implies(role):
+            raise BizException.create(ErrorCode.permission_already_granted)
+        entity.role = role
+    else:
+        entity = Permission(
+            resource_type=resource_type,
+            resource_id=resource_id,
+            user_identify=user_identify,
+            role=role,
+            tenant_id=current_user.tenant_id,
+        )
+    session.add(entity)
+    session.commit()
+
+
+def revoke_permission(session: Session, params: PermissionRevoke, current_user: User):
+    resource_type, resource_id = params.resource_type, params.resource_id
+    user_identify = params.user_identify
+
+    user = get_user_by_email(session, user_identify)
+    if not user.is_active:
+        raise BizException.create(ErrorCode.user_inactive, user_identify)
+
+    check_revoke_permission(resource_type, resource_id, current_user)
+
+    entity = get_permission(
+        session, resource_type, resource_id,
+        user_identify, current_user.tenant_id)
+
+    if not entity or not entity.role:
+        raise BizException.create(ErrorCode.permission_not_granted)
+
+    entity.role = None
+    session.add(entity)
+    session.commit()
+
+
+def check_grant_permission(
+        resource_type: PermissionResourceType, resource_id: int,
+        grant_user: User, grant_role: UserRole, current_user: User):
+    if current_user.is_superuser:
+        return
+    if grant_user.is_superuser:
+        raise BizException.create(ErrorCode.insufficient_permissions)
+
+    if resource_type == PermissionResourceType.Workspace:
+        pass
+
+
+def check_revoke_permission(
+        resource_type: PermissionResourceType, resource_id: int,
+        grant_user: User, current_user: User):
+    if current_user.is_superuser:
+        return
+    if grant_user.is_superuser:
+        raise BizException.create(ErrorCode.insufficient_permissions)

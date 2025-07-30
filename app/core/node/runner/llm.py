@@ -1,7 +1,8 @@
 from typing import Type
+
 from app.core.model.base import LLMPrompt
 from app.core.model.enums import PromptRoleType
-from app.core.model.privoder.base import get_model_provider
+from app.core.model.llm.base import get_llm_provider
 from app.core.model.service import create_structured_output_type, get_model, \
     process_prompt
 from app.core.node.base import LLMConfig
@@ -32,7 +33,7 @@ class LLMNodeRunner(NodeRunner):
                     for prompt in prompts]
 
         model = get_model(model_id)
-        model_provider = get_model_provider(model)
+        model_provider = get_llm_provider(model)
 
         if self.config.structured_output:
             structured_output_type = create_structured_output_type(

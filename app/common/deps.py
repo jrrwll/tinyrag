@@ -39,9 +39,9 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
     email = payload.sub
     user = get_user_by_email(session, email)
     if not user:
-        raise BizException.create(ErrorCode.user_not_found, email)
+        raise BizException.create(ErrorCode.login_user_not_found)
     if not user.is_active:
-        raise BizException.create(ErrorCode.user_inactive)
+        raise BizException.create(ErrorCode.login_user_inactive)
     return user
 
 

@@ -15,10 +15,11 @@ from app.core.model.api import (
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel,
 )
 from app.core.model.enums import ModelType, builtin_models
-from app.core.model.privoder.base import get_model_provider
+from app.core.model.llm.base import get_llm_provider
 from app.entities.dao.model import get_default_model, get_model, \
     page_and_count_models
 from app.entities.model import TenantDefaultModel
+from app.entities.user import User
 from app.util.api import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/model", tags=["model"])
@@ -113,9 +114,13 @@ def test_run(session: SessionDep, current_user: CurrentUser,
     entity = get_model(session, params.id, current_user.tenant_id)
     if not entity:
         raise BizException.create(ErrorCode.model_not_found, params.id)
+    if entity.type != ModelType.LLM:
+        raise BizException.create(
+            ErrorCode.need_specific_type_model,
+            ModelType.LLM.name, entity.type.name)
 
     model = ModelPublic.create(entity)
-    provider = get_model_provider(model)
+    provider=  get_llm_provider(model)
     result = provider.test_run(params.prompt)
     return ApiResult.create(ModelTestRunPublic(result=result))
 
@@ -144,7 +149,7 @@ def default_model(session: SessionDep, current_user: CurrentUser,
 
 @router.post("/default-model", response_model=ApiResult[Any])
 def set_or_unset_default_model(session: SessionDep, params: SetupDefaultModel,
-        current_user = Depends(get_current_active_superuser)) -> Any:
+        current_user: User = Depends(get_current_active_superuser)) -> Any:
     model_type, model_id, model_name = params.model_type, params.model_id, params.model_name
 
     entity = get_default_model(session, model_type, current_user.tenant_id)

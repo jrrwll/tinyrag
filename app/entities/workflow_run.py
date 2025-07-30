@@ -2,17 +2,17 @@ from datetime import datetime
 
 from sqlmodel import Field
 
-from app.entities.base import TableBase
+from app.entities.base import BizTableBase
 
 
-class WorkflowRun(TableBase, table=True):
+class WorkflowRun(BizTableBase, table=True):
     tenant_id: int
     workflow_id: int
     started_at: datetime | None = None
     stopped_at: datetime | None = None
 
 
-class WorkflowConversation(TableBase, table=True):
+class WorkflowConversation(BizTableBase, table=True):
     tenant_id: int
     workflow_run_id: int
     node_id: int | None = None
@@ -20,7 +20,7 @@ class WorkflowConversation(TableBase, table=True):
     summary: str = Field(max_length=1024)
 
 
-class WorkflowMessage(TableBase, table=True):
+class WorkflowMessage(BizTableBase, table=True):
     tenant_id: int
     conversation_id: int
     query: str = Field()

@@ -10,9 +10,12 @@ from app.entities.workspace import Workspace
 
 
 def page_and_count_workspaces(
-        session: SessionDep, page_no: int, page_size: int
+        session: SessionDep, page_no: int, page_size: int, tenant_id: int
 ) -> tuple[list[dict], int]:  # type: ignore[type-arg]
-    conditions = [Workspace.deleted == False]
+    conditions = [
+        Workspace.deleted == False,
+        Workspace.tenant_id == tenant_id
+    ]
 
     count_statement = (
         select(func.count()).select_from(Workspace)
@@ -38,6 +41,22 @@ def page_and_count_workspaces(
     )
     models = session.exec(page_statement).mappings().all()
     return [dict(i) for i in models], count
+
+
+def get_workspace(session: SessionDep,
+        id: int, tenant_id: int) -> Workspace | None:
+    stmt = select(Workspace).where(
+        Workspace.id == id, Workspace.tenant_id == tenant_id
+    ).limit(1)
+    return session.exec(stmt).one_or_none()
+
+
+def get_workspace_by_name(session: SessionDep,
+        name: str, tenant_id: int) -> Workspace | None:
+    stmt = select(Workspace).where(
+        Workspace.name == name, Workspace.tenant_id == tenant_id
+    ).limit(1)
+    return session.exec(stmt).one_or_none()
 
 
 def get_workspace_detail(workspace_id: int) -> WorkspaceDetail | None:

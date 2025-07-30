@@ -3,8 +3,8 @@ from typing import Type
 
 from app.config import settings
 from app.core.model.api import ModelPublic
-from app.core.model.privoder import ModelProvider
-from app.core.model.privoder.base import get_model_provider
+from app.core.model.embedding.base import EmbeddingProvider, \
+    get_embedding_provider
 from app.core.rag.enums import VectorStoreType
 from app.core.rag.text_process.base import DocumentModel
 
@@ -12,11 +12,11 @@ from app.core.rag.text_process.base import DocumentModel
 class Vector(ABC):
 
     collection_name: str
-    model_provider: ModelProvider
+    model_provider: EmbeddingProvider
 
     def __init__(self, collection_name: str, model: ModelPublic):
         self.collection_name = collection_name
-        self.model_provider = get_model_provider(model)
+        self.model_provider = get_embedding_provider(model)
         self._init()
 
     @abstractmethod

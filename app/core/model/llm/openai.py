@@ -8,6 +8,7 @@ from app.core.model.llm.base import BaseModelConfig, LLMProvider
 
 class OpenaiModelConfig(BaseModelConfig):
     api_key: str
+    max_tokens: int | None = None
 
 
 class OpenAILLMProvider(LLMProvider[OpenaiModelConfig]):
@@ -33,4 +34,5 @@ class OpenAILLMProvider(LLMProvider[OpenaiModelConfig]):
             model=model_name,
             api_key=api_key,  # type: ignore[arg-type]
             timeout=timeout,
+            max_tokens=self.model_config.max_tokens,
         )

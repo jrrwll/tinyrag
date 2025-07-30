@@ -38,21 +38,27 @@ class ErrorCode(Enum):
     # auth
     email_or_password_incorrect = auto()
     same_new_password = auto()
+    login_user_inactive = auto()
     user_inactive = auto()
     user_email_already_exists = auto()
     super_user_cannot_delete = auto()
     invalid_email_domain = auto()
+    login_user_not_found = auto()
     user_not_found = auto()
     user_email_not_found = auto()
     invalid_token = auto()
     invalid_credentials = auto()
     insufficient_permissions = auto()
+    permission_already_granted = auto()
+    permission_not_granted = auto()
 
     # feature
     workspace_not_found = auto()
+    workspace_name_already_exists = auto()
     model_not_found = auto()
     model_provider_not_supported = auto()
     default_model_not_set = auto()
+    need_specific_type_model = auto()
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()

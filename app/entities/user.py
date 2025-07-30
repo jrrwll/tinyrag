@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from sqlmodel import Field
 
-from app.core.user.enums import UserRole, UserStatus
-from app.entities.base import TableBase, enum_field_info
+from app.core.user.enums import PermissionResourceType, UserRole, UserStatus
+from app.entities.base import BizTableBase, TableBase, \
+    enum_field_info
 
 
 class Tenant(TableBase, table=True):
@@ -14,7 +17,7 @@ class Tenant(TableBase, table=True):
 class User(TableBase, table=True):
     tenant_id: int
     name: str = Field(max_length=255)
-    email: str = Field(unique=True, max_length=255)
+    email: str = Field(max_length=255)
 
     full_name: str | None = Field(default=None, max_length=255)
     avatar: str | None = Field(default=None, max_length=255)
@@ -34,3 +37,11 @@ class User(TableBase, table=True):
     @property
     def email_domain(self) -> str:
         return self.email.split("@", 2)[1]
+
+
+class Permission(TableBase, table=True):
+    tenant_id: int
+    user_identify: str = Field(max_length=255)
+    resource_type: PermissionResourceType = enum_field_info(PermissionResourceType)
+    resource_id: int
+    role: UserRole | None = enum_field_info(UserRole, default=None)

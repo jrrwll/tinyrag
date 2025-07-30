@@ -4,13 +4,10 @@ from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore
 
 from app.config import settings
-from app.core.model.privoder.base import ModelProvider
 from app.core.rag.vector.vectorstores import BaseVectorStore
 
 
 class ChromaVector(BaseVectorStore):
-
-    model_provider: ModelProvider
 
     client: Client
     vector_store: Chroma
@@ -23,7 +20,7 @@ class ChromaVector(BaseVectorStore):
 
             self.vector_store = Chroma(
                 collection_name=self.collection_name,
-                embedding_function=self.model_provider.embeddings_model,
+                embedding_function=self.model_provider.model,
                 persist_directory=persist_directory,
             )
             self.client = self.vector_store._client
@@ -40,7 +37,7 @@ class ChromaVector(BaseVectorStore):
             )
             self.vector_store = Chroma(
                 collection_name=self.collection_name,
-                embedding_function=self.model_provider.embeddings_model,
+                embedding_function=self.model_provider.model,
                 client=self.client,
             )
 

@@ -1,5 +1,4 @@
 import logging
-from abc import ABC
 from typing import Any, MutableMapping, Type
 
 from cachetools import TTLCache
@@ -7,7 +6,6 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel
 
-from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.model.api import ModelPublic
 from app.core.model.base import ModelParams
@@ -35,7 +33,8 @@ class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel]):
         return _model_cache
 
     def test_run(self,
-            prompt: str | None = None) -> dict:  # type: ignore[type-arg]
+            prompt: str | None = None
+    ) -> dict:  # type: ignore[type-arg]
         if not prompt:
             prompt = settings.DEFAULT_TEST_PROMPT
 

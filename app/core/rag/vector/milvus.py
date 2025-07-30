@@ -3,13 +3,10 @@ from langchain_milvus import Milvus
 from pymilvus import MilvusClient
 
 from app.config import settings
-from app.core.model.privoder.base import ModelProvider
 from app.core.rag.vector.vectorstores import BaseVectorStore
 
 
 class MilvusVector(BaseVectorStore):
-
-    model_provider: ModelProvider
 
     client: MilvusClient
     vector_store: Milvus
@@ -27,7 +24,7 @@ class MilvusVector(BaseVectorStore):
         self.vector_store = Milvus(
             connection_args=connection_args,
             collection_name=self.collection_name,
-            embedding_function=self.model_provider.embeddings_model
+            embedding_function=self.model_provider.model
         )
         self.client = self.vector_store._milvus_client
 

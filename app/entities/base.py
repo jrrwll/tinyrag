@@ -23,8 +23,11 @@ class LogTableBase(SQLModel):
 
 class TableBase(LogTableBase):
 
-    # id: int = Field(primary_key=True)
     updated_at: datetime
+
+
+class BizTableBase(TableBase):
+
     deleted: bool = False
 
 
