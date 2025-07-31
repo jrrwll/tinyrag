@@ -11,7 +11,7 @@ create table workflow (
 ) default charset utf8mb4;
 
 create table workflow_run (
-    id          bigint  not null primary key,
+    id          bigint  not null auto_increment primary key,
     created_at  timestamp not null default current_timestamp,
     updated_at  timestamp not null default current_timestamp on update current_timestamp,
     deleted     tinyint   not null default 0,

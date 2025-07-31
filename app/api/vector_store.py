@@ -9,7 +9,8 @@ from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.vector_store.api import SetupDefaultVectorStore, \
     VectorStoreCreate, VectorStorePublic
-from app.core.vector_store.service import delete_vector_store, \
+from app.core.vector_store.service import create_vector_store, \
+    delete_vector_store, \
     find_default_vector_store, \
     set_or_unset_default_vector_store
 from app.entities.dao.vector_store import get_vector_store, \
@@ -48,20 +49,15 @@ def get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
 
 
 @router.post("", response_model=ApiResult[IdResult])
-def create(session: SessionDep, current_user: CurrentUser,
-        params: VectorStoreCreate) -> Any:
-    entity = params.to_entity()
-    entity.tenant_id = current_user.tenant_id
-
-    session.add(entity)
-    session.commit()
-    session.refresh(entity)
-
-    return ApiResult.create(IdResult(id=entity.id))
+def create(session: SessionDep, params: VectorStoreCreate,
+        current_user: User = Depends(get_current_active_superuser)) -> Any:
+    res = create_vector_store(session, params, current_user)
+    return ApiResult.create(res)
 
 
 @router.delete("", response_model=ApiResult[Any])
-def delete(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
+def delete(session: SessionDep, id: int,
+        current_user: User = Depends(get_current_active_superuser)) -> Any:
     entity = get_vector_store(session, id, current_user.tenant_id)
     if not entity:
         raise BizException.create(ErrorCode.vector_store_not_found, id)

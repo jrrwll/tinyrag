@@ -11,11 +11,12 @@ from app.config import settings
 from app.core.file.api import FilePublic
 from app.core.file.service.file_type import detect_file_type
 from app.entities.file import File
+from app.entities.user import User
 from app.util.codec import get_file_md5
 from app.util.datetime import format_date_compact
 
 
-def upload_file(file: UploadFile) -> FilePublic:
+def upload_file(file: UploadFile, workspace_id: int, current_user: User) -> FilePublic:
     file_dir = f"{settings.UPLOAD_DIRECTORY}/{format_date_compact()}"
     if not os.path.exists(file_dir):
         os.makedirs(file_dir, exist_ok=True)
@@ -39,7 +40,9 @@ def upload_file(file: UploadFile) -> FilePublic:
 
     filename, size = file.filename, file.size
     entity = File(id=md5, type=file_type, name=filename,
-                  size=size, mime_type=mime_type)
+                  size=size, mime_type=mime_type,
+                  tenant_id=current_user.tenant_id,
+                  workspace_id=workspace_id)
 
     save_dir = _get_file_dir(md5)
     os.makedirs(save_dir, exist_ok=True)

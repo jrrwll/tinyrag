@@ -5,7 +5,7 @@ from typing import Tuple, Type
 from app.core.variable.base import Variable
 from app.core.workflow.base import Node
 from app.core.workflow.enums import NodeType
-from app.util.metadata import walk_packages
+from app.util.lang import walk_packages
 from pydantic import BaseModel
 
 

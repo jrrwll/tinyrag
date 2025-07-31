@@ -1,4 +1,4 @@
-from app.core.rag.api import KnowledgeStreamChatPublic
+from app.core.knowledge.api import KnowledgeStreamChatPublic
 from app.entities.knowledge import Knowledge
 from app.entities.knowledge import KnowledgeConversation
 

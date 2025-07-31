@@ -1,4 +1,4 @@
-GET http://{{origin}}{{api_prefix}}/knowledge/list
+GET http://{{origin}}{{api_prefix}}/knowledge/list?workspace_id=1
 Authorization: Bearer {{auth_token}}
 
 ###
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{origin}}{{api_prefix}}/dataset
+PUT http://{{origin}}{{api_prefix}}/knowledge
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/dataset/preview_chunk
+POST http://{{origin}}{{api_prefix}}/knowledge/preview-chunk
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -59,7 +59,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/dataset/import
+POST http://{{origin}}{{api_prefix}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -73,7 +73,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/dataset/import
+POST http://{{origin}}{{api_prefix}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

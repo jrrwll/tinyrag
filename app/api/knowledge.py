@@ -1,18 +1,21 @@
 from typing import Any
 
+from mypy.binder import CurrentType
+
 from app.api import CustomAPIRouter
-from app.common.deps import SessionDep
+from app.common.deps import CurrentUser, SessionDep
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import LogDep
 from app.config import settings
 from app.core.file.service.base import get_storage_files
-from app.core.rag.api import DocumentPreviewChunk, DocumentPreviewChunkPublic, \
+from app.core.knowledge.api import DocumentPreviewChunk, \
+    DocumentPreviewChunkPublic, \
     KnowledgeChat, KnowledgeChatPublic, KnowledgeCreate, KnowledgeImport, \
     KnowledgePublic, KnowledgeStreamChatPublic, KnowledgeUpdate, \
     SimpleKnowledgePublic
-from app.core.rag.service.chat import chat_knowledge
-from app.core.rag.service.preview_file_chunk import preview_file_chunk
-from app.core.rag.service.stream_chat import stream_chat_knowledge
+from app.core.knowledge.service.chat import chat_knowledge
+from app.core.knowledge.service.preview_file_chunk import preview_file_chunk
+from app.core.knowledge.service.stream_chat import stream_chat_knowledge
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.file import get_files
 from app.entities.dao.knowledge import page_and_count_knowledges
@@ -26,13 +29,13 @@ router = CustomAPIRouter(prefix="/knowledge", tags=["knowledge"])
 @router.get("/list", response_model=ApiResult[PageResult[SimpleKnowledgePublic]])
 def list(
         session: SessionDep,
-        workspace_id: str,
+        workspace_id: int,
         page_no: int = settings.page_no_query,
         page_size: int = settings.page_size_query,
         enable: bool | None = None,
 ) -> Any:
     entities, count = page_and_count_knowledges(
-        session, page_no, page_size, enable)
+        session, page_no, page_size, workspace_id, enable)
     res = PageResult[SimpleKnowledgePublic](
         page_no=page_no,
         page_size=page_size,
@@ -48,7 +51,7 @@ def get(session: SessionDep, id: str) -> Any:
     if not entity:
         raise BizException.create(ErrorCode.knowledge_not_found, id)
 
-    return ApiResult.create(KnowledgePublic.new(entity))
+    return ApiResult.create(KnowledgePublic.create(entity))
 
 
 @router.post("/preview-chunk", response_model=ApiResult[DocumentPreviewChunkPublic],
@@ -58,12 +61,15 @@ def preview_chunk(params: DocumentPreviewChunk) -> Any:
 
 
 @router.post("", response_model=ApiResult[KnowledgePublic], dependencies=[LogDep])
-def create(session: SessionDep, params: KnowledgeCreate) -> Any:
+def create(session: SessionDep, params: KnowledgeCreate,
+        current_user: CurrentUser) -> Any:
     entity = params.to_entity()
+    entity.tenant_id = current_user.tenant_id
+
     session.add(entity)
     session.commit()
     session.refresh(entity)
-    return ApiResult.create(KnowledgePublic.new(entity))
+    return ApiResult.create(KnowledgePublic.create(entity))
 
 
 @router.put("", response_model=ApiResult[Any], dependencies=[LogDep])

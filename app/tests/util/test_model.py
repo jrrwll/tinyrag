@@ -2,6 +2,7 @@ from typing import Protocol
 
 from pydantic import BaseModel, Field
 
+from app.core.knowledge.api import KnowledgePublic
 from app.util.model import create_model_type
 
 
@@ -43,3 +44,9 @@ def test_protocol():
     box = Box(name='Box')
     print(f"\nbox: {box}")
     process(box)
+
+
+def test_model():
+    print("\n")
+    for field_name, field_info in KnowledgePublic.model_fields.items():
+        print(f"{field_name} annotation={field_info.annotation} {field_info}")

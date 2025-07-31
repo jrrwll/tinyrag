@@ -1,4 +1,4 @@
-from app.core.rag.api import KnowledgeImportWebsite, KnowledgePublic
+from app.core.knowledge.api import KnowledgeImportWebsite, KnowledgePublic
 
 
 def import_website(

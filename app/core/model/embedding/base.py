@@ -1,20 +1,19 @@
 from abc import ABC
 from typing import Any, MutableMapping
 
-from langchain_core.embeddings import Embeddings
-from pydantic import BaseModel
 from cachetools import TTLCache
+from pydantic import BaseModel
+from langchain_core.embeddings import Embeddings
 
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.core.model.provider import BaseModelProvider, ModelProviderFactory
 
+_model_cache: TTLCache[str, Embeddings] = TTLCache(
+    maxsize=1000, ttl=10 * 60)  # 10min
 
-class BaseEmbeddingConfig(BaseModel):
-    vector_size: int | None = None
 
-
-class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings], ABC):
+class EmbeddingProvider[T: BaseModel](BaseModelProvider[T, Embeddings], ABC):
 
     @staticmethod
     def get_model_type() -> ModelType:
@@ -29,10 +28,6 @@ class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings]
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         return self.model.embed_documents(texts)
-
-
-_model_cache: TTLCache[str, Embeddings] = TTLCache(
-    maxsize=1000, ttl=10 * 60)  # 10min
 
 
 def get_embedding_provider(model: ModelPublic) -> EmbeddingProvider[Any]:

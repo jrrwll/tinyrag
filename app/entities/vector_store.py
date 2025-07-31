@@ -1,6 +1,8 @@
 from sqlmodel import Field
+
 from app.core.vector_store.enums import VectorStoreType
-from app.entities.base import BizTableBase, LogTableBase, enum_field_info
+from app.entities.base import LogTableBase, TableBase, \
+    enum_field_info
 
 
 class VectorStore(LogTableBase, table=True):
@@ -11,7 +13,7 @@ class VectorStore(LogTableBase, table=True):
     config: str
 
 
-class TenantDefaultVectorStore(BizTableBase, table=True):
+class TenantDefaultVectorStore(TableBase, table=True):
 
     tenant_id: int
     vector_store_id: int | None = None

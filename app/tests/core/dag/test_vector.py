@@ -1,11 +1,16 @@
+from sqlmodel import select
+
+from app.common.deps import open_session
 from app.config import settings
 from app.core.file.enums import FileType
 from app.core.model.api import ModelPublic
 from app.core.model.default_model import get_default_model
 from app.core.model.enums import ModelType
-from app.core.rag.enums import VectorStoreType
-from app.core.rag.text_process.base import get_text_processor
-from app.core.rag.vector.base import Vector, VectorFactory
+from app.core.knowledge.text_process.base import get_text_processor
+from app.core.vector_store.api import VectorStorePublic
+from app.core.vector_store.enums import VectorStoreType
+from app.core.vector_store.provider.base import VectorProvideFactory
+from app.entities.vector_store import VectorStore
 from app.tests.test_base import _find_first_file
 
 
@@ -58,8 +63,10 @@ def run_add_documents(vector_store_type: VectorStoreType):
     documents = text_processor.split_documents(docs)
 
     model = ModelPublic.create(get_default_model(ModelType.LLM))
-    vector_store = VectorFactory._get_vector_class(vector_store_type)("tinyrag_test", model)
-    vector_store.add_documents(documents)
+    vector_store = _get_vector_store(vector_store_type)
+    vector = VectorProvideFactory.create_vector("tinyrag_test", vector_store, model)
+
+    vector.add_documents(documents)
     doc_ids = [doc.id for doc in documents]
     print(f"doc_ids={doc_ids}")
 
@@ -69,11 +76,25 @@ def run_search(vector_store_type: VectorStoreType):
 
     print(f"\nvector_store_type={vector_store_type}")
     model = ModelPublic.create(get_default_model(ModelType.LLM))
-    vector_store: Vector = VectorFactory._get_vector_class(vector_store_type)("tinyrag_test", model)
+    vector_store = _get_vector_store(vector_store_type)
+    vector = VectorProvideFactory.create_vector("tinyrag_test", vector_store, model)
 
-    vec = vector_store.model_provider.embed_query("流沙")
+
+    vec = vector.model_provider.embed_query("流沙")
     print(f"\nvec {len(vec)} {vec}\n")
 
-    matched_dcos = vector_store.similarity_search("流沙", k=10)
+    matched_dcos = vector.similarity_search("流沙", k=10)
     for d in matched_dcos:
         print(f"{d}")
+
+
+def _get_vector_store(vector_store_type: VectorStoreType) -> VectorStorePublic:
+    with open_session() as session:
+        stmt = select(VectorStore).where(
+            VectorStore.tenant_id == 1
+        )
+        vector_stores = session.exec(stmt).all()
+        for vector_store in vector_stores:
+            if vector_store.type == vector_store_type:
+                return VectorStorePublic.create(vector_store)
+    raise Exception(f"vector store {vector_store_type} not found")

@@ -20,6 +20,10 @@ class DeploymentSettings(BaseSettings):
     UPLOAD_DIRECTORY: str = f"{_singleton_workdir}/uploads"
     # suggest to use a nfs/oss directory for uploads, for example /nfs/uploads
     FILES_DIRECTORY: str = f"{_singleton_workdir}/files"
+    # for test vector store only
+    VECTOR_STORE_DIRECTORY: str = f"{_singleton_workdir}/vectorstore"
+    # embedding models
+    MODEL_DIRECTORY: str = f"{_singleton_workdir}/models"
 
     @computed_field  # type: ignore[prop-decorator]
     @property

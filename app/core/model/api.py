@@ -4,9 +4,10 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.common.constants import MIN_UTC_DATETIME
-from app.core.model.enums import ModelType, BUILTIN_MODEL_PROVIDER_NAME
+from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.entities.model import Model
-from app.util.json import dump_and_update_dict, load_and_update_dict
+from app.util.codec import md5
+from app.util.model import dump_and_update_dict
 
 
 class ModelPublic(BaseModel):
@@ -21,10 +22,12 @@ class ModelPublic(BaseModel):
     config: dict # type: ignore[arg-type]
 
     @staticmethod
-    def create(item: Model) -> "ModelPublic":
-        item_dict = item.model_dump(exclude_none=True)
-        load_and_update_dict(item_dict, "config", "embedding_config")
-        return ModelPublic(**item_dict)
+    def create(entity: Model) -> "ModelPublic":
+        entity_dict = entity.model_dump(exclude_none=True)
+        if entity.config:
+            entity_dict['config'] = json.loads(entity.config)
+
+        return ModelPublic(**entity_dict)
 
     @staticmethod
     def from_builtin(model_type: ModelType, model_name: str) -> "ModelPublic":
@@ -41,6 +44,10 @@ class ModelPublic(BaseModel):
 
     def is_builtin(self) -> bool:
         return self.provider_name == BUILTIN_MODEL_PROVIDER_NAME
+
+    def footprint(self) -> str:
+        return md5(f"{self.provider_name} {self.model_name} "
+                   f"{json.dumps(self.config)}")
 
     # def __hash__(self) -> int:
     #     return hash(self.id)

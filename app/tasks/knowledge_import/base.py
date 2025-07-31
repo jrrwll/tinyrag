@@ -8,12 +8,13 @@ from pydantic import BaseModel
 from app.core.model.api import ModelPublic
 from app.core.model.default_model import get_default_model
 from app.core.model.enums import ModelType
-from app.core.rag.api import KnowledgePublic
-from app.core.rag.text_process.base import DocumentModel, get_text_processor
-from app.core.rag.text_process.keywords import extract_keywords
-from app.core.rag.text_process.tokens import get_word_count
-from app.core.rag.vector.base import Vector, VectorFactory
+from app.core.knowledge.api import KnowledgePublic
+from app.core.knowledge.text_process.base import DocumentModel, get_text_processor
+from app.core.knowledge.text_process.keywords import extract_keywords
+from app.core.knowledge.text_process.tokens import get_word_count
 from app.core.task.service import update_task_progress
+from app.core.vector_store.provider.base import VectorProvideFactory, \
+    VectorProvider
 from app.entities.dao.knowledge import save_knowledge_document, \
     save_knowledge_document_chucks
 from app.entities.knowledge import Knowledge, KnowledgeDocument, \
@@ -22,7 +23,7 @@ from app.util.collection import partition_iterable
 
 logger = logging.getLogger(__name__)
 from app.core.file.enums import FileType
-from app.core.rag.enums import DocumentSourceType
+from app.core.knowledge.enums import DocumentSourceType
 
 
 class _FileTaskParams(BaseModel):
@@ -40,7 +41,8 @@ def import_from_files(
 
     collection_name = Knowledge.get_collection_name(knowledge.id)
     model = get_default_model(ModelType.TextEmbedding)
-    vector = VectorFactory.create_vector(
+
+    vector = VectorProvideFactory.create_vector(
         collection_name, ModelPublic.create(model))
 
     task_raito, task_raito_step = 0.0, 1 / file_count
@@ -79,7 +81,7 @@ def import_from_files(
 
 def import_document_chucks(
         documents: list[DocumentModel], doc_entity: KnowledgeDocument,
-        offset: int, vector: Vector):
+        offset: int, vector: VectorProvider):
     for i in range(len(documents)):
         if not documents[i].id:
             documents[i].id = uuid4()

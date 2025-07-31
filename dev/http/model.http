@@ -49,15 +49,15 @@ Content-Type: application/json
 }
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default-model?model_type=llm
+GET http://{{origin}}{{api_prefix}}/model/default?model_type=llm
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default-model?model_type=text_embedding
+GET http://{{origin}}{{api_prefix}}/model/default?model_type=text_embedding
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/default-model
+POST http://{{origin}}{{api_prefix}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -67,7 +67,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/default-model
+POST http://{{origin}}{{api_prefix}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

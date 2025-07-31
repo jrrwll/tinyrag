@@ -40,10 +40,11 @@ create table tenant_default_model (
 
 
 create table vector_store (
-    id         bigint      not null primary key,
-    created_at timestamp   not null default current_timestamp,
-    tenant_id  bigint      not null,
-    type       varchar(50) not null,
+    id         bigint       not null auto_increment primary key,
+    created_at timestamp    not null default current_timestamp,
+    tenant_id  bigint       not null,
+    name       varchar(255) not null,
+    type       varchar(50)  not null,
     config     longtext
 ) default charset utf8mb4;
 
@@ -59,7 +60,7 @@ create table tenant_default_vector_store (
 
 
 create table async_task (
-    id           bigint       not null primary key,
+    id           char(36)     not null primary key,
     created_at   timestamp    not null default current_timestamp,
     tenant_id    bigint       not null,
     workspace_id bigint       not null,

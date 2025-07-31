@@ -3,36 +3,38 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.config import settings
-from app.core.rag.base import EmbeddingModelConfig, ProcessRule, \
+from app.core.knowledge.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
 from app.entities.knowledge import Knowledge
-from app.util.json import load_and_update_dict
+from app.util.model import dump_and_update_dict, load_and_update_dict
 
 
 class KnowledgeCreate(BaseModel):
+    workspace_id: int
     name: str
     description: str | None = None
 
     process_rule: ProcessRule | None = None
 
     def to_entity(self) -> Knowledge:
-        process_rule = self.process_rule
-        if not process_rule:
-            process_rule = settings.knowledge_default_process_rule
-        return Knowledge(name=self.name, description=self.description,
-                       process_rule=process_rule.model_dump_json())
+        entity_dict = self.model_dump(exclude_none=True)
+        if not entity_dict.get("process_rule"):
+            entity_dict["process_rule"] = settings.knowledge_default_process_rule
+        dump_and_update_dict(entity_dict, "process_rule")
+        return Knowledge(**entity_dict)
 
 
-class KnowledgeUpdate(KnowledgeCreate):
-    id: str
+class KnowledgeUpdate(BaseModel):
+    id: int
+
+    name: str
+    description: str | None = None
+
+    process_rule: ProcessRule | None = None
 
     def update_entity(self, entity: Knowledge) -> None:
         update_dict = self.model_dump(exclude_none=True)
-        update_dict.update(
-            {
-                "process_rule": self.process_rule.model_dump_json(),
-            }
-        )
+        dump_and_update_dict(update_dict, "process_rule")
         entity.sqlmodel_update(update_dict)
 
 
@@ -57,7 +59,7 @@ class KnowledgeImport(BaseModel):
 
 
 class SimpleKnowledgePublic(BaseModel):
-    id: str
+    id: int
     created_at: datetime
     updated_at: datetime
 
@@ -72,10 +74,12 @@ class KnowledgePublic(SimpleKnowledgePublic):
 
     @staticmethod
     def create(entity: Knowledge) -> "KnowledgePublic":
+
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
-            entity_dict,
-            "process_rule", "embedding_model", "retrieval_model")
+            entity_dict, process_rule=ProcessRule,
+            embedding_model=EmbeddingModelConfig,
+            retrieval_model=RetrievalModelConfig)
         return KnowledgePublic(**entity_dict)
 
 

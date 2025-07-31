@@ -1,0 +1,22 @@
+GET http://{{origin}}{{api_prefix}}/file?id={{file_id}}
+Authorization: Bearer {{auth_token}}
+
+###
+DELETE http://{{origin}}{{api_prefix}}/file?id=1
+Authorization: Bearer {{auth_token}}
+
+###
+# curl -F "file=@/path/to/file" http://127.0.0.1:8000/api/v1/file/upload?workspace_id=1
+POST http://{{origin}}{{api_prefix}}/file/upload?workspace_id=1
+Authorization: Bearer {{auth_token}}
+
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="some.file"
+Content-Type: application/json
+
+< ../../sql/ddl_base.sql
+--WebAppBoundary--
+
+> {% client.global.set("file_id", response.body.data.id); %}

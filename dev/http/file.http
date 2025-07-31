@@ -1,9 +1,0 @@
-GET http://{{origin}}{{api_prefix}}/file?id=1
-
-###
-DELETE http://{{origin}}{{api_prefix}}/file?id=1
-
-###
-# curl -F "file=@/path/to/file" http://127.0.0.1:8000/api/v1/file/upload
-POST http://{{origin}}{{api_prefix}}/file/upload
-Content-Type: multipart/form-data; boundary=WebAppBoundary

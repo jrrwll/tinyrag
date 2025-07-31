@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.common.deps import open_session
 from app.common.rq import send_rq_task
-from app.core.rag.api import KnowledgeImport, KnowledgePublic
+from app.core.knowledge.api import KnowledgeImport, KnowledgePublic
 from app.core.task.api import AsyncTaskPublic
 from app.core.task.enums import AsyncTaskType
 from app.entities.file import File

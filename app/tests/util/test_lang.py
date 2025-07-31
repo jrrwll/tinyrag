@@ -5,7 +5,8 @@ from typing import Annotated, get_type_hints
 
 from app.core.node.base import LLMConfig
 from app.core.node.runner.base import NodeRunner
-from app.util.metadata import find_sub_types, get_extra_schema, walk_packages
+from app.util.lang import find_sub_types, walk_packages
+from app.util.model import get_extra_schema
 
 
 class Type(StrEnum):

@@ -1,4 +1,4 @@
-from app.core.rag.api import KnowledgeStreamChatPublic
+from app.core.knowledge.api import KnowledgeStreamChatPublic
 from app.core.user.enums import UserRole
 from app.util.api import ApiResult
 

@@ -12,7 +12,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter, \
 from pydantic import BaseModel
 
 from app.core.file.enums import FileType
-from app.core.rag.base import ProcessRule
+from app.core.knowledge.base import ProcessRule
 from app.util.codec import md5
 
 

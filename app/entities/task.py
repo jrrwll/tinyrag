@@ -1,10 +1,15 @@
 from datetime import datetime
 
+from sqlmodel import Field, SQLModel
+
 from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
-from app.entities.base import LogTableBase, enum_field_info
+from app.entities.base import enum_field_info
 
 
-class AsyncTask(LogTableBase, table=True):
+class AsyncTask(SQLModel, table=True):
+    id: str = Field(primary_key=True)
+    created_at: datetime
+
     tenant_id: int
     type: AsyncTaskType = enum_field_info(AsyncTaskType)
     ref_id: str | None = None

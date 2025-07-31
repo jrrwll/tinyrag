@@ -2,11 +2,12 @@ from typing import Type
 
 from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
+from pydantic import BaseModel
 
-from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
+from app.core.model.embedding.base import EmbeddingProvider
 
 
-class OpenaiEmbeddingConfig(BaseEmbeddingConfig):
+class OpenaiEmbeddingConfig(BaseModel):
     api_key: str
 
 

@@ -2,8 +2,8 @@ from app.common.deps import open_session
 from app.common.error_code import BizException, ErrorCode
 from app.core.file.enums import FileType
 from app.core.file.service.upload import get_file_path
-from app.core.rag.api import DocumentPreviewChunk, DocumentPreviewChunkPublic
-from app.core.rag.text_process.base import get_text_processor
+from app.core.knowledge.api import DocumentPreviewChunk, DocumentPreviewChunkPublic
+from app.core.knowledge.text_process.base import get_text_processor
 from app.entities.file import File
 from app.util.collection import take_limit
 

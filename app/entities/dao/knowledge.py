@@ -7,9 +7,10 @@ from app.entities.knowledge import Knowledge, KnowledgeDocument, \
 
 
 def page_and_count_knowledges(
-        session: SessionDep, page_no: int, page_size: int, enable: bool | None
+        session: SessionDep, page_no: int, page_size: int,
+        workspace_id: int, enable: bool | None
 ) -> tuple[list[dict], int]:  # type: ignore[type-arg]
-    conditions = [Knowledge.deleted == False]
+    conditions = [Knowledge.workspace_id == workspace_id, Knowledge.deleted == False]
     if enable:
         conditions.append(Knowledge.enable == enable)
 

@@ -3,7 +3,7 @@ import logging
 from typing import Iterable, Optional
 
 from app.core.file.service.upload import get_file_path
-from app.core.rag.enums import DocumentSourceType
+from app.core.knowledge.enums import DocumentSourceType
 from app.entities.file import File
 from app.tasks.knowledge_import.base import _FileTaskParams
 

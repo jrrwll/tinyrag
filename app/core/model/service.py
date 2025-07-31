@@ -32,7 +32,6 @@ def update_model(session: Session, params: ModelUpdate, current_user: User):
 
     session.add(entity)
     session.commit()
-    
 
 
 def update_model_enable(

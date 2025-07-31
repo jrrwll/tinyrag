@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.core.workspace.base import EmbeddingModelConfig, LlmModelConfig, \
     VectorStoreConfig
 from app.entities.workspace import Workspace
-from app.util.json import load_and_update_dict
+from app.util.model import load_and_update_dict
 
 
 class SimpleWorkspacePublic(BaseModel):
@@ -25,7 +25,12 @@ class WorkspacePublic(SimpleWorkspacePublic):
     @staticmethod
     def create(entity: Workspace) -> "WorkspacePublic":
         entity_dict = entity.model_dump(exclude_none=True)
-        load_and_update_dict(entity_dict, "llm_model_config", "embedding_model_config")
+
+        load_and_update_dict(
+            entity_dict, llm_model_config=LlmModelConfig,
+            embedding_model_config=EmbeddingModelConfig,
+            vector_store_config=VectorStoreConfig)
+
         return WorkspacePublic(**entity_dict)
 
 

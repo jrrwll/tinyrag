@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.core.file.enums import StorageType
-from app.util.metadata import find_sub_types
+from app.util.lang import find_sub_types
 
 logger = logging.getLogger(__name__)
 

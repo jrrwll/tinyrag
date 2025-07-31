@@ -1,14 +1,16 @@
 create table file (
-    id         bigint       not null primary key,
-    created_at timestamp    not null default current_timestamp,
-    type       varchar(50)  not null,
-    name       varchar(100) not null,
-    size       bigint       not null,
-    mime_type  varchar(100) not null
+    id           char(36)     not null primary key,
+    created_at   timestamp    not null default current_timestamp,
+    tenant_id    bigint       not null,
+    workspace_id bigint       not null,
+    type         varchar(50)  not null,
+    name         varchar(100) not null,
+    size         bigint       not null,
+    mime_type    varchar(100) not null
 ) default charset utf8mb4;
 
 create table knowledge (
-    id              bigint       not null primary key,
+    id              bigint       not null auto_increment primary key,
     created_at      timestamp    not null default current_timestamp,
     updated_at      timestamp    not null default current_timestamp on update current_timestamp,
     deleted         tinyint      not null default 0,
@@ -23,7 +25,7 @@ create table knowledge (
 ) default charset utf8mb4;
 
 create table knowledge_document (
-    id           bigint    not null primary key,
+    id           bigint    not null auto_increment primary key,
     created_at   timestamp not null default current_timestamp,
     updated_at   timestamp not null default current_timestamp on update current_timestamp,
     deleted      tinyint   not null default 0,
@@ -36,7 +38,7 @@ create table knowledge_document (
 ) default charset utf8mb4;
 
 create table knowledge_document_chunk (
-    id           varchar(100)  not null primary key,
+    id           varchar(100)  not null auto_increment primary key,
     created_at   timestamp     not null default current_timestamp,
     updated_at   timestamp     not null default current_timestamp on update current_timestamp,
     deleted      tinyint       not null default 0,

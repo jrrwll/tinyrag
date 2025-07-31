@@ -2,11 +2,11 @@ from typing import Type
 
 from langchain_core.embeddings import Embeddings
 from langchain_ollama import OllamaEmbeddings
+from pydantic import BaseModel
+from app.core.model.embedding.base import EmbeddingProvider
 
-from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
 
-
-class OllamaEmbeddingConfig(BaseEmbeddingConfig):
+class OllamaEmbeddingConfig(BaseModel):
     base_url: str | None = None
     api_key: str | None = None
     content_length: int = 4096

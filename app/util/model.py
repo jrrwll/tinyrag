@@ -6,6 +6,10 @@ from pydantic import BaseModel, Field, create_model
 from pydantic.fields import FieldInfo
 
 
+class EmptyBaseModel(BaseModel):
+    pass
+
+
 def create_model_type( # type: ignore[no-untyped-def]
         model_name: str,
         fields: Dict[str, Tuple[Type[Any], Dict[str, Any] | FieldInfo]],
@@ -31,3 +35,33 @@ def dump_json(a: Any):
         return json.dumps(a.model_dump(), ensure_ascii=False)
     else:
         return json.dumps(a, ensure_ascii=False)
+
+
+# {"a": "{}"} -> {"a": BaseModel}
+def load_and_update_dict(d: dict[str, Any], **kwargs: type[BaseModel]) -> None:
+    new_dict = {}
+    for key, model_cls in kwargs.items():
+        if key in d:
+            new_dict[key] = model_cls.model_validate_json(d[key])
+
+    d.update(new_dict)
+
+
+# {"a": [1]} -> {"a": "[1]"}
+def dump_and_update_dict(d: dict[str, Any], *keys: str) -> None:
+    new_dict = {}
+    for key in keys:
+        if key in d:
+            new_dict[key] = dump_json(d[key])
+    d.update(new_dict)
+
+
+def get_extra_schema(model_cls: type[BaseModel]) -> dict[str, dict[str, Any]]:
+    fields = {}
+    for field_name, field_info in model_cls.model_fields.items():
+        json_schema_extra = field_info.json_schema_extra
+        if json_schema_extra and isinstance(json_schema_extra, dict):
+            fields[field_name] = json_schema_extra
+
+    return fields
+

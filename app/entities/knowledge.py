@@ -1,11 +1,12 @@
 from sqlmodel import Field
 
-from app.core.rag.enums import DocumentSourceType
+from app.core.knowledge.enums import DocumentSourceType
 from app.entities.base import BizTableBase, enum_field_info
 
 
 class Knowledge(BizTableBase, table=True):
     tenant_id: int
+    workspace_id: int
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
@@ -21,7 +22,9 @@ class Knowledge(BizTableBase, table=True):
 
 class KnowledgeDocument(BizTableBase, table=True):
     tenant_id: int
+    workspace_id: int
     knowledge_id: int
+
     position: int
     word_count: int = 0
 
@@ -33,8 +36,10 @@ class KnowledgeDocument(BizTableBase, table=True):
 class KnowledgeDocumentChunk(BizTableBase, table=True):
 
     tenant_id: int
+    workspace_id: int
     knowledge_id: int
     document_id: int
+
     position: int
     content: str = Field(max_length=10000)
     word_count: int = 0
@@ -45,13 +50,16 @@ class KnowledgeDocumentChunk(BizTableBase, table=True):
 class KnowledgeConversation(BizTableBase, table=True):
 
     tenant_id: int
+    workspace_id: int
     knowledge_id: int
 
 
 class KnowledgeMessage(BizTableBase, table=True):
     tenant_id: int
+    workspace_id: int
     knowledge_id: int
     conversation_id: int
+
     query: str
     answer: str | None = None
     error: str | None = None

@@ -1,12 +1,35 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
-from app.core.vector_store.api import SetupDefaultVectorStore, VectorStorePublic
+from app.core.vector_store.api import SetupDefaultVectorStore, \
+    VectorStoreCreate, VectorStorePublic
 from app.entities.dao.vector_store import get_default_vector_store, \
     get_vector_store
 from app.entities.user import User
 from app.entities.vector_store import TenantDefaultVectorStore
-from app.util.api import ApiResult
+from app.util.api import ApiResult, IdResult
+
+
+def create_vector_store(
+        session: Session, params: VectorStoreCreate,
+        current_user: User) -> IdResult:
+    entity = params.to_entity()
+    entity.tenant_id = current_user.tenant_id
+
+    session.add(entity)
+    session.commit()
+    session.refresh(entity)
+
+    return IdResult(id=entity.id)
+
+
+def delete_vector_store(
+        session: Session, vector_store_id: int,
+        current_user: User):
+    default_entity = get_default_vector_store(session, current_user.tenant_id)
+    if default_entity and default_entity.vector_store_id == vector_store_id:
+        raise BizException.create(ErrorCode.vector_store_is_set_in_default)
+    # TODO
 
 
 def find_default_vector_store(
@@ -54,12 +77,3 @@ def set_or_unset_default_vector_store(
 
     session.add(entity)
     session.commit()
-
-
-def delete_vector_store(
-        session: Session, vector_store_id: int,
-        current_user: User):
-    default_entity = get_default_vector_store(session, current_user.tenant_id)
-    if default_entity and default_entity.vector_store_id == vector_store_id:
-        raise BizException.create(ErrorCode.vector_store_is_set_in_default)
-    # TODO

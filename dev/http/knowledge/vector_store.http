@@ -1,0 +1,72 @@
+GET http://{{origin}}{{api_prefix}}/vector-store/list
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/vector-store?id=1
+Authorization: Bearer {{auth_token}}
+
+###
+POST http://{{origin}}{{api_prefix}}/vector-store
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "chroma vector store",
+  "type": "chroma",
+  "config": {
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/vector-store
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "qdrant vector store",
+  "type": "qdrant",
+  "config": {
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/vector-store
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "pgvector vector store",
+  "type": "pgvector",
+  "config": {
+    "url": "{{PGVECTOR_URL}}"
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/vector-store
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "milvus vector store",
+  "type": "milvus",
+  "config": {
+    "uri": "{{MILVUS_URI}}",
+    "user": "{{MILVUS_USER}}",
+    "password": "{{MILVUS_PASSWORD}}"
+  }
+}
+
+
+###
+GET http://{{origin}}{{api_prefix}}/vector-store/default
+Authorization: Bearer {{auth_token}}
+
+###
+POST http://{{origin}}{{api_prefix}}/vector-store/default
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "vector_store_id": 1
+}

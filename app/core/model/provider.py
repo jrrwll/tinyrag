@@ -1,6 +1,6 @@
-import multiprocessing
+import threading
 from abc import ABC, abstractmethod
-from typing import Any, MutableMapping, Optional, Type
+from typing import MutableMapping, Type
 
 from pydantic import BaseModel
 
@@ -8,7 +8,7 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.util.codec import md5
-from app.util.metadata import find_sub_types
+from app.util.lang import find_sub_types
 
 
 class BaseModelProvider[T: BaseModel, M](ABC):
@@ -56,7 +56,7 @@ class BaseModelProvider[T: BaseModel, M](ABC):
 
 class ModelProviderFactory:
 
-    _lock = multiprocessing.Lock()
+    _lock = threading.Lock()
     _initialized = False
     _implements: dict[ModelType, dict[str, type]] = {}
 

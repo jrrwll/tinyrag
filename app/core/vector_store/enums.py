@@ -6,3 +6,4 @@ class VectorStoreType(StrEnum):
     Qdrant = "qdrant"
     PGVector = "pgvector"
     Milvus = "milvus"
+    LanceDB = "lancedb"
