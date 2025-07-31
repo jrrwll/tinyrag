@@ -43,16 +43,13 @@ Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "file_id": "6bd6766b56467942ea6ed31875df9294",
+  "file_id": "{{file_id}}",
   "process_rule": {
     "text_splitter": {
       "chunk_overlap": 50,
       "chunk_size": 256,
       "separators": [
-        "\n\n",
-        "\n",
-        " ",
-        ""
+        "create table"
       ]
     }
   }
@@ -67,7 +64,7 @@ Content-Type: application/json
   "id": 1,
   "file": {
     "file_ids": [
-      "6bd6766b56467942ea6ed31875df9294"
+      "{{file_id}}"
     ]
   }
 }

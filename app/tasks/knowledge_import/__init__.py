@@ -13,6 +13,7 @@ from app.entities.task import AsyncTask
 from app.tasks.knowledge_import.base import _FileTaskParams, import_from_files
 from app.util.model import dump_json
 
+
 class _ImportTaskParams(BaseModel):
     params: KnowledgeImport
     knowledge: KnowledgePublic

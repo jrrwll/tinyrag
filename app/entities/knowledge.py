@@ -16,7 +16,7 @@ class Knowledge(BizTableBase, table=True):
     retrieval_model: str | None = None
 
     @staticmethod
-    def get_collection_name(knowledge_id: str) -> str:
+    def get_collection_name(knowledge_id: int) -> str:
         return f"Knowledge_{knowledge_id}"
 
 

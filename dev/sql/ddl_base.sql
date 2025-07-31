@@ -28,14 +28,15 @@ create table model (
 
 
 create table tenant_default_model (
-    id         bigint       not null auto_increment primary key,
-    created_at timestamp    not null default current_timestamp,
-    updated_at timestamp    not null default current_timestamp on update current_timestamp,
-    tenant_id  bigint       not null,
-    model_type varchar(50)  not null,
-    model_id   bigint       null     default null,
-    model_name varchar(255) null     default null,
-    unique key uk_tenant_id_model_type (tenant_id, model_type)
+    id           bigint       not null auto_increment primary key,
+    created_at   timestamp    not null default current_timestamp,
+    updated_at   timestamp    not null default current_timestamp on update current_timestamp,
+    tenant_id    bigint       not null,
+    workspace_id bigint       not null default 0,
+    model_type   varchar(50)  not null,
+    model_id     bigint       null     default null,
+    model_name   varchar(255) null     default null,
+    unique key uk_tenant_id_workspace_id_model_type (tenant_id, workspace_id, model_type)
 ) default charset utf8mb4;
 
 
@@ -54,8 +55,9 @@ create table tenant_default_vector_store (
     created_at      timestamp not null default current_timestamp,
     updated_at      timestamp not null default current_timestamp on update current_timestamp,
     tenant_id       bigint    not null,
+    workspace_id bigint       not null default 0,
     vector_store_id bigint    null     default null,
-    unique key uk_tenant_id_model_type (tenant_id, vector_store_id)
+    unique key uk_tenant_id_workspace_id_vector_store_id (tenant_id, workspace_id, vector_store_id)
 ) default charset utf8mb4;
 
 

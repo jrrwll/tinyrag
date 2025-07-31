@@ -92,6 +92,10 @@ class DocumentPreviewChunkPublic(BaseModel):
     content: list[str]
 
 
+class KnowledgeStartConversation(BaseModel):
+    knowledge_id: int
+
+
 class KnowledgeChat(BaseModel):
     conversation_id: str
     query: str
