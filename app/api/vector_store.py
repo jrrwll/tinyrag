@@ -67,8 +67,9 @@ def delete(session: SessionDep, id: int,
 
 
 @router.get("/default", response_model=ApiResult[Optional[VectorStorePublic]])
-def get_default(session: SessionDep, current_user: CurrentUser) -> Any:
-    res = find_default_vector_store(session, current_user)
+def get_default(session: SessionDep, current_user: CurrentUser,
+        workspace_id: int | None = None) -> Any:
+    res = find_default_vector_store(session, workspace_id, current_user)
     return ApiResult.create(res)
 
 

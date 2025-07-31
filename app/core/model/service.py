@@ -77,30 +77,38 @@ def test_run_model(
 
 
 def find_default_model(
-        session: Session, model_type: ModelType, current_user: User
+        session: Session, model_type: ModelType, workspace_id: int | None, current_user: User
 ) -> ModelPublic | None:
-    default_model = get_default_model(
-        session, model_type, current_user.tenant_id)
-    if not default_model:
-        return None
+    entity = get_default_model(
+        session, model_type, workspace_id, current_user.tenant_id)
+    if not entity or entity.is_unset():
+        if workspace_id:
+            # tenant default
+            entity = get_default_model(
+                session, model_type, None, current_user.tenant_id)
+        if not entity or entity.is_unset():
+            return None
 
-    if default_model.model_name:
-        return ModelPublic.from_builtin(model_type, default_model.model_name)
+    if entity.model_name:
+        return ModelPublic.from_builtin(model_type, entity.model_name)
 
-    elif default_model.model_id:
-        model_id = default_model.model_id
+    elif entity.model_id:
+        model_id = entity.model_id
         model_entity = get_model(session, model_id, current_user.tenant_id)
         if not model_entity:
             raise BizException.create(ErrorCode.model_not_found, model_id)
         return ModelPublic.create(model_entity)
+    else:
+        return None
 
 
 def set_or_unset_default_model(
         session: Session, params: SetupDefaultModel, current_user: User
 ):
-    model_type, model_id, model_name = params.model_type, params.model_id, params.model_name
+    workspace_id, model_type = params.workspace_id, params.model_type
+    model_id, model_name = params.model_id, params.model_name
 
-    entity = get_default_model(session, model_type, current_user.tenant_id)
+    entity = get_default_model(session, model_type, workspace_id, current_user.tenant_id)
 
     # unset case
     if not model_id and not model_name:
@@ -116,8 +124,9 @@ def set_or_unset_default_model(
     # set case
     if not entity:
         entity = TenantDefaultModel(
-            model_type=model_type,
             tenant_id=current_user.tenant_id,
+            workspace_id=workspace_id,
+            model_type=model_type,
         )
 
     if model_name:

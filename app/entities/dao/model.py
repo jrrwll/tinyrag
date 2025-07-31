@@ -59,13 +59,17 @@ def get_model(session: Session, id: int, tenant_id: int) -> Model | None:
     return session.exec(stmt).first()
 
 
-def get_default_model(session: Session, model_type: ModelType, tenant_id: int
+def get_default_model(session: Session, model_type: ModelType, workspace_id: int | None, tenant_id: int
 ) -> TenantDefaultModel | None:
-    stmt = select(TenantDefaultModel).where(
+    conditions = [
         TenantDefaultModel.model_type == model_type,
-        TenantDefaultModel.tenant_id == tenant_id
-    )
-    return session.exec(stmt).one_or_none()
+        TenantDefaultModel.tenant_id == tenant_id,
+    ]
+    if workspace_id:
+        conditions.append(TenantDefaultModel.workspace_id == workspace_id)
+
+    stmt = select(TenantDefaultModel).where(*conditions)
+    return session.exec(stmt).first()
 
 
 def get_default_models(tenant_id: int) -> dict[ModelType, ModelPublic]:

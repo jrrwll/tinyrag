@@ -38,9 +38,13 @@ def get_vector_store(
 
 
 def get_default_vector_store(
-        session: Session, tenant_id: int
+        session: Session, workspace_id: int | None, tenant_id: int
 ) -> TenantDefaultVectorStore | None:
-    stmt = select(TenantDefaultVectorStore).where(
+    conditions = [
         TenantDefaultVectorStore.tenant_id == tenant_id
-    )
+    ]
+    if workspace_id:
+        conditions.append(TenantDefaultVectorStore.workspace_id == workspace_id)
+
+    stmt = select(TenantDefaultVectorStore).where(*conditions)
     return session.exec(stmt).first()

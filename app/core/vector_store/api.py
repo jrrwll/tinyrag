@@ -42,4 +42,5 @@ class VectorStoreCreate(BaseModel):
 
 
 class SetupDefaultVectorStore(BaseModel):
+    workspace_id: int | None = None
     vector_store_id: int | None = None

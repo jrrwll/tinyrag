@@ -33,28 +33,34 @@ def delete_vector_store(
 
 
 def find_default_vector_store(
-        session: Session, current_user: User
+        session: Session, workspace_id: int | None, current_user: User
 ) -> VectorStorePublic | None:
-    default_vector_store = get_default_vector_store(
-        session, current_user.tenant_id)
-    if not default_vector_store or not default_vector_store.vector_store_id:
-        return None
+    entity = get_default_vector_store(
+        session, workspace_id, current_user.tenant_id)
+    if not entity or entity.is_unset():
+        if workspace_id:
+            entity = get_default_vector_store(
+                session, None, current_user.tenant_id)
+            if not entity or entity.is_unset():
+                return None
 
-    vector_store_id = default_vector_store.vector_store_id
-    entity = get_vector_store(session, vector_store_id, current_user.tenant_id)
-    if not entity:
-        raise BizException.create(ErrorCode.vector_store_not_found,
-                                  vector_store_id)
+    vector_store_id = entity.vector_store_id
+    vector_store_entity = get_vector_store(
+        session, vector_store_id, current_user.tenant_id)
+    if not vector_store_entity:
+        raise BizException.create(
+            ErrorCode.vector_store_not_found, vector_store_id)
 
-    return VectorStorePublic.create(entity)
+    return VectorStorePublic.create(vector_store_entity)
 
 
 def set_or_unset_default_vector_store(
         session: Session, params: SetupDefaultVectorStore,
         current_user: User):
+    workspace_id = params.workspace_id
     vector_store_id = params.vector_store_id
 
-    entity = get_default_vector_store(session, current_user.tenant_id)
+    entity = get_default_vector_store(session, workspace_id, current_user.tenant_id)
 
     # unset case
     if not vector_store_id:
@@ -71,6 +77,7 @@ def set_or_unset_default_vector_store(
     if not entity:
         entity = TenantDefaultVectorStore(
             tenant_id=current_user.tenant_id,
+            workspace_id=workspace_id,
         )
 
     entity.vector_store_id = vector_store_id

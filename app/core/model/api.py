@@ -105,6 +105,7 @@ class ModelTestRunPublic(BaseModel):
 
 
 class SetupDefaultModel(BaseModel):
+    workspace_id: int | None = None
     model_type: ModelType
     model_id: int | None = None
     model_name: str | None = None

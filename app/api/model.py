@@ -10,7 +10,6 @@ from app.config import settings
 from app.core.model.api import (
     ModelCreate,
     ModelPublic,
-
     ModelTestRun,
     ModelTestRunPublic,
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel,
@@ -96,8 +95,8 @@ def test_run(session: SessionDep, current_user: CurrentUser,
 
 @router.get("/default", response_model=ApiResult[Optional[ModelPublic]])
 def get_default(session: SessionDep, current_user: CurrentUser,
-        model_type: ModelType) -> Any:
-    res = find_default_model(session, model_type, current_user)
+        model_type: ModelType, workspace_id: int | None = None) -> Any:
+    res = find_default_model(session, model_type, workspace_id, current_user)
     return ApiResult.create(res)
 
 
