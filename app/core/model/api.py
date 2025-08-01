@@ -4,7 +4,8 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.common.constants import MIN_UTC_DATETIME
-from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
+from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType, \
+    get_builtin_model_id
 from app.entities.model import Model
 from app.util.codec import md5
 from app.util.model import dump_and_update_dict
@@ -32,7 +33,7 @@ class ModelPublic(BaseModel):
     @staticmethod
     def from_builtin(model_type: ModelType, model_name: str) -> "ModelPublic":
         return ModelPublic(
-            id=0,
+            id=get_builtin_model_id(model_type, model_name),
             created_at=MIN_UTC_DATETIME,
             updated_at=MIN_UTC_DATETIME,
             type=model_type,

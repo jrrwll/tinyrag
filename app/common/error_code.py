@@ -66,6 +66,7 @@ class ErrorCode(Enum):
 
     vector_store_not_found = auto()
     vector_store_is_set_in_default = auto()
+    default_vector_store_not_set = auto()
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()

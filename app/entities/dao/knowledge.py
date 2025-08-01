@@ -1,5 +1,5 @@
 # ruff: noqa: E712
-from sqlmodel import and_, func, select
+from sqlmodel import Session, and_, func, select
 
 from app.common.deps import SessionDep, open_session
 from app.entities.knowledge import Knowledge, KnowledgeDocument, \
@@ -7,10 +7,14 @@ from app.entities.knowledge import Knowledge, KnowledgeDocument, \
 
 
 def page_and_count_knowledges(
-        session: SessionDep, page_no: int, page_size: int,
-        workspace_id: int, enable: bool | None
+        session: Session, page_no: int, page_size: int,
+        workspace_id: int, enable: bool | None, tenant_id: int
 ) -> tuple[list[dict], int]:  # type: ignore[type-arg]
-    conditions = [Knowledge.workspace_id == workspace_id, Knowledge.deleted == False]
+    conditions = [
+        Knowledge.tenant_id == tenant_id,
+        Knowledge.workspace_id == workspace_id,
+        Knowledge.deleted == False
+    ]
     if enable:
         conditions.append(Knowledge.enable == enable)
 
@@ -39,6 +43,14 @@ def page_and_count_knowledges(
     models = session.exec(page_statement).mappings().all()
     return [dict(i) for i in models], count
 
+
+def get_knowledge(session: Session, id: int, tenant_id: int) -> Knowledge | None:
+    stmt = select(Knowledge).where(
+        Knowledge.id == id,
+        Knowledge.tenant_id == tenant_id,
+        Knowledge.deleted == False
+    )
+    return session.exec(stmt).first()
 
 def save_knowledge_document(entity: KnowledgeDocument) -> KnowledgeDocument:
     with open_session() as session:

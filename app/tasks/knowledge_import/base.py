@@ -5,14 +5,14 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
-from app.core.model.api import ModelPublic
-from app.core.model.default_model import get_default_model
-from app.core.model.enums import ModelType
 from app.core.knowledge.api import KnowledgePublic
-from app.core.knowledge.text_process.base import DocumentModel, get_text_processor
+from app.core.knowledge.text_process.base import DocumentModel, \
+    get_text_processor
 from app.core.knowledge.text_process.keywords import extract_keywords
 from app.core.knowledge.text_process.tokens import get_word_count
+from app.core.model.api import ModelPublic
 from app.core.task.service import update_task_progress
+from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.provider.base import VectorProvideFactory, \
     VectorProvider
 from app.entities.dao.knowledge import save_knowledge_document, \
@@ -35,15 +35,15 @@ class _FileTaskParams(BaseModel):
 
 def import_from_files(
         file_params: Iterable[Optional[_FileTaskParams]], file_count: int,
-        task_id: str, knowledge: KnowledgePublic):
+        task_id: str, knowledge: KnowledgePublic,
+        model: ModelPublic, vector_store: VectorStorePublic):
     process_rule = knowledge.process_rule
     text_processor = get_text_processor(process_rule)
 
     collection_name = Knowledge.get_collection_name(knowledge.id)
-    model = get_default_model(ModelType.TextEmbedding)
 
     vector = VectorProvideFactory.create_vector(
-        collection_name, ModelPublic.create(model))
+        collection_name, vector_store, model)
 
     task_raito, task_raito_step = 0.0, 1 / file_count
     for params in file_params:

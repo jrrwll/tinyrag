@@ -81,7 +81,8 @@ class ModelProviderFactory:
 
             from app.core import model as model_mod
 
-            provider_classes = find_sub_types(BaseModelProvider, model_mod)
+            provider_classes = find_sub_types(
+                BaseModelProvider, model_mod, exclude_abc=True)
             for c in provider_classes:
                 classes = cls._implements.get(c.get_model_type())
                 if not classes:

@@ -1,4 +1,5 @@
 import logging
+from abc import ABC
 from typing import Any, MutableMapping, Type
 
 from cachetools import TTLCache
@@ -21,7 +22,7 @@ class BaseModelConfig(BaseModel):
     timeout: int | None = None
 
 
-class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel]):
+class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel], ABC):
 
     @staticmethod
     def get_model_type() -> ModelType:

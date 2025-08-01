@@ -3,13 +3,13 @@ from sqlmodel import select
 from app.common.deps import open_session
 from app.config import settings
 from app.core.file.enums import FileType
-from app.core.model.api import ModelPublic
-from app.core.model.default_model import get_default_model
-from app.core.model.enums import ModelType
 from app.core.knowledge.text_process.base import get_text_processor
+from app.core.model.enums import ModelType
 from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.enums import VectorStoreType
-from app.core.vector_store.provider.base import VectorProvideFactory
+from app.core.vector_store.provider.base import VectorProvideFactory, \
+    VectorProvider
+from app.entities.repo.model import get_required_setup_model
 from app.entities.vector_store import VectorStore
 from app.tests.test_base import _find_first_file
 
@@ -47,8 +47,6 @@ def test_search_milvus():
 
 
 def run_add_documents(vector_store_type: VectorStoreType):
-    settings.VECTOR_STORE_TYPE = vector_store_type
-
     print(f"\nvector_store_type={vector_store_type}")
     local_path = _find_first_file()
     print(f"\nlocal_path={local_path}")
@@ -62,9 +60,7 @@ def run_add_documents(vector_store_type: VectorStoreType):
 
     documents = text_processor.split_documents(docs)
 
-    model = ModelPublic.create(get_default_model(ModelType.LLM))
-    vector_store = _get_vector_store(vector_store_type)
-    vector = VectorProvideFactory.create_vector("tinyrag_test", vector_store, model)
+    vector = _get_vector(vector_store_type)
 
     vector.add_documents(documents)
     doc_ids = [doc.id for doc in documents]
@@ -72,13 +68,8 @@ def run_add_documents(vector_store_type: VectorStoreType):
 
 
 def run_search(vector_store_type: VectorStoreType):
-    settings.VECTOR_STORE_TYPE = vector_store_type
-
     print(f"\nvector_store_type={vector_store_type}")
-    model = ModelPublic.create(get_default_model(ModelType.LLM))
-    vector_store = _get_vector_store(vector_store_type)
-    vector = VectorProvideFactory.create_vector("tinyrag_test", vector_store, model)
-
+    vector = _get_vector(vector_store_type)
 
     vec = vector.model_provider.embed_query("流沙")
     print(f"\nvec {len(vec)} {vec}\n")
@@ -88,13 +79,21 @@ def run_search(vector_store_type: VectorStoreType):
         print(f"{d}")
 
 
-def _get_vector_store(vector_store_type: VectorStoreType) -> VectorStorePublic:
+def _get_vector(vector_store_type: VectorStoreType) -> VectorProvider:
+    workspace_id, tenant_id = 1, 1
     with open_session() as session:
-        stmt = select(VectorStore).where(
-            VectorStore.tenant_id == 1
-        )
-        vector_stores = session.exec(stmt).all()
-        for vector_store in vector_stores:
-            if vector_store.type == vector_store_type:
-                return VectorStorePublic.create(vector_store)
-    raise Exception(f"vector store {vector_store_type} not found")
+        model = get_required_setup_model(
+            session, ModelType.LLM,
+            workspace_id, tenant_id)
+
+        stmt = select(VectorStore).where(VectorStore.type == vector_store_type).limit(1)
+        vector_store_entity = session.exec(stmt).first()
+        if not vector_store_entity:
+            raise ValueError(f"Vector store {vector_store_type} not found in db")
+        vector_store = VectorStorePublic.create(vector_store_entity)
+
+        print(f"\nvector_store={vector_store.model_dump_json(exclude_defaults=True)}")
+        print(f"\nmodel={model.model_dump_json(exclude_defaults=True)}")
+
+        return VectorProvideFactory.create_vector(
+            "tinyrag_test", vector_store, model)

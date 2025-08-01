@@ -9,8 +9,7 @@ from app.core.knowledge.api import DocumentPreviewChunk, \
     DocumentPreviewChunkPublic, \
     KnowledgeChat, KnowledgeChatPublic, KnowledgeCreate, KnowledgeImport, \
     KnowledgePublic, KnowledgeStartConversation, KnowledgeStreamChatPublic, \
-    KnowledgeUpdate, \
-    SimpleKnowledgePublic
+    KnowledgeUpdate, SimpleKnowledgePublic
 from app.core.knowledge.service.base import create_knowledge, update_knowledge
 from app.core.knowledge.service.chat import chat_knowledge
 from app.core.knowledge.service.conversation import start_conversation

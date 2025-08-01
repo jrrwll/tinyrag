@@ -55,7 +55,7 @@ def get_model_required(
 def get_model(session: Session, id: int, tenant_id: int) -> Model | None:
     stmt = select(Model).where(
         Model.id == id, Model.tenant_id == tenant_id
-    ).limit(1)
+    )
     return session.exec(stmt).first()
 
 

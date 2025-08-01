@@ -81,7 +81,7 @@ class VectorProvideFactory:
             model: ModelPublic
     ) -> VectorProvider:
         vector_class = VectorProvideFactory._get_vector_class(
-            settings.VECTOR_STORE_TYPE)
+            vector_store.type)
 
         return vector_class(collection_name, vector_store, model)
 

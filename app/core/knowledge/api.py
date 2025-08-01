@@ -47,11 +47,11 @@ class KnowledgeImportStorage(BaseModel):
 
 
 class KnowledgeImportWebsite(BaseModel):
-    pass
+    page_urls: list[str]
 
 
 class KnowledgeImport(BaseModel):
-    id: str
+    id: int
 
     file: KnowledgeImportFile | None = None
     storage: KnowledgeImportStorage | None = None

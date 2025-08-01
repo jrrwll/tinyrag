@@ -2,11 +2,12 @@ from abc import ABCMeta, abstractmethod
 from functools import cache
 from typing import Tuple, Type
 
+from pydantic import BaseModel
+
 from app.core.variable.base import Variable
 from app.core.workflow.base import Node
 from app.core.workflow.enums import NodeType
-from app.util.lang import walk_packages
-from pydantic import BaseModel
+from app.util.lang import walk_and_import_modules
 
 
 class NodeRunnerRegistry(ABCMeta):
@@ -58,5 +59,7 @@ class NodeRunner[T: BaseModel](metaclass=NodeRunnerRegistry):
     def implements_and_mappings() -> Tuple[list[Type["NodeRunner"]], dict[NodeType, Type[BaseModel]]]:
         import app.core.node.runner as _runner
 
-        walk_packages(_runner)
+        for _ in walk_and_import_modules(_runner):
+            pass
+
         return NodeRunner._implements, NodeRunner._mappings # type: ignore[return-value]

@@ -4,7 +4,7 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelCreate, ModelPublic, ModelTestRun, \
     ModelTestRunPublic, \
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel
-from app.core.model.enums import ModelType, builtin_models
+from app.core.model.enums import ModelType, get_builtin_model_id
 from app.core.model.llm.base import get_llm_provider
 from app.entities.dao.model import get_default_model, get_default_models, \
     get_model, get_model_required
@@ -130,7 +130,7 @@ def set_or_unset_default_model(
         )
 
     if model_name:
-        if model_name not in builtin_models.get(model_type, []):
+        if not get_builtin_model_id(model_type, model_name):
             raise BizException.create(
                 ErrorCode.request_validation_error_detail,
                 f"model `{model_name}` is unsupported")
