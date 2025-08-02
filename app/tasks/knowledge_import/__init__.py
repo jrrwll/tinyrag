@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+import orjson
 from pydantic import BaseModel
 
 from app.common.deps import open_session
@@ -7,10 +10,9 @@ from app.core.model.api import ModelPublic
 from app.core.task.api import AsyncTaskPublic
 from app.core.task.enums import AsyncTaskType
 from app.core.vector_store.api import VectorStorePublic
-from app.entities.dao.task import create_async_task
 from app.entities.file import File
+from app.entities.task import AsyncTask
 from app.tasks.knowledge_import.base import _FileTaskParams, import_from_files
-from app.util.model import dump_json
 
 
 class ImportTaskParams(BaseModel):
@@ -24,19 +26,22 @@ class ImportTaskParams(BaseModel):
 
 
 def send_knowledge_import_task(
-        task_params: ImportTaskParams
+        task_params: ImportTaskParams, workspace_id: int, tenant_id: int
 ) -> AsyncTaskPublic:
-    # task_params_json = orjson.dumps(task_params.model_dump())
-    task_params_json = dump_json(task_params.model_dump())
+    task_params_json = orjson.dumps(task_params.model_dump()).decode('utf-8')
 
+    task_id = str(uuid4())
     with open_session() as session:
-        entity = create_async_task(
-            session, AsyncTaskType.KnowledgeImport,
-            task_params.knowledge.id, task_params_json)
+        entity = AsyncTask(
+            id=task_id, type=AsyncTaskType.KnowledgeImport,
+            workspace_id=workspace_id, tenant_id=tenant_id,
+            ref_id=task_params.knowledge.id, payload=task_params_json)
+        session.add(entity)
+        session.commit()
+        session.refresh(entity)
 
-    task_id = entity.id
     send_rq_task(task_id, knowledge_import_task, task_id, task_params_json)
-    return AsyncTaskPublic.new(entity)
+    return AsyncTaskPublic.create(entity)
 
 
 # @celery.task(queue="knowledge", bind=True, track_started=True)

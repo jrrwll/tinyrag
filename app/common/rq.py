@@ -55,6 +55,7 @@ class AsyncTaskJob(Job):
             res = super()._execute()
         except Exception:
             ex_str = traceback.format_exc()
+            logger.error(f"async_task={task_id}, failed with exception: {ex_str}")
 
         res_str = dump_json(res) if res else None
 
@@ -63,7 +64,6 @@ class AsyncTaskJob(Job):
                 AsyncTaskStatus.Success, res_str):
                 logger.warning(f"async_task={task_id}, failed to update status Started -> Success")
         else:
-            logger.error(f"async_task={task_id}, failed with exception: {ex_str}")
             if not update_task_status(task_id, AsyncTaskStatus.Started,
                 AsyncTaskStatus.Failure, ex_str):
                 logger.warning(f"async_task={task_id}, failed to update status Started -> Failure")

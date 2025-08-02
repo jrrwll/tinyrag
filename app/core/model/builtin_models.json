@@ -1,0 +1,18 @@
+{
+  "text_embedding": {
+    "all-MiniLM-L6-v2": {
+      "vector_size": 384
+    },
+    "all-MiniLM-L12-v2": {
+      "vector_size": 384
+    },
+    "multilingual-e5-small": {
+      "vector_size": 384,
+      "repo_name": "intfloat"
+    },
+    "nomic-embed-text-v1.5": {
+      "vector_size": 768,
+      "repo_name": "nomic-ai"
+    }
+  }
+}

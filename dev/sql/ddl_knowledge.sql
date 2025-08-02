@@ -20,8 +20,10 @@ create table knowledge (
     description     varchar(1000)         default null,
     enable          tinyint      not null default 1,
     process_rule    text,
-    embedding_model text,
-    retrieval_model text
+    llm_model_config       text,
+    embedding_model_config text,
+    vector_store_config    text,
+    retrieval_model_config  text
 ) default charset utf8mb4;
 
 create table knowledge_document (

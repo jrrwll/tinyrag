@@ -31,6 +31,14 @@ def import_documents(session: Session, params: KnowledgeImport,
         raise BizException.create(ErrorCode.knowledge_not_found, knowledge_id)
     workspace_id = entity.workspace_id
 
+    # check config
+    if not entity.embedding_model_config:
+        raise BizException.create(
+            ErrorCode.model_not_set, ModelType.TextEmbedding.name,
+        )
+    if not entity.vector_store_config:
+        raise BizException.create(ErrorCode.vector_store_not_set)
+
     vector_store = get_setup_vector_store(session, workspace_id, tenant_id)
     model = get_required_setup_model(
         session, ModelType.TextEmbedding, workspace_id, tenant_id)
@@ -60,4 +68,4 @@ def import_documents(session: Session, params: KnowledgeImport,
         task_params.page_urls = params.website.page_urls
 
     # import task
-    return send_knowledge_import_task(task_params)
+    return send_knowledge_import_task(task_params, workspace_id, tenant_id)

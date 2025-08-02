@@ -1,11 +1,12 @@
 import json
 from datetime import datetime
+from functools import cache
 
 from pydantic import BaseModel
 
 from app.common.constants import MIN_UTC_DATETIME
-from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType, \
-    get_builtin_model_id
+from app.core.model.builtin_models import get_builtin_model
+from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.entities.model import Model
 from app.util.codec import md5
 from app.util.model import dump_and_update_dict
@@ -31,16 +32,18 @@ class ModelPublic(BaseModel):
         return ModelPublic(**entity_dict)
 
     @staticmethod
+    @cache
     def from_builtin(model_type: ModelType, model_name: str) -> "ModelPublic":
+        model = get_builtin_model(model_type, model_name)
         return ModelPublic(
-            id=get_builtin_model_id(model_type, model_name),
+            id=model.id,
             created_at=MIN_UTC_DATETIME,
             updated_at=MIN_UTC_DATETIME,
             type=model_type,
             enable=True,
             provider_name=BUILTIN_MODEL_PROVIDER_NAME,
             model_name=model_name,
-            config={},
+            config=model.model_dump(),
         )
 
     def is_builtin(self) -> bool:

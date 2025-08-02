@@ -1,10 +1,14 @@
 from datetime import datetime
+from pydoc import describe
+from typing import Self
 
 from pydantic import BaseModel
 
 from app.config import settings
 from app.core.knowledge.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
+from app.core.model.base import LlmModelConfig
+from app.core.vector_store.base import VectorStoreConfig
 from app.entities.knowledge import Knowledge
 from app.util.model import dump_and_update_dict, load_and_update_dict
 
@@ -15,26 +19,46 @@ class KnowledgeCreate(BaseModel):
     description: str | None = None
 
     process_rule: ProcessRule | None = None
+    llm_model_config: LlmModelConfig | None = None
+    embedding_model_config: EmbeddingModelConfig | None = None
+    vector_store_config: VectorStoreConfig | None = None
+    retrieval_model_config: RetrievalModelConfig | None = None
 
     def to_entity(self) -> Knowledge:
         entity_dict = self.model_dump(exclude_none=True)
         if not entity_dict.get("process_rule"):
-            entity_dict["process_rule"] = settings.knowledge_default_process_rule
-        dump_and_update_dict(entity_dict, "process_rule")
+            entity_dict["process_rule"] = settings.default_process_rule
+
+        dump_and_update_dict(
+            entity_dict, "process_rule", "llm_model_config",
+            "embedding_model_config", "vector_store_config",
+            "retrieval_model_config"
+        )
         return Knowledge(**entity_dict)
 
 
 class KnowledgeUpdate(BaseModel):
     id: int
-
     name: str
     description: str | None = None
 
+    def update_entity(self, entity: Knowledge) -> None:
+        update_dict = self.model_dump()
+        entity.sqlmodel_update(update_dict)
+
+
+class KnowledgeUpdateConfig(BaseModel):
+    id: int
+
     process_rule: ProcessRule | None = None
+    llm_model_config: LlmModelConfig | None = None
+    embedding_model_config: EmbeddingModelConfig | None = None
+    vector_store_config: VectorStoreConfig | None = None
+    retrieval_model_config: RetrievalModelConfig | None = None
 
     def update_entity(self, entity: Knowledge) -> None:
         update_dict = self.model_dump(exclude_none=True)
-        dump_and_update_dict(update_dict, "process_rule")
+        dump_and_update_dict(update_dict, *self.model_fields_set)
         entity.sqlmodel_update(update_dict)
 
 
@@ -68,18 +92,22 @@ class SimpleKnowledgePublic(BaseModel):
 
 
 class KnowledgePublic(SimpleKnowledgePublic):
-    process_rule: ProcessRule | None = None
-    embedding_model: EmbeddingModelConfig | None = None
-    retrieval_model: RetrievalModelConfig | None = None
+    process_rule: ProcessRule
+    llm_model_config: LlmModelConfig
+    embedding_model_config: EmbeddingModelConfig
+    vector_store_config: VectorStoreConfig
+    retrieval_model_config: RetrievalModelConfig | None = None
 
     @staticmethod
     def create(entity: Knowledge) -> "KnowledgePublic":
-
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
             entity_dict, process_rule=ProcessRule,
-            embedding_model=EmbeddingModelConfig,
-            retrieval_model=RetrievalModelConfig)
+            llm_model_config=LlmModelConfig,
+            embedding_model_config=EmbeddingModelConfig,
+            vector_store_config=VectorStoreConfig,
+            retrieval_model_config=RetrievalModelConfig
+        )
         return KnowledgePublic(**entity_dict)
 
 

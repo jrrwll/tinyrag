@@ -4,10 +4,11 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.model.api import ModelCreate, ModelPublic, ModelTestRun, \
     ModelTestRunPublic, \
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel
-from app.core.model.enums import ModelType, get_builtin_model_id
+from app.core.model.builtin_models import is_valid_model_name
+from app.core.model.enums import ModelType
 from app.core.model.llm.base import get_llm_provider
-from app.entities.dao.model import get_default_model, get_default_models, \
-    get_model, get_model_required
+from app.entities.dao.model import get_default_model, get_model, \
+    is_set_in_default_model
 from app.entities.model import TenantDefaultModel
 from app.entities.user import User
 from app.util.api import IdResult
@@ -51,18 +52,18 @@ def update_model_enable(
 
 
 def delete_model(session: Session, model_id: int, current_user: User):
-    default_models = get_default_models(current_user.tenant_id)
-    default_model_ids = [i.model_id for i in default_models.values()
-                         if not i.is_builtin()]
-    if model_id in default_model_ids:
+    tenant_id = current_user.tenant_id
+
+    if is_set_in_default_model(session, model_id, tenant_id):
         raise BizException.create(ErrorCode.model_is_set_in_default)
+
     # TODO
 
 
 def test_run_model(
         session: Session, params: ModelTestRun, current_user: User
 ) -> ModelTestRunPublic:
-    entity = get_model_required(params.id, current_user.tenant_id, session)
+    entity = get_model(session, params.id, current_user.tenant_id)
     if not entity:
         raise BizException.create(ErrorCode.model_not_found, params.id)
     if entity.type != ModelType.LLM:
@@ -130,7 +131,7 @@ def set_or_unset_default_model(
         )
 
     if model_name:
-        if not get_builtin_model_id(model_type, model_name):
+        if not is_valid_model_name(model_type, model_name):
             raise BizException.create(
                 ErrorCode.request_validation_error_detail,
                 f"model `{model_name}` is unsupported")

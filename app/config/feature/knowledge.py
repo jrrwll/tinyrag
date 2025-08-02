@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 
 from app.core.knowledge.base import ProcessRule
 
-_knowledge_default_process_rule = {
+_default_process_rule = {
     "text_splitter": {
         "chunk_overlap": 50,
         "chunk_size": 1024,
@@ -16,17 +16,16 @@ _knowledge_default_process_rule = {
 }
 
 class KnowledgeSettings(BaseSettings):
-    DATASET_DEFAULT_PROCESS_RULE: str = json.dumps(_knowledge_default_process_rule)
+    DEFAULT_PROCESS_RULE: str = json.dumps(_default_process_rule)
 
     @cached_property
-    def knowledge_default_process_rule(self) -> ProcessRule:
+    def default_process_rule(self) -> ProcessRule:
         return ProcessRule.model_validate_json(
-            self.DATASET_DEFAULT_PROCESS_RULE)
+            self.DEFAULT_PROCESS_RULE)
 
     @model_validator(mode="after")
     def _validate_process_rule(self) -> Self:
-        process_rule = self.knowledge_default_process_rule
-        assert process_rule
+        assert self.default_process_rule
         return self
 
 

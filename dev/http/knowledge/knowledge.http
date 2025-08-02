@@ -80,3 +80,9 @@ Content-Type: application/json
     "file_path": "chinese-poetry/quantangshi/"
   }
 }
+
+> {% client.global.set("task_id", response.body.data.id); %}
+
+###
+GET http://{{origin}}{{api_prefix}}/task?id={{task_id}}
+Authorization: Bearer {{auth_token}}

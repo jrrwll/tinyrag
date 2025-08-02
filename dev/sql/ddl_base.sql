@@ -6,9 +6,10 @@ create table workspace (
     tenant_id              bigint        not null,
     name                   varchar(100)  not null,
     description            varchar(1000) null     default null,
-    llm_model_config       longtext,
-    embedding_model_config longtext,
-    vector_store_config    longtext,
+    llm_model_config       text,
+    embedding_model_config text,
+    vector_store_config    text,
+    retrieval_model_config  text,
     unique key uk_tenant_id_name (tenant_id, name)
 ) default charset utf8mb4;
 

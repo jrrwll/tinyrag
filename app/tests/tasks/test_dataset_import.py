@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from sqlmodel import select
 
 from app.common.deps import open_session
@@ -6,10 +8,10 @@ from app.core.knowledge.api import KnowledgePublic
 from app.core.model.enums import ModelType
 from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
 from app.entities.dao.knowledge import get_knowledge
-from app.entities.dao.task import create_async_task
 from app.entities.file import File
 from app.entities.repo.model import get_required_setup_model
 from app.entities.repo.vector_store import get_setup_vector_store
+from app.entities.task import AsyncTask
 from app.tasks.knowledge_import import import_from_files
 from app.tasks.knowledge_import.file import list_files
 from app.tasks.knowledge_import.storage import list_storage_files
@@ -53,9 +55,13 @@ def test_knowledge_import_task_for_storage_files():
         model = get_required_setup_model(
             session, ModelType.TextEmbedding, workspace_id, tenant_id)
 
-        task_id = create_async_task(
-            session, AsyncTaskType.KnowledgeImport,
-            knowledge_id, '{}', status=AsyncTaskStatus.Started).id
+        task_id = str(uuid4())
+        entity = AsyncTask(
+            id=task_id, type=AsyncTaskType.KnowledgeImport,
+            workspace_id=workspace_id, tenant_id=tenant_id,
+            ref_id=knowledge.id, payload='{}', status=AsyncTaskStatus.Started)
+        session.add(entity)
+        session.commit()
         print(f"\ntask_id = {task_id}")
 
     storage_files = get_storage_files("chinese-poetry/quantangshi/")

@@ -83,7 +83,7 @@ def _get_vector(vector_store_type: VectorStoreType) -> VectorProvider:
     workspace_id, tenant_id = 1, 1
     with open_session() as session:
         model = get_required_setup_model(
-            session, ModelType.LLM,
+            session, ModelType.TextEmbedding,
             workspace_id, tenant_id)
 
         stmt = select(VectorStore).where(VectorStore.type == vector_store_type).limit(1)

@@ -5,14 +5,13 @@ from typing import Any, Iterable, Type
 from cachetools import TTLCache
 from pydantic import BaseModel
 
-from app.config import settings
+from app.core.knowledge.text_process.base import DocumentModel
 from app.core.model.api import ModelPublic
 from app.core.model.embedding.base import EmbeddingProvider, \
     get_embedding_provider
-from app.core.knowledge.text_process.base import DocumentModel
 from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.enums import VectorStoreType
-from app.entities.vector_store import VectorStore
+from langchain_core.vectorstores import VectorStore
 
 _client_cache: TTLCache[str, Any] = TTLCache(
     maxsize=1000, ttl=10 * 60)  # 10 min

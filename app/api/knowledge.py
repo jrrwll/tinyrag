@@ -9,8 +9,9 @@ from app.core.knowledge.api import DocumentPreviewChunk, \
     DocumentPreviewChunkPublic, \
     KnowledgeChat, KnowledgeChatPublic, KnowledgeCreate, KnowledgeImport, \
     KnowledgePublic, KnowledgeStartConversation, KnowledgeStreamChatPublic, \
-    KnowledgeUpdate, SimpleKnowledgePublic
-from app.core.knowledge.service.base import create_knowledge, update_knowledge
+    KnowledgeUpdate, KnowledgeUpdateConfig, SimpleKnowledgePublic
+from app.core.knowledge.service.base import create_knowledge, update_knowledge, \
+    update_knowledge_config
 from app.core.knowledge.service.chat import chat_knowledge
 from app.core.knowledge.service.conversation import start_conversation
 from app.core.knowledge.service.import_task import import_documents
@@ -28,13 +29,14 @@ router = CustomAPIRouter(prefix="/knowledge", tags=["knowledge"])
             response_model=ApiResult[PageResult[SimpleKnowledgePublic]])
 def _list(
         session: SessionDep,
+        current_user: CurrentUser,
         workspace_id: int,
         page_no: int = settings.page_no_query,
         page_size: int = settings.page_size_query,
         enable: bool | None = None,
 ) -> Any:
     entities, count = page_and_count_knowledges(
-        session, page_no, page_size, workspace_id, enable)
+        session, page_no, page_size, workspace_id, enable, current_user.tenant_id)
     res = PageResult[SimpleKnowledgePublic](
         page_no=page_no,
         page_size=page_size,
@@ -70,9 +72,16 @@ def _create(session: SessionDep, params: KnowledgeCreate,
 
 
 @router.put("", response_model=ApiResult[Any], dependencies=[LogDep])
-def update(session: SessionDep, params: KnowledgeUpdate,
+def _update(session: SessionDep, params: KnowledgeUpdate,
         current_user: CurrentUser) -> Any:
     update_knowledge(session, params, current_user)
+    return ApiResult.create()
+
+
+@router.post("/config", response_model=ApiResult[Any], dependencies=[LogDep])
+def _update_config(session: SessionDep, params: KnowledgeUpdateConfig,
+        current_user: CurrentUser) -> Any:
+    update_knowledge_config(session, params, current_user)
     return ApiResult.create()
 
 

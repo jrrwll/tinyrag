@@ -2,7 +2,7 @@ from sqlmodel import func, select
 
 from app.common.deps import SessionDep, open_session
 from app.core.model.api import ModelPublic
-from app.core.model.enums import EmbeddingType, ModelType
+from app.core.model.enums import ModelType
 from app.core.workspace.api import WorkspacePublic
 from app.core.workspace.base import WorkspaceDetail
 from app.entities.dao.model import get_model
@@ -77,7 +77,7 @@ def get_workspace_detail(workspace_id: int) -> WorkspaceDetail | None:
             model_id = llm_model_config.model_id
             workspace_detail.llm_model = get_model(session, model_id, tenant_id)
         if embedding_model_config:
-            if embedding_model_config.embedding_type == EmbeddingType.Provider:
+            if embedding_model_config.model_id:
                 model_id = embedding_model_config.model_id
                 workspace_detail.embedding_model = get_model(
                     session, model_id, tenant_id)

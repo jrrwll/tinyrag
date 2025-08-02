@@ -11,13 +11,15 @@ class Knowledge(BizTableBase, table=True):
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
 
-    process_rule: str | None = None
-    embedding_model: str | None = None
-    retrieval_model: str | None = None
+    process_rule: str
+    llm_model_config: str
+    embedding_model_config: str
+    vector_store_config: str
+    retrieval_model_config: str | None = None
 
     @staticmethod
     def get_collection_name(knowledge_id: int) -> str:
-        return f"Knowledge_{knowledge_id}"
+        return f"knowledge_{knowledge_id}"
 
 
 class KnowledgeDocument(BizTableBase, table=True):
@@ -34,7 +36,6 @@ class KnowledgeDocument(BizTableBase, table=True):
 
 
 class KnowledgeDocumentChunk(BizTableBase, table=True):
-
     tenant_id: int
     workspace_id: int
     knowledge_id: int
@@ -48,7 +49,6 @@ class KnowledgeDocumentChunk(BizTableBase, table=True):
 
 
 class KnowledgeConversation(BizTableBase, table=True):
-
     tenant_id: int
     workspace_id: int
     knowledge_id: int

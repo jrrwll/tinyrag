@@ -2,8 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.core.workspace.base import EmbeddingModelConfig, LlmModelConfig, \
-    VectorStoreConfig
+from app.core.knowledge.base import EmbeddingModelConfig, RetrievalModelConfig
+from app.core.model.base import LlmModelConfig
+from app.core.vector_store.base import VectorStoreConfig
 from app.entities.workspace import Workspace
 from app.util.model import load_and_update_dict
 
@@ -21,6 +22,7 @@ class WorkspacePublic(SimpleWorkspacePublic):
     llm_model_config:  LlmModelConfig | None = None
     embedding_model_config:  EmbeddingModelConfig | None = None
     vector_store_config:  VectorStoreConfig | None = None
+    retrieval_model_config: RetrievalModelConfig | None = None
 
     @staticmethod
     def create(entity: Workspace) -> "WorkspacePublic":
@@ -29,7 +31,9 @@ class WorkspacePublic(SimpleWorkspacePublic):
         load_and_update_dict(
             entity_dict, llm_model_config=LlmModelConfig,
             embedding_model_config=EmbeddingModelConfig,
-            vector_store_config=VectorStoreConfig)
+            vector_store_config=VectorStoreConfig,
+            retrieval_model_config=RetrievalModelConfig,
+        )
 
         return WorkspacePublic(**entity_dict)
 
@@ -57,6 +61,7 @@ class WorkspaceUpdateConfig(BaseModel):
     llm_model_config:  LlmModelConfig | None = None
     embedding_model_config:  EmbeddingModelConfig | None = None
     vector_store_config:  VectorStoreConfig | None = None
+    retrieval_model_config: RetrievalModelConfig | None = None
 
 
 class WorkspaceUnsetConfig(BaseModel):
@@ -65,3 +70,4 @@ class WorkspaceUnsetConfig(BaseModel):
     llm_model_config: bool = False
     embedding_model_config: bool = False
     vector_store_config: bool = False
+    retrieval_model_config: bool = False

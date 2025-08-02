@@ -7,20 +7,27 @@ from app.entities.dao.model import get_default_model, get_model
 from app.entities.model import Model, TenantDefaultModel
 
 
-def get_required_setup_model(
+def get_setup_model(
         session: Session, model_type: ModelType,
-        workspace_id: int, tenant_id: int) -> ModelPublic:
+        workspace_id: int, tenant_id: int,
+        required: bool = False) -> ModelPublic | None:
     entity = get_default_model(session, model_type, workspace_id, tenant_id)
     if not entity or entity.is_unset():
         entity = get_default_model(session, model_type, None, tenant_id)
     if not entity or entity.is_unset():
-        raise BizException.create(ErrorCode.default_model_not_set, model_type)
+        if required:
+            raise BizException.create(ErrorCode.model_not_set, model_type)
+        else:
+            return None
 
     if entity.model_name:
         return ModelPublic.from_builtin(model_type, entity.model_name)
     model_entity = get_model(session, entity.model_id, tenant_id)
     if not model_entity:
-        raise BizException.create(ErrorCode.model_not_found, entity.model_id)
+        if required:
+            raise BizException.create(ErrorCode.model_not_found, entity.model_id)
+        else:
+            return None
     return ModelPublic.create(model_entity)
 
 

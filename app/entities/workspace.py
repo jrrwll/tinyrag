@@ -10,3 +10,4 @@ class Workspace(BizTableBase, table=True):
     llm_model_config:  str | None = None
     embedding_model_config:  str | None = None
     vector_store_config:  str | None = None
+    retrieval_model_config: str | None = None

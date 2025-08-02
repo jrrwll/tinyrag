@@ -1,14 +1,14 @@
 from sqlalchemy.orm.session import Session
 
 from app.common.error_code import BizException, ErrorCode
-from app.core.model.enums import EmbeddingType, ModelType
 from app.core.user.enums import UserRole
 from app.core.workspace.api import WorkspaceCreate, WorkspaceUnsetConfig, \
     WorkspaceUpdate, \
     WorkspaceUpdateConfig
-from app.entities.dao.model import get_model
+from app.core.workspace.check_config import check_embedding_model_config, \
+    check_llm_model_config, check_retrieval_model_config, \
+    check_vector_store_config
 from app.entities.dao.user import get_workspace_permission
-from app.entities.dao.vector_store import get_vector_store
 from app.entities.dao.workspace import get_workspace, get_workspace_by_name
 from app.entities.user import User
 
@@ -57,7 +57,8 @@ def config_workspace(
         current_user: User):
     if (not params.llm_model_config
             and not params.embedding_model_config
-            and not params.vector_store_config):
+            and not params.vector_store_config
+            and not params.retrieval_model_config):
         raise BizException.create(ErrorCode.request_validation_error_detail, "any config param is required")
 
     entity = get_workspace(session, params.id, current_user.tenant_id)
@@ -69,44 +70,20 @@ def config_workspace(
 
     # check model
     if params.llm_model_config:
-        model_id = params.llm_model_config.model_id
-        model_entity = get_model(session, model_id, current_user.tenant_id)
-        if not model_entity:
-            raise BizException.create(ErrorCode.model_not_found, model_id)
-        elif model_entity.type != ModelType.LLM:
-            raise BizException.create(
-                ErrorCode.model_type_not_supported, model_entity.type.name)
-
+        check_llm_model_config(session, params.llm_model_config, current_user)
         entity.llm_model_config = params.llm_model_config.model_dump_json()
 
     if params.embedding_model_config:
-        embedding_type = params.embedding_model_config.embedding_type
-        if embedding_type == EmbeddingType.Provider:
-            model_id = params.embedding_model_config.model_id
-            model_entity = get_model(session, model_id, current_user.tenant_id)
-            if not model_entity:
-                raise BizException.create(ErrorCode.model_not_found, model_id)
-            elif model_entity.type != ModelType.TextEmbedding:
-                raise BizException.create(
-                    ErrorCode.model_type_not_supported, model_entity.type.name)
-        else:
-            # transformer
-            model_name = params.embedding_model_config.model_name
-            if not EmbeddingType.is_valid_model_name(model_name):
-                raise BizException.create(
-                    ErrorCode.model_name_not_supported, model_name)
-
+        check_embedding_model_config(session, params.embedding_model_config, current_user)
         entity.embedding_model_config = params.embedding_model_config.model_dump_json()
 
     if params.vector_store_config:
-        vector_store_id = params.vector_store_config.vector_id
-        vector_store_entity = get_vector_store(
-            session, vector_store_id, current_user.tenant_id)
-        if not vector_store_entity:
-            raise BizException.create(
-                ErrorCode.vector_store_not_found, vector_store_id)
-
+        check_vector_store_config(session, params.vector_store_config, current_user)
         entity.vector_store_config = params.vector_store_config.model_dump_json()
+
+    if params.retrieval_model_config:
+        check_retrieval_model_config(session, params.retrieval_model_config, current_user)
+        entity.retrieval_model_config = params.retrieval_model_config.model_dump_json()
 
     session.add(entity)
     session.commit()
@@ -117,7 +94,8 @@ def unset_config_workspace(
         current_user: User):
     if (not params.llm_model_config
             and not params.embedding_model_config
-            and not params.vector_store_config):
+            and not params.vector_store_config
+            and not params.retrieval_model_config):
         raise BizException.create(ErrorCode.request_validation_error_detail, "any config param is required")
 
     entity = get_workspace(session, params.id, current_user.tenant_id)
@@ -133,6 +111,8 @@ def unset_config_workspace(
         entity.embedding_model_config = None
     if params.vector_store_config:
         entity.vector_store_config = None
+    if params.retrieval_model_config:
+        entity.retrieval_model_config = None
 
     session.add(entity)
     session.commit()

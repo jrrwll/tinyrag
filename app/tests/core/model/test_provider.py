@@ -19,11 +19,45 @@ def test_embedding(print_time):
     print(v)
 
 
-def test_builtin_embedding(print_time):
+def test_builtin_embedding1(print_time):
     print("\ntest_builtin_embedding")
+
     model = ModelPublic.from_builtin(
         ModelType.TextEmbedding, "all-MiniLM-L6-v2")
     embedding_provider = get_embedding_provider(model)
     v = embedding_provider.embed_query("Hello World!")
-    print(len(v))
+    print(len(v)) # 384
+    print(v)
+
+
+def test_builtin_embedding2(print_time):
+    print("\ntest_builtin_embedding")
+
+    model = ModelPublic.from_builtin(
+        ModelType.TextEmbedding, "all-MiniLM-L12-v2")
+    embedding_provider = get_embedding_provider(model)
+    v = embedding_provider.embed_query("Hello World!")
+    print(len(v)) # 384
+    print(v)
+
+
+def test_builtin_embedding3(print_time):
+    print("\ntest_builtin_embedding")
+
+    model = ModelPublic.from_builtin(
+        ModelType.TextEmbedding, "multilingual-e5-small")
+    embedding_provider = get_embedding_provider(model)
+    v = embedding_provider.embed_query("Hello World!")
+    print(len(v)) #
+    print(v)
+
+
+def test_builtin_embedding4(print_time):
+    print("\ntest_builtin_embedding")
+
+    model = ModelPublic.from_builtin(
+        ModelType.TextEmbedding, "nomic-embed-text-v1.5")
+    embedding_provider = get_embedding_provider(model)
+    v = embedding_provider.embed_query("Hello World!")
+    print(len(v)) # 768
     print(v)

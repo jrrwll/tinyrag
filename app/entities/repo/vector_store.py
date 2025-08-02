@@ -6,14 +6,19 @@ from app.entities.dao.vector_store import get_default_vector_store, \
     get_vector_store
 
 
-def get_setup_vector_store(session: Session, workspace_id: int, tenant_id: int) -> VectorStorePublic:
+def get_setup_vector_store(session: Session, workspace_id: int, tenant_id: int,
+        required: bool = False) -> VectorStorePublic | None:
     entity = get_default_vector_store(session, workspace_id, tenant_id)
     if not entity or entity.is_unset():
         entity = get_default_vector_store(session, None, tenant_id)
     if not entity or entity.is_unset():
-        raise BizException.create(ErrorCode.default_vector_store_not_set)
+        raise BizException.create(ErrorCode.vector_store_not_set)
 
     model_entity = get_vector_store(session, entity.vector_store_id, tenant_id)
     if not model_entity:
-        raise BizException.create(ErrorCode.vector_store_not_found, entity.model_id)
+        if required:
+            raise BizException.create(
+                ErrorCode.vector_store_not_found, entity.model_id)
+        else:
+            return None
     return VectorStorePublic.create(model_entity)
