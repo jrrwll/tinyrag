@@ -1,5 +1,6 @@
 import os
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Mapping
+from copy import deepcopy
 
 
 def take_limit[T](iterable: Iterable[T], limit: int) -> list[T]:
@@ -46,3 +47,26 @@ def any_match[T](iterable: Iterable[T],
         if predicate(i):
             return i
     return None
+
+
+def first_not_none[T](mapping: Mapping[str, T], *keys: str) -> T | None:
+    for k in keys:
+        if k in mapping and mapping[k] is not None:
+            return mapping[k]
+    return None
+
+
+def deep_merge_dict(a: dict, b: dict) -> dict:
+    c = deepcopy(a)
+    for k, v in b.items():
+        if k not in c:
+            c[k] = deepcopy(v)
+        else:
+            ov = c[k]
+            if isinstance(ov, dict) and isinstance(v, dict):
+                c[k] = deep_merge_dict(ov, v)
+            elif isinstance(ov, list) and isinstance(v, list):
+                c[k] = ov + v
+            else:
+                c[k] = deepcopy(v) # overwrite
+    return c

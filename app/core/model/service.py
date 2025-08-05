@@ -15,6 +15,9 @@ from app.util.api import IdResult
 
 
 def create_model(session: Session, params: ModelCreate, current_user: User) -> IdResult:
+    if params.type == ModelType.TextEmbedding:
+        params.config
+
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
 

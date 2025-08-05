@@ -13,7 +13,12 @@ _model_cache: TTLCache[str, Embeddings] = TTLCache(
     maxsize=1000, ttl=10 * 60)  # 10min
 
 
-class EmbeddingProvider[T: BaseModel](BaseModelProvider[T, Embeddings], ABC):
+class BaseEmbeddingConfig(BaseModel):
+    vector_size: int | None = None
+    timeout: int | None = None
+
+
+class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings], ABC):
 
     @staticmethod
     def get_model_type() -> ModelType:

@@ -28,7 +28,7 @@ router = CustomAPIRouter(prefix="/model", tags=["model"])
 
 
 @router.get("/list", response_model=ApiResult[PageResult[ModelPublic]])
-def list(
+def _list(
         session: SessionDep,
         current_user: CurrentUser,
         page_no: int = settings.page_no_query,

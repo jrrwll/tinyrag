@@ -1,0 +1,10 @@
+GET http://{{origin}}{{api_prefix}}/meta/model/providers?model_type=llm
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/meta/model/providers?model_type=text_embedding
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/meta/vector-store/providers
+Authorization: Bearer {{auth_token}}

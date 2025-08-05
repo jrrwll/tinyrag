@@ -1,54 +1,35 @@
-import configparser
-import os.path
 from enum import Enum, auto
-from pathlib import Path
+from functools import cached_property
 
-from fastapi import Response, HTTPException
+from fastapi import HTTPException, Response
 from fastapi.responses import JSONResponse
 
+from app.common.i18n import I18nMetaManager
 from app.config import settings
 
-_common_dir = Path(__file__).resolve().parent
-_error_code_file = str(_common_dir / "error_code.ini")
-_error_code_test_file = str(_common_dir / "error_code_test.ini")
-_error_code_prod_file = str(_common_dir / "error_code_prod.ini")
-
-_error_code_files = [_error_code_file]
-if settings.IS_TEST_ENV and os.path.exists(_error_code_test_file):
-    _error_code_files.append(_error_code_test_file)
-elif not settings.IS_TEST_ENV and os.path.exists(_error_code_prod_file):
-    _error_code_files.append(_error_code_prod_file)
-
-_config = configparser.ConfigParser()
-_config.read(_error_code_files)
-
-_unknown_status_code = 500
-try:
-    _unknown_message = _config["500"]["unknown_error"]
-except KeyError:
-    raise Exception("unknown_error not found in error_code.ini")
+_config = I18nMetaManager().error_codes(settings.DEFAULT_LANG)
 
 
 class ErrorCode(Enum):
-    ok = auto()
-    unknown_error = auto()
+    ok = auto(), 200
+    unknown_error = auto(), 500
     request_validation_error = auto()
     request_validation_error_detail = auto()
 
     # auth
-    email_or_password_incorrect = auto()
+    email_or_password_incorrect = auto(), 401
     same_new_password = auto()
-    login_user_inactive = auto()
+    login_user_inactive = auto(), 403
     user_inactive = auto()
     user_email_already_exists = auto()
     super_user_cannot_delete = auto()
     invalid_email_domain = auto()
-    login_user_not_found = auto()
+    login_user_not_found = auto(), 401
     user_not_found = auto()
     user_email_not_found = auto()
-    invalid_token = auto()
-    invalid_credentials = auto()
-    insufficient_permissions = auto()
+    invalid_token = auto(), 401
+    invalid_credentials = auto(), 401
+    insufficient_permissions = auto(), 403
     permission_already_granted = auto()
     permission_not_granted = auto()
 
@@ -85,12 +66,18 @@ class ErrorCode(Enum):
     knowledge_not_found = auto()
     knowledge_conversation_not_found = auto()
 
-    def get_status_code_and_message(self) -> tuple[int, str]:
-        for status_code, kv in _config.items():
-            message = kv.get(self.name)
-            if message:
-                return int(status_code), message
-        return _unknown_status_code, _unknown_message
+    def __new__(cls, value, status_code: int = 400):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj.status_code = status_code
+        return obj
+
+    @cached_property
+    def message(self):
+        message = _config.get(self.name)
+        if not message:
+            message = self.name.replace("_", " ").capitalize()
+        return message
 
 
 class BizException(Exception):
@@ -105,7 +92,7 @@ class BizException(Exception):
 
     @staticmethod
     def create(error_code: ErrorCode, *args) -> "BizException":  # type: ignore[no-untyped-def]
-        status_code, message = error_code.get_status_code_and_message()
+        status_code, message = error_code.status_code, error_code.message
         try:
             message = message.format(*args)
         except KeyError:
@@ -122,8 +109,8 @@ class BizException(Exception):
             message = exc.detail
             status_code=exc.status_code
         else:
-            message = _unknown_message
-            status_code=_unknown_status_code
+            message = ErrorCode.unknown_error.message
+            status_code=ErrorCode.unknown_error.status_code
 
         if settings.IS_TEST_ENV:
             message = str(exc)

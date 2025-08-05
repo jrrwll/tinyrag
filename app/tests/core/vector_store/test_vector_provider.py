@@ -4,12 +4,13 @@ from app.common.deps import open_session
 from app.config import settings
 from app.core.file.enums import FileType
 from app.core.knowledge.text_process.base import get_text_processor
+from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.enums import VectorStoreType
 from app.core.vector_store.provider.base import VectorProvideFactory, \
     VectorProvider
-from app.entities.repo.model import get_required_setup_model
+from app.entities.repo.model import get_setup_model
 from app.entities.vector_store import VectorStore
 from app.tests.test_base import _find_first_file
 
@@ -53,14 +54,16 @@ def run_add_documents(vector_store_type: VectorStoreType):
     if not local_path:
         return
 
-    text_processor = get_text_processor(settings.knowledge_default_process_rule)
+    text_processor = get_text_processor(settings.default_process_rule)
 
     docs = list(text_processor.load_documents(local_path, FileType.TXT))
     print(f"\ndocs len {len(docs)}")
 
     documents = text_processor.split_documents(docs)
 
-    vector = _get_vector(vector_store_type)
+    vector_store, model = _get_vector_store_and_model(vector_store_type)
+    vector = VectorProvideFactory.create_vector(
+        "tinyrag_test", vector_store, model)
 
     vector.add_documents(documents)
     doc_ids = [doc.id for doc in documents]
@@ -69,7 +72,9 @@ def run_add_documents(vector_store_type: VectorStoreType):
 
 def run_search(vector_store_type: VectorStoreType):
     print(f"\nvector_store_type={vector_store_type}")
-    vector = _get_vector(vector_store_type)
+    vector_store, model = _get_vector_store_and_model(vector_store_type)
+    vector = VectorProvideFactory.create_vector(
+        "tinyrag_test", vector_store, model)
 
     vec = vector.model_provider.embed_query("流沙")
     print(f"\nvec {len(vec)} {vec}\n")
@@ -78,13 +83,16 @@ def run_search(vector_store_type: VectorStoreType):
     for d in matched_dcos:
         print(f"{d}")
 
-
-def _get_vector(vector_store_type: VectorStoreType) -> VectorProvider:
+def _get_vector_store_and_model(
+        vector_store_type: VectorStoreType
+) -> tuple[VectorStorePublic, ModelPublic]:
     workspace_id, tenant_id = 1, 1
     with open_session() as session:
-        model = get_required_setup_model(
+        model = get_setup_model(
             session, ModelType.TextEmbedding,
             workspace_id, tenant_id)
+        if not model:
+            raise RuntimeError("No embedding model")
 
         stmt = select(VectorStore).where(VectorStore.type == vector_store_type).limit(1)
         vector_store_entity = session.exec(stmt).first()
@@ -94,6 +102,4 @@ def _get_vector(vector_store_type: VectorStoreType) -> VectorProvider:
 
         print(f"\nvector_store={vector_store.model_dump_json(exclude_defaults=True)}")
         print(f"\nmodel={model.model_dump_json(exclude_defaults=True)}")
-
-        return VectorProvideFactory.create_vector(
-            "tinyrag_test", vector_store, model)
+        return vector_store, model

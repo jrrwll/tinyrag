@@ -3,12 +3,14 @@ from abc import ABC, ABCMeta, abstractmethod
 from enum import StrEnum
 from typing import Annotated, get_type_hints
 
+from pydantic import BaseModel, PositiveInt
+
 from app.core.model.embedding.base import EmbeddingProvider
 from app.core.model.embedding.transformer import TransformerEmbeddingProvider
 from app.core.model.provider import BaseModelProvider
 from app.core.node.base import LLMConfig
 from app.core.node.runner.base import NodeRunner
-from app.util.lang import find_sub_types, walk_and_import_modules
+from app.util.lang import find_sub_types, strip_type, walk_and_import_modules
 from app.util.model import get_extra_schema
 
 
@@ -19,10 +21,11 @@ class Type(StrEnum):
     D = "d"
 
 
-class Box:
+class Box(BaseModel):
     type: str = Annotated[str, "a,b"]
     value: str = Annotated[str, "c,d"]
     name: str = Annotated[str, Type.A, Type.B]
+    port: PositiveInt | None = None
 
 
 def model_provider_registry(cls):
@@ -125,3 +128,9 @@ def test_find_sub_types():
         BaseModelProvider, model_mod, exclude_abc=True)
     for cls in provider_classes:
         print(cls)
+
+
+def test_strip_type():
+    print(f"\nBox: {strip_type(Box)}")
+    for name, info in Box.model_fields.items():
+        print(f"{name}: {strip_type(info.annotation)}")

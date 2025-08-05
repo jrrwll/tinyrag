@@ -67,11 +67,10 @@ class ModelCreate(BaseModel):
     provider_name: str
     model_name: str
     config: dict = {} # type: ignore[type-arg]
-    embedding_config: dict = {}
 
     def to_entity(self) -> Model:
         entity_dict = self.model_dump(exclude_none=True)
-        dump_and_update_dict(entity_dict, "config", "embedding_config")
+        dump_and_update_dict(entity_dict, "config")
         return Model(**entity_dict)
 
 
@@ -79,7 +78,6 @@ class ModelUpdate(BaseModel):
     id: int
     model_name: str
     config: dict = {}  # type: ignore[type-arg]
-    embedding_config: dict = {}
 
     def update_entity(self, entity: Model) -> None:
         config_dict = json.loads(entity.config)

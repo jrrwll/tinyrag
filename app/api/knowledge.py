@@ -63,7 +63,7 @@ def _preview_chunk(params: DocumentPreviewChunk) -> Any:
     return ApiResult.create(res)
 
 
-@router.post("", response_model=ApiResult[KnowledgePublic],
+@router.post("", response_model=ApiResult[IdResult],
              dependencies=[LogDep])
 def _create(session: SessionDep, params: KnowledgeCreate,
         current_user: CurrentUser) -> Any:

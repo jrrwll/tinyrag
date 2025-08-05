@@ -7,6 +7,7 @@ from app.core.model.embedding.base import EmbeddingProvider
 
 
 class OllamaEmbeddingConfig(BaseModel):
+    vector_size: int | None = None
     base_url: str | None = None
     api_key: str | None = None
     content_length: int = 4096

@@ -56,6 +56,19 @@ def dump_and_update_dict(d: dict[str, Any], *keys: str) -> None:
     d.update(new_dict)
 
 
+def model_validate_dict[T: BaseModel](
+        raw_dict: dict[str, dict[str, dict]], model: type[T]
+) -> dict[str, dict[str, T]]:
+    new_dict = {}
+    for k1, d in raw_dict.items():
+        new_d = {}
+        for k2, v in d.items():
+            new_d[k2] = model.model_validate(v)
+        new_dict[k1] = new_d
+
+    return new_dict
+
+
 def get_extra_schema(model_cls: type[BaseModel]) -> dict[str, dict[str, Any]]:
     fields = {}
     for field_name, field_info in model_cls.model_fields.items():

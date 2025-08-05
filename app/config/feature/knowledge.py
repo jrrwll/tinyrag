@@ -15,22 +15,22 @@ _default_process_rule = {
     }
 }
 
+
 class KnowledgeSettings(BaseSettings):
     DEFAULT_PROCESS_RULE: str = json.dumps(_default_process_rule)
 
     @cached_property
     def default_process_rule(self) -> ProcessRule:
-        return ProcessRule.model_validate_json(
-            self.DEFAULT_PROCESS_RULE)
+        return ProcessRule.model_validate_json(self.DEFAULT_PROCESS_RULE)
 
     @model_validator(mode="after")
     def _validate_process_rule(self) -> Self:
         assert self.default_process_rule
+        ProcessRule.model_validate_json(self.DEFAULT_PROCESS_RULE)
         return self
 
 
 class FileUploadSettings(BaseSettings):
-
     UPLOAD_FILE_SIZE_LIMIT: NonNegativeInt = 20
     UPLOAD_IMAGE_FILE_SIZE_LIMIT: NonNegativeInt = 20
     UPLOAD_AUDIO_FILE_SIZE_LIMIT: NonNegativeInt = 50

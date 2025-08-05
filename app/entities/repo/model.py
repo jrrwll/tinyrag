@@ -1,10 +1,23 @@
 from sqlmodel import Session, or_, select
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.knowledge.base import EmbeddingModelConfig
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.entities.dao.model import get_default_model, get_model
 from app.entities.model import Model, TenantDefaultModel
+
+
+def get_embedding_model_from_config(
+        session: Session,
+        embedding_model_config: EmbeddingModelConfig, tenant_id: int) -> ModelPublic:
+    if embedding_model_config.model_name:
+        return ModelPublic.from_builtin(ModelType.TextEmbedding, embedding_model_config.model_name)
+    model_id = embedding_model_config.model_id
+    model = get_model(session, model_id, tenant_id)
+    if not model:
+        raise BizException(ErrorCode.model_not_found, model_id)
+    return ModelPublic.create(model)
 
 
 def get_setup_model(

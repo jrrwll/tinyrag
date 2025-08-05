@@ -58,13 +58,19 @@ class ModelProviderFactory:
 
     _lock = threading.Lock()
     _initialized = False
+    # model_type -> provider_name -> cls
     _implements: dict[ModelType, dict[str, type]] = {}
+
+    @classmethod
+    def get_implements(cls, model_type: ModelType) -> dict[str, type[BaseModelProvider]]:
+        cls._ensure_provider_classes()
+
+        return cls._implements.get(model_type, {})
 
     @classmethod
     def get_provider_class(cls, model_type: ModelType,
             provider_name: str) -> type:
-        if not cls._initialized:
-            cls.load_provider_classes()
+        cls._ensure_provider_classes()
 
         classes = cls._implements.get(model_type, {})
         c =  classes.get(provider_name)
@@ -75,8 +81,14 @@ class ModelProviderFactory:
         return c
 
     @classmethod
-    def load_provider_classes(cls) -> None:
+    def _ensure_provider_classes(cls) -> None:
+        if cls._initialized:
+            return
+
         with cls._lock:
+            if cls._initialized:
+                return
+
             cls._implements.clear()
 
             from app.core import model as model_mod
@@ -91,5 +103,4 @@ class ModelProviderFactory:
 
                 classes[c.get_provider_name()] = c
 
-            if not cls._initialized:
-                cls._initialized = True
+            cls._initialized = True

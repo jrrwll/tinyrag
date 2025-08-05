@@ -25,7 +25,16 @@ Content-Type: application/json
 {
   "id": 1,
   "name": "全唐诗",
-  "description": "资源来源：https://github.com/chinese-poetry/chinese-poetry",
+  "description": "资源来源：https://github.com/chinese-poetry/chinese-poetry"
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/knowledge/config
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": 1,
   "process_rule": {
     "text_splitter": {
       "chunk_overlap": 50,

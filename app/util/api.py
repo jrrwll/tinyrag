@@ -13,13 +13,21 @@ class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
         return ApiResult(data=data)
 
 
+class IdResult(BaseModel):
+    id: int | str
+
+
+class ListResult[T: BaseModel | JsonValue](BaseModel):
+    items: list[T]
+
+    @classmethod
+    def create[R: BaseModel | JsonValue](cls, data: list[R]) -> "ListResult[R]":
+        return ListResult(items=data)
+
+
 # PEP 695 Generic Bounds
 class PageResult[T: BaseModel | JsonValue](BaseModel):
     page_no: int
     page_size: int
     total: int
     items: list[T]
-
-
-class IdResult(BaseModel):
-    id: int | str

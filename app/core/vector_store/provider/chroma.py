@@ -8,7 +8,7 @@ from app.core.vector_store.provider.base import VectorProvider
 
 
 class ChromaVectorStoreConfig(BaseModel):
-    host: str | None = None
+    host: str
     port: PositiveInt | None = None
     tenant: str | None = None
     database: str | None = None
@@ -20,11 +20,11 @@ class ChromaVectorProvider(
     VectorProvider[ChromaVectorStoreConfig, ClientAPI]):
 
     @staticmethod
-    def _get_config_type() -> Type[ChromaVectorStoreConfig]:
+    def get_config_type() -> Type[ChromaVectorStoreConfig]:
         return ChromaVectorStoreConfig
 
     def _create_client(self) -> Client:
-        if not self.config.host:
+        if self.config.host == "*":
             client_settings = Settings(
                 persist_directory=self.vector_store_local_dir)
             client = Client(client_settings)

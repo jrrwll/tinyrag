@@ -2,7 +2,6 @@ from typing import Self
 
 from pydantic import BaseModel, model_validator
 
-from app.common.error_code import BizException, ErrorCode
 from app.core.model.builtin_models import is_valid_model_name
 from app.core.model.enums import ModelType
 
@@ -29,10 +28,11 @@ class EmbeddingModelConfig(BaseModel):
             raise ValueError("Embedding model id or name is required")
 
         if self.model_id:
-            return
+            return self
 
         if not is_valid_model_name(ModelType.TextEmbedding, self.model_name):
-            raise BizException.create(ErrorCode.model_name_not_supported, self.model_name)
+            raise ValueError(f"Embedding model name is not supported: {self.model_name}")
+        return self
 
 
 class RetrievalModelConfig(BaseModel):

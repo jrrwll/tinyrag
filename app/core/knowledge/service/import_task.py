@@ -4,12 +4,11 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.file.service.base import get_storage_files
 from app.core.knowledge.api import KnowledgeImport, \
     KnowledgePublic
-from app.core.model.enums import ModelType
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.file import get_files
 from app.entities.dao.knowledge import get_knowledge
-from app.entities.repo.model import get_required_setup_model
-from app.entities.repo.vector_store import get_setup_vector_store
+from app.entities.repo.model import get_embedding_model_from_config
+from app.entities.repo.vector_store import get_vector_store_from_config
 from app.entities.user import User
 from app.tasks.knowledge_import import ImportTaskParams, \
     send_knowledge_import_task
@@ -30,18 +29,12 @@ def import_documents(session: Session, params: KnowledgeImport,
     if not entity:
         raise BizException.create(ErrorCode.knowledge_not_found, knowledge_id)
     workspace_id = entity.workspace_id
+    knowledge = KnowledgePublic.create(entity)
 
-    # check config
-    if not entity.embedding_model_config:
-        raise BizException.create(
-            ErrorCode.model_not_set, ModelType.TextEmbedding.name,
-        )
-    if not entity.vector_store_config:
-        raise BizException.create(ErrorCode.vector_store_not_set)
-
-    vector_store = get_setup_vector_store(session, workspace_id, tenant_id)
-    model = get_required_setup_model(
-        session, ModelType.TextEmbedding, workspace_id, tenant_id)
+    model = get_embedding_model_from_config(
+        session, knowledge.embedding_model_config, tenant_id)
+    vector_store = get_vector_store_from_config(
+        session, knowledge.vector_store_config, tenant_id)
 
     task_params = ImportTaskParams(
         knowledge=KnowledgePublic.create(entity),

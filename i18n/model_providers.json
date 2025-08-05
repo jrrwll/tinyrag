@@ -1,0 +1,26 @@
+{
+  "text_embedding": {
+    "builtin": {
+      "description": "",
+      "icon": "",
+      "fields": {
+        "model_name": {
+          "description": ""
+        }
+      }
+    },
+    "ollama": {
+      "description": "",
+      "icon": "",
+      "fields": {
+        "model_name": {
+          "description": ""
+        }
+      }
+    },
+    "openai": {
+      "description": "",
+      "icon": ""
+    }
+  }
+}

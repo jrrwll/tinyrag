@@ -1,0 +1,11 @@
+{
+  "qdrant": {
+    "description": "",
+    "icon": "",
+    "fields": {
+      "url": {
+        "description": ""
+      }
+    }
+  }
+}

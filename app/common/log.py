@@ -1,32 +1,17 @@
-import contextvars
-import sys
-import uuid
-from logging.handlers import RotatingFileHandler
-from app.config import settings
-import os.path
 import logging
-from fastapi import Request, Response, Depends
-from fastapi.routing import APIRoute
+import os.path
+import sys
 from datetime import datetime
-import pytz
+from logging.handlers import RotatingFileHandler
 
+import pytz
+from fastapi import Depends, Request
+from fastapi.routing import APIRoute
+
+from app.common.app_dispatch import request_id_var
+from app.config import settings
 
 logger = logging.getLogger(__name__)
-request_id_var = contextvars.ContextVar("request_id", default="")
-
-
-# @app.middleware("http")
-async def add_request_id(request: Request, call_next) -> Response: # type: ignore[no-untyped-def]
-    request_id = request.headers.get("request_id")
-    if not request_id:
-        request_id = str(uuid.uuid4())
-
-    request_id_var.set(request_id)
-
-    response: Response = await call_next(request)
-
-    response.headers["request_id"] = request_id
-    return response
 
 
 def config_logging() -> None:

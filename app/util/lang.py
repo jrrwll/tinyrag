@@ -2,8 +2,8 @@ import importlib
 import pkgutil
 from abc import ABC
 from enum import Enum
-from types import ModuleType
-from typing import Any, Iterable, Type
+from types import ModuleType, UnionType
+from typing import Annotated, Any, Iterable, Type, Union, get_args, get_origin
 
 
 def enum_values[T: Enum](enum_type: Type[T]) -> list[Any]:
@@ -38,3 +38,16 @@ def walk_and_import_modules(package: ModuleType) -> Iterable[ModuleType]:
             yield from walk_and_import_modules(sub_mod)
         else:
             yield sub_mod
+
+
+def strip_type(typ: type) -> type:
+    if get_origin(typ) in [Union, UnionType]:
+        args = tuple(a for a in get_args(typ) if a is not type(None))
+        if len(args) == 1:
+            typ = args[0]
+        else:
+            return typ
+
+    if get_origin(typ) is Annotated:
+        typ = get_args(typ)[0]
+    return typ

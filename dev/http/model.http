@@ -45,7 +45,7 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "prompt": "Who are you?"
+  "prompt": "帮忙写段提示语ABCD，请注意，用户是一个中国古诗词爱好者，用户想要提问问关于古诗词的问题作为LLM的提示词，但是他的问题可能没有表述好，你需要写一段提示词ABCD给用户，然后用户会将ABCD作为提示词去给LLM，以让LLM帮忙优化他的提示词。请问，这里的ABCD该如何设计？请输出具体的ABCD提示词，并给出优化建议"
 }
 
 ###

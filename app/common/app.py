@@ -1,11 +1,12 @@
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.base import api_router
+from app.common.app_dispatch import add_request_vars
 from app.common.error_code import BizException, ErrorCode
-from app.common.log import add_request_id, config_logging
+from app.common.log import config_logging
 from app.config import settings
 
 config_logging()
@@ -22,7 +23,7 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.API_PREFIX_STR)
-app.add_middleware(BaseHTTPMiddleware, dispatch=add_request_id)
+app.add_middleware(BaseHTTPMiddleware, dispatch=add_request_vars)
 
 
 # app.add_exception_handler(Exception, exception_handler)

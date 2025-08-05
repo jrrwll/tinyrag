@@ -14,6 +14,7 @@ _singleton_workdir = _root_dir / "workdir"
 class DeploymentSettings(BaseSettings):
     PROJECT_NAME: str
     DEBUG: bool = False
+    DEFAULT_LANG: str = "en"
 
     ENVIRONMENT: Literal["test", "production"] = "test"
 
