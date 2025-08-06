@@ -25,6 +25,10 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
     def get_config_type() -> Type[Cfg]:
         raise NotImplementedError()
 
+    @classmethod
+    def validate_config(cls, config: dict):
+        cls.get_config_type().model_validate(config)
+
     def _create_client(self) -> C:
         raise NotImplementedError()
 

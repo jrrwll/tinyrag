@@ -1,6 +1,7 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.meta.provider import validate_vector_store_config_dict
 from app.core.vector_store.api import SetupDefaultVectorStore, \
     VectorStoreCreate, VectorStorePublic
 from app.entities.dao.vector_store import get_default_vector_store, \
@@ -13,6 +14,9 @@ from app.util.api import ApiResult, IdResult
 def create_vector_store(
         session: Session, params: VectorStoreCreate,
         current_user: User) -> IdResult:
+    # validate config
+    validate_vector_store_config_dict(params.type, params.config)
+
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
 

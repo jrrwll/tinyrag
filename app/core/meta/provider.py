@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import get_origin, get_args, Union, Annotated
 
 from app.common.app_dispatch import request_id_var
+from app.common.error_code import BizException, ErrorCode
 from app.common.i18n import I18nBaseEntity, I18nMetaManager
 from app.core.meta.api import MetaBaseEntity, MetaBaseField
 from app.core.meta.enums import FormInputType
@@ -52,8 +52,8 @@ def list_vector_store_providers() -> list[MetaBaseEntity]:
     for vector_store_type in VectorStoreType:
         msg = msgs.get(vector_store_type.value, I18nBaseEntity())
 
-        config_type = (VectorProvideFactory.get_vector_class(vector_store_type)
-                       .get_config_type())
+        cls = VectorProvideFactory.get_vector_class(vector_store_type)
+        config_type = cls.get_config_type()
         fields = _parse_fields(config_type)
         items.append(MetaBaseEntity(
             name=vector_store_type.value,
@@ -91,3 +91,18 @@ def _parse_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
         field.type = typ
 
     return fields
+
+
+def validate_model_config_dict(model_type: ModelType, provider_name: str, config: dict):
+    providers = ModelProviderFactory.get_implements(model_type)
+    for name, cls in providers.items():
+        if name == provider_name:
+            cls.validate_config(config)
+            return
+
+    raise BizException.create(ErrorCode.model_provider_not_supported, provider_name)
+
+
+def validate_vector_store_config_dict(vector_store_type: VectorStoreType, config: dict):
+    cls = VectorProvideFactory.get_vector_class(vector_store_type)
+    cls.validate_config(config)

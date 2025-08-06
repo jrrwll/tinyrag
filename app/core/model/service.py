@@ -1,6 +1,7 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.meta.provider import validate_model_config_dict
 from app.core.model.api import ModelCreate, ModelPublic, ModelTestRun, \
     ModelTestRunPublic, \
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel
@@ -15,8 +16,8 @@ from app.util.api import IdResult
 
 
 def create_model(session: Session, params: ModelCreate, current_user: User) -> IdResult:
-    if params.type == ModelType.TextEmbedding:
-        params.config
+    # validate config
+    validate_model_config_dict(params.type, params.provider_name, params.config)
 
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
@@ -31,6 +32,9 @@ def update_model(session: Session, params: ModelUpdate, current_user: User):
     entity = get_model(session, params.id, current_user.tenant_id)
     if not entity:
         raise BizException.create(ErrorCode.model_not_found, params.id)
+
+    # validate config
+    validate_model_config_dict(entity.type, entity.provider_name, params.config)
 
     params.update_entity(entity)
 

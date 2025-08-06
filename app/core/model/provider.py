@@ -34,6 +34,10 @@ class BaseModelProvider[T: BaseModel, M](ABC):
     def get_config_type() -> Type[T]:
         raise NotImplementedError()
 
+    @classmethod
+    def validate_config(cls, config: dict):
+        cls.get_config_type().model_validate(config)
+
     @abstractmethod
     def _create_model(self) -> M:
         raise NotImplementedError()

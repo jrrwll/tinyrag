@@ -80,15 +80,8 @@ class ModelUpdate(BaseModel):
     config: dict = {}  # type: ignore[type-arg]
 
     def update_entity(self, entity: Model) -> None:
-        config_dict = json.loads(entity.config)
-        config_dict.update(self.config)
-
         update_dict = self.model_dump(exclude_none=True)
-        update_dict.update(
-            {
-                "config": json.dumps(config_dict),
-            }
-        )
+        dump_and_update_dict(update_dict, "config")
         entity.sqlmodel_update(update_dict)
 
 
