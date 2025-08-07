@@ -1,11 +1,12 @@
 import logging
 from typing import Any
-
+from uuid import uuid4
+from datetime import datetime, timedelta
 from fastapi import APIRouter
 from pydantic import EmailStr
 from rq.worker import Job
 
-from app.tasks.base import RQManager
+from app.tasks.base import RQManager, send_rq_scheduled_task
 from app.config import settings
 from app.core.user.email import generate_test_email, send_email
 from app.util.api import ApiResult, PageResult
@@ -80,3 +81,12 @@ def _to_job_dict(job: Job) -> dict[str, Any]:
     }
     isoformat_dict(job_dict)
     return job_dict
+
+
+@router.get("/test-scheduled-task")
+def test_log() -> Any:
+    job_id = str(uuid4())
+    logger.info(f"test scheduled task, start send: {job_id}")
+    scheduled_time = datetime.now() + timedelta(seconds=5)
+    send_rq_scheduled_task(job_id, scheduled_time, test_log)
+    logger.info(f"test scheduled task, finish sent")

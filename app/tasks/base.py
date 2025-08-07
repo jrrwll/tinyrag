@@ -42,6 +42,9 @@ class AsyncTaskContextManager(AbstractContextManager):
             exc_val: BaseException | None,
             exc_tb: object | None,
     ) -> None:
+        if self.early_exit:
+            return
+
         res_str = None
         if exc_type:
             status = AsyncTaskStatus.Failure
