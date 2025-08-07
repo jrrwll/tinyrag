@@ -14,6 +14,8 @@ A Tiny Agent Workflow AI Application
 
 ```shell
 uv init
+uv venv
+# uv sync
 
 # mypy: static type check
 # ruff: code smell check
@@ -90,6 +92,15 @@ source .venv/bin/activate
 ./scripts/build_docker.sh
 
 curl http://localhost:8000/api/v1/openapi.json
+```
+
+### run on linux machine for fork compatibility
+
+```shell
+rsync --exclude='.git' --exclude-from=.gitignore -avz --delete ./ devbox:/path/to/tinyrag
+
+python -m app.tasks.worker
+python -m app.tasks.scheduler
 ```
 
 ## Demo

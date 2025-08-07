@@ -5,7 +5,7 @@ from app.tasks.base import AsyncTaskJob, RQManager
 
 # production mode, rq scheduler entrypoint
 if __name__ == '__main__':
-    config_logging()
+    config_logging("scheduler")
 
     rq_manager = RQManager()
 

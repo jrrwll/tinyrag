@@ -2,7 +2,7 @@ import logging
 import os.path
 import sys
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 import pytz
 from fastapi import Depends, Request
@@ -14,20 +14,20 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 
-def config_logging() -> None:
+def config_logging(name: str) -> None:
     log_handlers: list[logging.Handler] = []
 
-    log_file = settings.LOG_FILE
-    if log_file:
-        log_dir = os.path.dirname(log_file)
-        os.makedirs(log_dir, exist_ok=True)
-        log_handlers.append(
-            RotatingFileHandler(
-                filename=log_file,
-                maxBytes=settings.LOG_FILE_MAX_SIZE * 1024 * 1024,
-                backupCount=settings.LOG_FILE_BACKUP_COUNT,
-            )
+    log_file = settings.LOG_FILE % name
+    log_dir = os.path.dirname(log_file)
+    os.makedirs(log_dir, exist_ok=True)
+    # RotatingFileHandler(log_file, maxBytes=20 << 20)
+    log_handlers.append(
+        TimedRotatingFileHandler(
+            filename=log_file,
+            when='D', interval=1,
+            backupCount=settings.LOG_FILE_BACKUP_COUNT,
         )
+    )
 
     # console log
     log_handlers.append(logging.StreamHandler(sys.stdout))
@@ -36,7 +36,7 @@ def config_logging() -> None:
         handler.addFilter(_RequestIdFilter())
 
     logging.basicConfig(
-        level=settings.LOG_LEVEL,
+        level= "DEBUG" if settings.DEBUG else settings.LOG_LEVEL,
         format=settings.LOG_FORMAT,
         datefmt=settings.LOG_DATEFORMAT,
         handlers=log_handlers,

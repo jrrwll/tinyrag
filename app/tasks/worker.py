@@ -6,7 +6,7 @@ from typing import Iterable
 from redis import ConnectionPool
 from rq import Queue, Worker
 from rq.job import Job
-from rq.serializers import DefaultSerializer, Serializer
+from rq.serializers import DefaultSerializer, Serializer, JSONSerializer
 from rq.worker import BaseWorker
 from rq.worker_pool import WorkerPool
 
@@ -75,12 +75,12 @@ class NoSchedulerWorkerPool(WorkerPool):
 
 # production mode, rq worker entrypoint
 if __name__ == '__main__':
-    config_logging()
+    config_logging("worker")
 
     rq_manager = RQManager()
 
     pool = NoSchedulerWorkerPool(
         queues=[rq_manager.queue], connection=rq_manager.connection,
-        job_class=AsyncTaskJob,
+        job_class=AsyncTaskJob, serializer=JSONSerializer,
         num_workers=settings.RQ_WORKERS, )
     pool.start(logging_level=settings.LOG_LEVEL)

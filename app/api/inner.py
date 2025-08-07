@@ -1,14 +1,18 @@
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import uuid4
-from datetime import datetime, timedelta
+
 from fastapi import APIRouter
 from pydantic import EmailStr
 from rq.worker import Job
 
-from app.tasks.base import RQManager, send_rq_scheduled_task
+from app.common.deps import open_session
 from app.config import settings
+from app.core.task.enums import AsyncTaskType
 from app.core.user.email import generate_test_email, send_email
+from app.entities.task import AsyncTask
+from app.tasks.base import RQManager, send_rq_scheduled_task
 from app.util.api import ApiResult, PageResult
 from app.util.datetime import isoformat_dict
 
@@ -84,9 +88,22 @@ def _to_job_dict(job: Job) -> dict[str, Any]:
 
 
 @router.get("/test-scheduled-task")
-def test_log() -> Any:
+def test_scheduled_task() -> Any:
     job_id = str(uuid4())
-    logger.info(f"test scheduled task, start send: {job_id}")
+    with open_session() as session:
+        entity = AsyncTask(
+            id=job_id, type=AsyncTaskType.KnowledgeImport,
+            workspace_id=1, tenant_id=1,
+            ref_id=1, payload='{}')
+        session.add(entity)
+        session.commit()
+
     scheduled_time = datetime.now() + timedelta(seconds=5)
-    send_rq_scheduled_task(job_id, scheduled_time, test_log)
+    logger.info(f"test scheduled task, start send: {job_id} {scheduled_time}")
+    send_rq_scheduled_task(job_id, scheduled_time, test_write_file)
     logger.info(f"test scheduled task, finish sent")
+    return job_id
+
+
+def test_write_file():
+    logger.info(f"test writing file {datetime.now()}.txt")

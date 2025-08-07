@@ -48,7 +48,7 @@ create table knowledge_document_chunk (
     knowledge_id bigint        not null,
     document_id  varchar(100)        not null,
     position     int           not null,
-    content      varchar(1024) not null,
+    content      text,
     word_count   int                    default 0,
     keywords     text,
     index idx_tenant_id_knowledge_id_document_id (tenant_id, knowledge_id, document_id)

@@ -36,16 +36,13 @@ class DeploymentSettings(BaseSettings):
         return _root_dir
 
 
-_log_format_prefix = "%(asctime)s %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]"
-
-
 class LoggingSettings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
-    LOG_FORMAT: str = f"{_log_format_prefix}: %(message)s"
+    LOG_FORMAT: str = f"%(asctime)s %(levelname)s %(requestId)s [%(threadName)s] [%(filename)s:%(lineno)d]: %(message)s"
     LOG_DATEFORMAT: str | None = None
-    LOG_TZ: str = "UTC"
+    LOG_TZ: str | None = None # example: UTC, Asia/Shanghai
 
-    LOG_FILE: str | None = None
-    LOG_FILE_MAX_SIZE: PositiveInt = 20 # MB
+    LOG_FILE: str = f"{_singleton_workdir}/logs/%s.log"
+    # LOG_FILE_MAX_SIZE: PositiveInt = 20 # MB
     LOG_FILE_BACKUP_COUNT: PositiveInt = 10

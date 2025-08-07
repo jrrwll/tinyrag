@@ -9,7 +9,7 @@ from app.common.error_code import BizException, ErrorCode
 from app.common.log import config_logging
 from app.config import settings
 
-config_logging()
+config_logging("app")
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:

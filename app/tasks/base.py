@@ -8,6 +8,7 @@ from typing import Any, Callable, Self
 from redis import Redis
 from rq import Queue
 from rq.job import Job
+from rq.serializers import JSONSerializer
 
 from app.common.constants import APP_NAME
 from app.common.log import request_id_var
@@ -100,7 +101,8 @@ class RQManager:
 
     def init(self):
         self.connection = Redis.from_url(settings.RQ_REDIS_URL)
-        self.queue = Queue(name=APP_NAME, connection=self.connection)
+        self.queue = Queue(name=APP_NAME, connection=self.connection,
+                           serializer=JSONSerializer)
 
 
 def send_rq_task(job_id: str, func: Callable[..., Any], *args, **kwargs):

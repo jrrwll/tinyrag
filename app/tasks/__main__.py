@@ -1,4 +1,5 @@
 from rq import SimpleWorker
+from rq.serializers import JSONSerializer
 
 from app.config import settings
 from app.tasks.base import AsyncTaskJob, RQManager
@@ -11,5 +12,5 @@ if __name__ == '__main__':
     # so just use same process for test purpose
     worker = SimpleWorker(
         queues=[rq_manager.queue], connection=rq_manager.connection,
-        job_class=AsyncTaskJob)
+        job_class=AsyncTaskJob, serializer=JSONSerializer)
     worker.work(with_scheduler=True, logging_level=settings.LOG_LEVEL)
