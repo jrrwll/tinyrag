@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable, Type
+from typing import Type
 
 from langchain_core.vectorstores import VectorStore
 from langchain_qdrant import QdrantVectorStore
@@ -7,7 +7,6 @@ from pydantic import BaseModel, PositiveInt
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
-from app.core.knowledge.text_process.base import DocumentModel
 from app.core.vector_store.provider.base import VectorProvider
 
 logger = logging.getLogger(__name__)
@@ -51,14 +50,11 @@ class QdrantVectorProvider(
             return
 
         vectors_config = VectorParams(
-            size=2560,
+            size=self.vector_size,
             distance=Distance.COSINE
         )
 
-        logger.info(f"vector create collection {self.collection_name}")
-        self.client.create_collection(self.collection_name,
-                                      vectors_config=vectors_config)
-
-
-    def add_documents(self, documents: Iterable[DocumentModel]) -> None:
-        pass
+        logger.info(f"vector create collection {self.collection_name}, "
+                    f"vectors_config={vectors_config.model_dump_json()}")
+        self.client.create_collection(
+            self.collection_name, vectors_config=vectors_config)

@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.core.model.enums import ModelType
 
 
 class BuiltinModel(BaseModel):
-    id: int = Field(exclude=True)
+    id: int
     vector_size: int
     repo_name: str | None = None
 

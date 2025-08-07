@@ -26,6 +26,7 @@ class ChromaVectorProvider(
     def _create_client(self) -> Client:
         if self.config.host == "*":
             client_settings = Settings(
+                is_persistent=True,
                 persist_directory=self.vector_store_local_dir)
             client = Client(client_settings)
             return client

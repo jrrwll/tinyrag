@@ -2,16 +2,16 @@ from typing import Type
 
 from langchain_core.embeddings import Embeddings
 from langchain_ollama import OllamaEmbeddings
-from pydantic import BaseModel
-from app.core.model.embedding.base import EmbeddingProvider
+from pydantic import PositiveInt
+
+from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
 
 
-class OllamaEmbeddingConfig(BaseModel):
-    vector_size: int | None = None
-    base_url: str | None = None
+class OllamaEmbeddingConfig(BaseEmbeddingConfig):
+    base_url: str
     api_key: str | None = None
-    content_length: int = 4096
-    timeout: int | None = None
+    content_length: PositiveInt = 4096
+    timeout: PositiveInt | None = None
 
 
 class OllamaEmbeddingProvider(EmbeddingProvider[OllamaEmbeddingConfig]):

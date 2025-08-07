@@ -2,13 +2,14 @@ from typing import Type
 
 from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
-from pydantic import BaseModel
+from pydantic import PositiveFloat
 
-from app.core.model.embedding.base import EmbeddingProvider
+from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
 
 
-class OpenaiEmbeddingConfig(BaseModel):
+class OpenaiEmbeddingConfig(BaseEmbeddingConfig):
     api_key: str
+    timeout: PositiveFloat | None = None
 
 
 class OpenAILLMProvider(EmbeddingProvider[OpenaiEmbeddingConfig]):
@@ -28,7 +29,7 @@ class OpenAILLMProvider(EmbeddingProvider[OpenaiEmbeddingConfig]):
 
         timeout = None
         if self.model_config.timeout:
-            timeout = float(self.model_config.timeout)
+            timeout = self.model_config.timeout
 
         return OpenAIEmbeddings(
             model=model_name,

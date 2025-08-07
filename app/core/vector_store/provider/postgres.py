@@ -1,10 +1,12 @@
+import asyncio
 from typing import Type
 
 from langchain_core.vectorstores import VectorStore
 from langchain_postgres import PGEngine, PGVectorStore
 from pydantic import BaseModel, PositiveInt
+from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy.inspection import inspect
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.core.vector_store.provider.base import VectorProvider
 
@@ -35,8 +37,6 @@ class PostgresVectorProvider(
             url=self.config.url, **optional_params)
 
     def _create_vector_store(self) -> VectorStore:
-        self.create_collection_if_absent()
-
         return PGVectorStore.create_sync(
             engine=self.client,
             table_name=self.collection_name,
@@ -45,15 +45,26 @@ class PostgresVectorProvider(
         )
 
     def create_collection_if_absent(self):
+        if self.has_collection_sync():
+            return
+
         try:
             self.client.init_vectorstore_table(
                 self.collection_name,
-                2560,
+                self.vector_size,
                 id_column="id", metadata_json_column="metadata")
         except ProgrammingError as e:
             if "already exists" not in str(e):
                 raise e
 
-    def has_collection(self, collection_name: str):
-        with self.client._pool.connect() as conn:
-            return inspect(conn).has_table(collection_name)
+    def has_collection_sync(self) -> bool:
+        return asyncio.run(self.has_collection())
+
+    async def has_collection(self) -> bool:
+        pool: AsyncEngine = self.client._pool
+        async with pool.connect() as conn:
+            row = await conn.scalar(
+                text("select 1 from information_schema.tables where table_name = :tbl"),
+                {"tbl": self.collection_name},
+            )
+            return row is not None

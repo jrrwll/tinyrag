@@ -2,6 +2,7 @@ import logging
 import multiprocessing
 import os.path
 from typing import Type
+from pydantic import ConfigDict
 
 from huggingface_hub import snapshot_download
 from langchain_core.embeddings import Embeddings
@@ -9,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 
 from app.config import settings
 from app.core.model.builtin_models import BuiltinModel
-from app.core.model.embedding.base import EmbeddingProvider
+from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
 from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,11 @@ huggingface-cli download \
   --local-dir ./nomic-embed-text-v1.5 \
   --local-dir-use-symlinks False
 """
+
+class TransformerEmbeddingConfig(BaseEmbeddingConfig):
+    model_config = ConfigDict(json_schema_extra={"builtin": True})
+
+    repo_name: str | None = None
 
 
 class TransformerEmbedding(Embeddings):
@@ -58,15 +64,15 @@ class TransformerEmbedding(Embeddings):
         return model_path
 
 
-class TransformerEmbeddingProvider(EmbeddingProvider[BuiltinModel]):
+class TransformerEmbeddingProvider(EmbeddingProvider[TransformerEmbeddingConfig]):
 
     @staticmethod
     def get_provider_name() -> str:
         return BUILTIN_MODEL_PROVIDER_NAME
 
     @staticmethod
-    def get_config_type() -> Type[BuiltinModel]:
-        return BuiltinModel
+    def get_config_type() -> Type[TransformerEmbeddingConfig]:
+        return TransformerEmbeddingConfig
 
     def _create_model(self) -> Embeddings:
         return TransformerEmbedding(self.model_name, self.model_config)

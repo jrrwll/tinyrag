@@ -2,8 +2,8 @@ from abc import ABC
 from typing import Any, MutableMapping
 
 from cachetools import TTLCache
-from pydantic import BaseModel
 from langchain_core.embeddings import Embeddings
+from pydantic import BaseModel, Field, PositiveInt
 
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
@@ -14,8 +14,8 @@ _model_cache: TTLCache[str, Embeddings] = TTLCache(
 
 
 class BaseEmbeddingConfig(BaseModel):
-    vector_size: int | None = None
-    timeout: int | None = None
+    vector_size: PositiveInt | None = Field(
+        default=None, json_schema_extra={"builtin": True})
 
 
 class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings], ABC):
@@ -37,5 +37,10 @@ class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings]
 
 def get_embedding_provider(model: ModelPublic) -> EmbeddingProvider[Any]:
     provider_name = model.provider_name
-    cls = ModelProviderFactory.get_provider_class(ModelType.TextEmbedding, provider_name)
+    cls = ModelProviderFactory.get_provider_class(
+        ModelType.TextEmbedding, provider_name)
     return cls(model)
+
+
+def fill_default_fields():
+    pass

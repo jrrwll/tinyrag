@@ -1,8 +1,7 @@
 import json
-from typing import Any
-from typing import Dict, Tuple, Type
+from typing import Any, Dict, Tuple, Type
 
-from pydantic import BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model, JsonValue
 from pydantic.fields import FieldInfo
 
 
@@ -37,10 +36,15 @@ def dump_json(a: Any):
         return json.dumps(a, ensure_ascii=False)
 
 
-# {"a": "{}"} -> {"a": BaseModel}
-def load_and_update_dict(d: dict[str, Any], **kwargs: type[BaseModel]) -> None:
+# {"a": "{}", "b": "[]"} -> {"a": BaseModel, "b": []}
+def load_and_update_dict(d: dict[str, Any],
+        *keys: str, **model_classes: type[BaseModel]) -> None:
     new_dict = {}
-    for key, model_cls in kwargs.items():
+    for key in keys:
+        if key in d:
+            new_dict[key] = json.loads(d[key])
+
+    for key, model_cls in model_classes.items():
         if key in d:
             new_dict[key] = model_cls.model_validate_json(d[key])
 

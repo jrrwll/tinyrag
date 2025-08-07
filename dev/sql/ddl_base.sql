@@ -24,7 +24,8 @@ create table model (
     model_name    varchar(255) not null,
     type          varchar(50)  not null,
     enable        tinyint      not null default 1,
-    config        longtext
+    config        longtext,
+    feature_config        longtext
 ) default charset utf8mb4;
 
 

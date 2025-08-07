@@ -11,6 +11,7 @@ class Model(BizTableBase, table=True):
     provider_name: str = Field(max_length=100)
     model_name: str = Field(max_length=100)
     config: str
+    feature_config: str
 
 
 class TenantDefaultModel(BizTableBase, table=True):

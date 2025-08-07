@@ -1,24 +1,22 @@
-from urllib.parse import urlparse
+from pymilvus import Role, connections, db, utility
 
-from pymilvus import Role, connections, utility, db
-
-from app.config import settings
+from app.core.vector_store.enums import VectorStoreType
+from app.core.vector_store.provider.milvus import MilvusVectorStoreConfig
+from app.tests.core.vector_store.test_vector_provider import \
+    _get_vector_store_and_model
 
 
 def test_create_user():
-    if not settings.MILVUS_URI:
-        print("MILVUS_URI is not set")
-        return
+    vector_store, model = _get_vector_store_and_model(VectorStoreType.Milvus)
+    config = MilvusVectorStoreConfig.model_validate(vector_store.config)
 
-    parsed = urlparse(settings.MILVUS_URI)
     connections.connect(
         alias="default",
-        host=parsed.hostname,
-        port=parsed.port,
-        user="root",
-        password="Milvus"
+        uri=config.uri,
+        user=config.user,
+        password=config.password,
     )
-    db_name = settings.MILVUS_DB_NAME
+    db_name = config.db_name
 
     ensure_database(db_name)
     db.using_database(db_name)
@@ -59,6 +57,7 @@ def ensure_rw_role(db_name: str) -> bool:
         role.grant_v2(privilege, "*", db_name=db_name)
 
     return True
+
 
 def ensure_database(db_name: str) -> bool:
     if db_name in db.list_database():

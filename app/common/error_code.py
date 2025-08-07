@@ -40,6 +40,7 @@ class ErrorCode(Enum):
     model_not_found = auto()
     model_type_not_supported = auto()
     model_provider_not_supported = auto()
+    model_provider_not_supported_to_create = auto()
     model_not_set = auto()
     need_specific_type_model = auto()
     model_name_not_supported = auto()

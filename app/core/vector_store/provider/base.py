@@ -42,6 +42,9 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
             model: ModelPublic):
         self.collection_name: str = collection_name
         self.model_provider: EmbeddingProvider = get_embedding_provider(model)
+        # model_feature_config
+        self.vector_size = model.feature_config.vector_size
+
         self._footprint = f"{model.footprint()}:{vector_store.footprint()}"
         self.config: Cfg = self.get_config_type()(**vector_store.config)
         self.vector_store_local_dir = vector_store.local_dir()

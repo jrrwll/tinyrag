@@ -4,6 +4,10 @@ from app.core.model.enums import PromptRoleType
 from app.core.variable.enums import VariableType
 
 
+class ModelFeatureConfig(BaseModel):
+    vector_size: int | None = None
+
+
 class LlmModelConfig(BaseModel):
     model_id:  int
     temperature: float = 0.7

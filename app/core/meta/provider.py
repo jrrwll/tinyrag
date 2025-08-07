@@ -5,7 +5,7 @@ from app.common.error_code import BizException, ErrorCode
 from app.common.i18n import I18nBaseEntity, I18nMetaManager
 from app.core.meta.api import MetaBaseEntity, MetaBaseField
 from app.core.meta.enums import FormInputType
-from app.core.model.enums import ModelType
+from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.core.model.provider import ModelProviderFactory
 from app.core.vector_store.enums import VectorStoreType
 from app.core.vector_store.provider.base import VectorProvideFactory
@@ -67,14 +67,20 @@ def list_vector_store_providers() -> list[MetaBaseEntity]:
 
 def _parse_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
     fields = []
+    if config_type.model_json_schema().get("builtin"):
+        return fields
+
     for name, field_info in config_type.model_fields.items():
+        json_schema_extra = field_info.json_schema_extra or {}
+        if json_schema_extra.get("builtin"):
+            continue
+
         field = MetaBaseField(
             name=name,
-            required=field_info.default is not None,
+            required=field_info.is_required(),
         )
         fields.append(field)
 
-        json_schema_extra = field_info.json_schema_extra or {}
         typ = json_schema_extra.get("type")
         if typ:
             if typ == FormInputType.Select:
@@ -93,16 +99,23 @@ def _parse_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
     return fields
 
 
-def validate_model_config_dict(model_type: ModelType, provider_name: str, config: dict):
+def validate_model_config_dict(model_type: ModelType, provider_name: str,
+        config: dict):
+    if provider_name == BUILTIN_MODEL_PROVIDER_NAME:
+        raise BizException.create(
+            ErrorCode.model_provider_not_supported_to_create, provider_name)
+
     providers = ModelProviderFactory.get_implements(model_type)
     for name, cls in providers.items():
         if name == provider_name:
             cls.validate_config(config)
             return
 
-    raise BizException.create(ErrorCode.model_provider_not_supported, provider_name)
+    raise BizException.create(ErrorCode.model_provider_not_supported,
+                              provider_name)
 
 
-def validate_vector_store_config_dict(vector_store_type: VectorStoreType, config: dict):
+def validate_vector_store_config_dict(vector_store_type: VectorStoreType,
+        config: dict):
     cls = VectorProvideFactory.get_vector_class(vector_store_type)
     cls.validate_config(config)

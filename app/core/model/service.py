@@ -7,6 +7,7 @@ from app.core.model.api import ModelCreate, ModelPublic, ModelTestRun, \
     ModelUpdate, ModelUpdateEnablePublic, SetupDefaultModel
 from app.core.model.builtin_models import is_valid_model_name
 from app.core.model.enums import ModelType
+from app.core.model.feature import compute_model_feature
 from app.core.model.llm.base import get_llm_provider
 from app.entities.dao.model import get_default_model, get_model, \
     is_set_in_default_model
@@ -21,6 +22,9 @@ def create_model(session: Session, params: ModelCreate, current_user: User) -> I
 
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
+
+    feature_config = compute_model_feature(entity)
+    entity.feature_config = feature_config.model_dump_json()
 
     session.add(entity)
     session.commit()

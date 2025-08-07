@@ -53,7 +53,8 @@ Content-Type: application/json
   "config": {
     "uri": "{{MILVUS_URI}}",
     "user": "{{MILVUS_USER}}",
-    "password": "{{MILVUS_PASSWORD}}"
+    "password": "{{MILVUS_PASSWORD}}",
+    "db_name": "{{MILVUS_DB_NAME}}"
   }
 }
 

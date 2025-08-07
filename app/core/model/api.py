@@ -2,14 +2,15 @@ import json
 from datetime import datetime
 from functools import cache
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.common.constants import MIN_UTC_DATETIME
+from app.core.model.base import ModelFeatureConfig
 from app.core.model.builtin_models import get_builtin_model
 from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.entities.model import Model
 from app.util.codec import md5
-from app.util.model import dump_and_update_dict
+from app.util.model import dump_and_update_dict, load_and_update_dict
 
 
 class ModelPublic(BaseModel):
@@ -22,19 +23,19 @@ class ModelPublic(BaseModel):
     provider_name: str
     model_name: str
     config: dict # type: ignore[arg-type]
+    feature_config: ModelFeatureConfig = Field(exclude=True)
 
     @staticmethod
     def create(entity: Model) -> "ModelPublic":
         entity_dict = entity.model_dump(exclude_none=True)
-        if entity.config:
-            entity_dict['config'] = json.loads(entity.config)
-
+        load_and_update_dict(entity_dict, "config", feature_config=ModelFeatureConfig)
         return ModelPublic(**entity_dict)
 
     @staticmethod
     @cache
     def from_builtin(model_type: ModelType, model_name: str) -> "ModelPublic":
         model = get_builtin_model(model_type, model_name)
+        model_config = model.model_dump()
         return ModelPublic(
             id=model.id,
             created_at=MIN_UTC_DATETIME,
@@ -43,7 +44,8 @@ class ModelPublic(BaseModel):
             enable=True,
             provider_name=BUILTIN_MODEL_PROVIDER_NAME,
             model_name=model_name,
-            config=model.model_dump(),
+            config=model_config,
+            feature_config=model_config,
         )
 
     def is_builtin(self) -> bool:
