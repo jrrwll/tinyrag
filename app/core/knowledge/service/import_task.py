@@ -37,6 +37,7 @@ def import_documents(session: Session, params: KnowledgeImport,
         session, knowledge.vector_store_config, tenant_id)
 
     task_params = ImportTaskParams(
+        tenant_id=tenant_id, workspace_id=workspace_id,
         knowledge=KnowledgePublic.create(entity),
         model=model, vector_store=vector_store,
     )
@@ -61,4 +62,4 @@ def import_documents(session: Session, params: KnowledgeImport,
         task_params.page_urls = params.website.page_urls
 
     # import task
-    return send_knowledge_import_task(task_params, workspace_id, tenant_id)
+    return send_knowledge_import_task(task_params)

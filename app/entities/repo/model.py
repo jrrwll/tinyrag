@@ -16,7 +16,7 @@ def get_embedding_model_from_config(
     model_id = embedding_model_config.model_id
     model = get_model(session, model_id, tenant_id)
     if not model:
-        raise BizException(ErrorCode.model_not_found, model_id)
+        raise BizException.create(ErrorCode.model_not_found, model_id)
     return ModelPublic.create(model)
 
 

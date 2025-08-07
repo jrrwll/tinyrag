@@ -1,10 +1,12 @@
+import logging
 from uuid import uuid4
 
 import orjson
 from pydantic import BaseModel
 
 from app.common.deps import open_session
-from app.common.rq import send_rq_task
+from app.tasks.base import send_rq_task
+from app.config import settings
 from app.core.knowledge.api import KnowledgePublic
 from app.core.model.api import ModelPublic
 from app.core.task.api import AsyncTaskPublic
@@ -14,8 +16,12 @@ from app.entities.file import File
 from app.entities.task import AsyncTask
 from app.tasks.knowledge_import.base import _FileTaskParams, import_from_files
 
+logger = logging.getLogger(__name__)
+
 
 class ImportTaskParams(BaseModel):
+    tenant_id: int
+    workspace_id: int
     knowledge: KnowledgePublic
     model: ModelPublic
     vector_store: VectorStorePublic
@@ -26,15 +32,14 @@ class ImportTaskParams(BaseModel):
 
 
 def send_knowledge_import_task(
-        task_params: ImportTaskParams, workspace_id: int, tenant_id: int
-) -> AsyncTaskPublic:
+        task_params: ImportTaskParams) -> AsyncTaskPublic:
     task_params_json = orjson.dumps(task_params.model_dump()).decode('utf-8')
 
     task_id = str(uuid4())
     with open_session() as session:
         entity = AsyncTask(
             id=task_id, type=AsyncTaskType.KnowledgeImport,
-            workspace_id=workspace_id, tenant_id=tenant_id,
+            workspace_id=task_params.workspace_id, tenant_id=task_params.tenant_id,
             ref_id=task_params.knowledge.id, payload=task_params_json)
         session.add(entity)
         session.commit()
@@ -48,8 +53,11 @@ def send_knowledge_import_task(
 def knowledge_import_task(task_id: str, task_params_json: str | bytes):
     # task_params = ImportTaskParams.model_validate(
     #     orjson.loads(task_params_json))
+    if settings.DEBUG:
+        logger.info(f"received task {task_id}: {task_params_json}")
     task_params = ImportTaskParams.model_validate_json(task_params_json)
 
+    tenant_id, workspace_id = task_params.tenant_id, task_params.workspace_id
     knowledge = task_params.knowledge
     model, vector_store = task_params.model, task_params.vector_store
     files = task_params.files
@@ -61,13 +69,13 @@ def knowledge_import_task(task_id: str, task_params_json: str | bytes):
 
         file_params = list_files(files)
         import_from_files(file_params, len(files), task_id, knowledge, model,
-                          vector_store)
+                          vector_store, tenant_id, workspace_id)
     elif storage_files:
         from app.tasks.knowledge_import.storage import list_storage_files
 
         file_params = list_storage_files(storage_files)
         import_from_files(file_params, len(storage_files), task_id, knowledge,
-                          model, vector_store)
+                          model, vector_store, tenant_id, workspace_id)
     elif page_urls:
         from app.tasks.knowledge_import.website import import_website
 

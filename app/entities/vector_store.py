@@ -6,6 +6,7 @@ from app.entities.base import LogTableBase, TableBase, \
 
 
 class VectorStore(LogTableBase, table=True):
+    id: int = Field(primary_key=True)
     tenant_id: int
 
     name: str = Field(max_length=100)

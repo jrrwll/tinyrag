@@ -6,6 +6,10 @@ GET http://{{origin}}{{api_prefix}}/model?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
+GET http://{{origin}}{{api_prefix}}/model?id=2
+Authorization: Bearer {{auth_token}}
+
+###
 # llm text_embedding
 POST http://{{origin}}{{api_prefix}}/model
 Authorization: Bearer {{auth_token}}

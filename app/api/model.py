@@ -45,7 +45,8 @@ def _list(
     return ApiResult.create(res)
 
 
-@router.get("", response_model=ApiResult[ModelPublic])
+@router.get("", response_model=ApiResult[ModelPublic],
+            response_model_exclude={"data": {"feature_config"}})
 def get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     entity = get_model(session, id, current_user.tenant_id)
     if not entity:

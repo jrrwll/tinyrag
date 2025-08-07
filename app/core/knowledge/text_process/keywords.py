@@ -6,7 +6,7 @@ import jieba.analyse
 from app.core.knowledge.text_process.tokens import _stopwords
 
 
-def extract_keywords(text: str, top_k: int = 10) -> set[str]:
+def extract_keywords(text: str, top_k: int = 10) -> list[str]:
     tokens = jieba.analyse.extract_tags(
         sentence=text,
         topK=top_k,
@@ -20,4 +20,4 @@ def extract_keywords(text: str, top_k: int = 10) -> set[str]:
             if w not in _stopwords:
                 keywords.add(w)
 
-    return keywords
+    return list(keywords)

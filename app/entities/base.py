@@ -12,7 +12,6 @@ from app.util.text import camel_to_snake
 
 class LogTableBase(SQLModel):
 
-    id: int = Field(primary_key=True)
     created_at: datetime
 
     @declared_attr  # type: ignore
@@ -21,7 +20,7 @@ class LogTableBase(SQLModel):
 
 
 class TableBase(LogTableBase):
-
+    id: int = Field(primary_key=True)
     updated_at: datetime
 
 

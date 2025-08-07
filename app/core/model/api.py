@@ -23,7 +23,7 @@ class ModelPublic(BaseModel):
     provider_name: str
     model_name: str
     config: dict # type: ignore[arg-type]
-    feature_config: ModelFeatureConfig = Field(exclude=True)
+    feature_config: ModelFeatureConfig
 
     @staticmethod
     def create(entity: Model) -> "ModelPublic":

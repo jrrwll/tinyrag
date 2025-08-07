@@ -1,7 +1,7 @@
 from sqlmodel import Field
 
 from app.core.knowledge.enums import DocumentSourceType
-from app.entities.base import BizTableBase, enum_field_info
+from app.entities.base import BizTableBase, LogTableBase, enum_field_info
 
 
 class Knowledge(BizTableBase, table=True):
@@ -22,7 +22,9 @@ class Knowledge(BizTableBase, table=True):
         return f"knowledge_{knowledge_id}"
 
 
-class KnowledgeDocument(BizTableBase, table=True):
+class KnowledgeDocument(LogTableBase, table=True):
+    id: str = Field(primary_key=True)
+
     tenant_id: int
     workspace_id: int
     knowledge_id: int
@@ -35,17 +37,18 @@ class KnowledgeDocument(BizTableBase, table=True):
     indexing: bool = False
 
 
-class KnowledgeDocumentChunk(BizTableBase, table=True):
+class KnowledgeDocumentChunk(LogTableBase, table=True):
+    id: str = Field(primary_key=True)
+
     tenant_id: int
     workspace_id: int
     knowledge_id: int
-    document_id: int
+    document_id: str
 
     position: int
     content: str = Field(max_length=10000)
     word_count: int = 0
     keywords: str | None = None
-    index_doc_id: str | None = None
 
 
 class KnowledgeConversation(BizTableBase, table=True):

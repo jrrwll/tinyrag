@@ -3,10 +3,13 @@ from typing import Any
 
 from fastapi import APIRouter
 from pydantic import EmailStr
-from app.common.rq import AsyncTaskJob, RQManager
+from rq.worker import Job
+
+from app.tasks.base import RQManager
 from app.config import settings
 from app.core.user.email import generate_test_email, send_email
 from app.util.api import ApiResult, PageResult
+from app.util.datetime import isoformat_dict
 
 router = APIRouter(tags=["inner"], prefix="/inner")
 
@@ -52,7 +55,7 @@ def queue_stat(page_no: int = settings.page_no_query,
     if offset < total:
         jobs = queue.get_jobs(
             offset=offset, length=page_size)
-        jobs = [AsyncTaskJob.dict(job) for job in jobs]
+        jobs = [_to_job_dict(job) for job in jobs]
     else:
         jobs = []
 
@@ -61,3 +64,19 @@ def queue_stat(page_no: int = settings.page_no_query,
         total=total, items=jobs)
 
     return ApiResult.create(res)
+
+
+def _to_job_dict(job: Job) -> dict[str, Any]:
+    job_dict = {
+        "id": job.id,
+        "description": job.description,
+        "status": job.get_status(),
+        "meta": job.meta,
+        "func_name": job.func_name,
+        "created_at": job.created_at,
+        "enqueued_at": job.enqueued_at,
+        "started_at": job.started_at,
+        "ended_at": job.ended_at,
+    }
+    isoformat_dict(job_dict)
+    return job_dict

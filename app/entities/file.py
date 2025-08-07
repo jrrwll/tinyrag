@@ -1,14 +1,11 @@
-from datetime import datetime
-
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
 
 from app.core.file.enums import FileType
-from app.entities.base import enum_field_info
+from app.entities.base import LogTableBase, enum_field_info
 
 
-class File(SQLModel, table=True):
+class File(LogTableBase, table=True):
     id: str = Field(primary_key=True)
-    created_at: datetime
 
     tenant_id: int
     workspace_id: int

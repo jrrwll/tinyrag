@@ -2,11 +2,9 @@ import logging
 import multiprocessing
 import os.path
 from typing import Type
-from pydantic import ConfigDict
 
-from huggingface_hub import snapshot_download
 from langchain_core.embeddings import Embeddings
-from sentence_transformers import SentenceTransformer
+from pydantic import ConfigDict
 
 from app.config import settings
 from app.core.model.builtin_models import BuiltinModel
@@ -22,6 +20,7 @@ huggingface-cli download \
   --local-dir-use-symlinks False
 """
 
+
 class TransformerEmbeddingConfig(BaseEmbeddingConfig):
     model_config = ConfigDict(json_schema_extra={"builtin": True})
 
@@ -32,6 +31,8 @@ class TransformerEmbedding(Embeddings):
     _lock = multiprocessing.Lock()
 
     def __init__(self, model_name: str, model_config: BuiltinModel):
+        from sentence_transformers import SentenceTransformer
+
         model_path = self._ensure_model_path(model_name, model_config)
         self.transformer = SentenceTransformer(
             model_path, trust_remote_code=True)
@@ -53,6 +54,8 @@ class TransformerEmbedding(Embeddings):
         if not os.path.exists(model_path):
             with TransformerEmbedding._lock:
                 if not os.path.exists(model_path):
+                    from huggingface_hub import snapshot_download
+
                     repo_id = f"{repo_name}/{model_name}"
                     logger.info(
                         f"snapshot_download model {repo_id} to {model_path}")
@@ -64,7 +67,8 @@ class TransformerEmbedding(Embeddings):
         return model_path
 
 
-class TransformerEmbeddingProvider(EmbeddingProvider[TransformerEmbeddingConfig]):
+class TransformerEmbeddingProvider(
+    EmbeddingProvider[TransformerEmbeddingConfig]):
 
     @staticmethod
     def get_provider_name() -> str:

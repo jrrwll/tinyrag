@@ -36,7 +36,8 @@ class _FileTaskParams(BaseModel):
 def import_from_files(
         file_params: Iterable[Optional[_FileTaskParams]], file_count: int,
         task_id: str, knowledge: KnowledgePublic,
-        model: ModelPublic, vector_store: VectorStorePublic):
+        model: ModelPublic, vector_store: VectorStorePublic,
+        tenant_id: int, workspace_id: int):
     process_rule = knowledge.process_rule
     text_processor = get_text_processor(process_rule)
 
@@ -55,6 +56,7 @@ def import_from_files(
         position = 0
         for doc in docs:
             doc_entity = KnowledgeDocument(
+                id=doc.id, tenant_id=tenant_id, workspace_id=workspace_id,
                 knowledge_id=knowledge.id, position=position,
                 source_type=params.source_type, source_info=params.source_info)
             doc_entity = save_knowledge_document(doc_entity)
@@ -95,17 +97,18 @@ def import_document_chucks(
 
 def to_document_chuck(index: int, doc: DocumentModel,
         doc_entity: KnowledgeDocument) -> KnowledgeDocumentChunk:
-    word_count = get_word_count(doc.page_content)
-    keywords = extract_keywords(doc.page_content)
-    index_doc_id = doc.id
+    word_count = get_word_count(doc.content)
+    keywords = extract_keywords(doc.content)
 
     doc_entity.word_count += word_count
     return KnowledgeDocumentChunk(
+        id=doc.id,
+        tenant_id=doc_entity.tenant_id,
+        workspace_id=doc_entity.workspace_id,
         knowledge_id=doc_entity.knowledge_id,
         document_id=doc_entity.id,
         position=index,
-        content=doc.page_content,
+        content=doc.content,
         word_count=word_count,
         keywords=json.dumps(keywords),
-        index_doc_id=index_doc_id
     )
