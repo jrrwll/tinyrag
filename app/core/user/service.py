@@ -26,8 +26,9 @@ def create_user(session: Session, params: UserCreate,
     if user:
         raise BizException.create(ErrorCode.user_email_already_exists)
     if params.email_domain != current_user.email_domain:
-        raise BizException.create(ErrorCode.invalid_email_domain,
-                                  params.email_domain)
+        raise BizException.create(
+            ErrorCode.invalid_email_domain,
+            email_domain=params.email_domain)
 
     entity = User.model_validate(
         params, update={
@@ -53,7 +54,7 @@ def create_user(session: Session, params: UserCreate,
 def update_user(session: Session, params: UserUpdate) -> UserPublic:
     entity = get_user_by_email(session, params.email)
     if not entity:
-        raise BizException.create(ErrorCode.user_not_found, params.email)
+        raise BizException.create(ErrorCode.user_not_found)
 
     entity.full_name = params.full_name
     entity.avatar = params.avatar
@@ -80,7 +81,7 @@ def update_my_password(session: Session, params: UserUpdatePassword,
 def delete_user(session: Session, email: str, current_user: User):
     entity = get_user_by_email(session, email)
     if not entity:
-        raise BizException.create(ErrorCode.user_not_found, email)
+        raise BizException.create(ErrorCode.user_not_found)
 
     if email == current_user.email or entity.role == UserRole.Owner:
         raise BizException.create(ErrorCode.super_user_cannot_delete)
@@ -107,7 +108,7 @@ def generate_access_token(session: Session, username: str,
     if not user:
         raise BizException.create(ErrorCode.email_or_password_incorrect)
     elif not user.is_active:
-        raise BizException.create(ErrorCode.user_inactive)
+        raise BizException.create(ErrorCode.user_not_active)
 
     return AccessTokenPublic(
         access_token=create_access_token(user.email)
@@ -117,7 +118,7 @@ def generate_access_token(session: Session, username: str,
 def recover_user_password(session: Session, email: str):
     user = get_user_by_email(session, email)
     if not user:
-        raise BizException.create(ErrorCode.user_not_found, email)
+        raise BizException.create(ErrorCode.user_not_found)
 
     password_reset_token = generate_password_reset_token(email)
     subject, html_content = generate_reset_password_email(
@@ -139,7 +140,7 @@ def reset_user_password(session: Session, params: UserResetPassword):
     if not user:
         raise BizException.create(ErrorCode.user_email_not_found)
     elif not user.is_active:
-        raise BizException.create(ErrorCode.user_inactive)
+        raise BizException.create(ErrorCode.user_not_active)
 
     hashed_password = get_password_hash(password=params.new_password)
     user.hashed_password = hashed_password
@@ -154,7 +155,7 @@ def grant_permission(session: Session, params: PermissionGrant, current_user: Us
 
     user = get_user_by_email(session, user_identify)
     if not user.is_active:
-        raise BizException.create(ErrorCode.user_inactive)
+        raise BizException.create(ErrorCode.user_not_active)
 
     check_grant_permission(resource_type, resource_id, user, role, current_user)
 
@@ -183,7 +184,7 @@ def revoke_permission(session: Session, params: PermissionRevoke, current_user: 
 
     user = get_user_by_email(session, user_identify)
     if not user.is_active:
-        raise BizException.create(ErrorCode.user_inactive, user_identify)
+        raise BizException.create(ErrorCode.user_not_active)
 
     check_revoke_permission(resource_type, resource_id, user, current_user)
 

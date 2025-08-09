@@ -43,7 +43,7 @@ def _list(
 def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     entity = get_workspace(session, id, current_user.tenant_id)
     if not entity:
-        raise BizException.create(ErrorCode.workspace_not_found, id)
+        raise BizException.create(ErrorCode.workspace_not_found)
 
     return ApiResult.create(WorkspacePublic.create(entity))
 

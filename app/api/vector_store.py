@@ -8,11 +8,13 @@ from app.common.deps import CurrentUser, SessionDep, \
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.vector_store.api import SetupDefaultVectorStore, \
-    VectorStoreCreate, VectorStorePublic
+    VectorStoreCreate, VectorStorePublic, VectorStoreUpdate, \
+    VectorStoreUpdateConfig
 from app.core.vector_store.service import create_vector_store, \
     delete_vector_store, \
     find_default_vector_store, \
-    set_or_unset_default_vector_store
+    set_or_unset_default_vector_store, update_vector_store, \
+    update_vector_store_config
 from app.entities.dao.vector_store import get_vector_store, \
     page_and_count_vector_stores
 from app.entities.user import User
@@ -22,7 +24,7 @@ router = CustomAPIRouter(prefix="/vector-store", tags=["vectorstore"])
 
 
 @router.get("/list", response_model=ApiResult[PageResult[VectorStorePublic]])
-def list(
+def _list(
         session: SessionDep,
         current_user: CurrentUser,
         page_no: int = settings.page_no_query,
@@ -40,41 +42,52 @@ def list(
 
 
 @router.get("", response_model=ApiResult[VectorStorePublic])
-def get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
+def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     entity = get_vector_store(session, id, current_user.tenant_id)
     if not entity:
-        raise BizException.create(ErrorCode.vector_store_not_found, id)
+        raise BizException.create(ErrorCode.vector_store_not_found)
 
     return ApiResult.create(VectorStorePublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
-def create(session: SessionDep, params: VectorStoreCreate,
+def _create(session: SessionDep, params: VectorStoreCreate,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     res = create_vector_store(session, params, current_user)
     return ApiResult.create(res)
 
 
-@router.delete("", response_model=ApiResult[Any])
-def delete(session: SessionDep, id: int,
-        current_user: User = Depends(get_current_active_superuser)) -> Any:
-    entity = get_vector_store(session, id, current_user.tenant_id)
-    if not entity:
-        raise BizException.create(ErrorCode.vector_store_not_found, id)
+@router.put("/config",
+            response_model=ApiResult[Any])
+def _update_config(session: SessionDep, current_user: CurrentUser,
+        params: VectorStoreUpdateConfig) -> Any:
+    res = update_vector_store_config(session, params, current_user)
+    return ApiResult.create(res)
 
+
+@router.put("", response_model=ApiResult[Any])
+def _update(session: SessionDep, current_user: CurrentUser,
+        params: VectorStoreUpdate) -> Any:
+    update_vector_store(session, params, current_user)
+    return ApiResult.create()
+
+
+@router.delete("", response_model=ApiResult[Any])
+def _delete(session: SessionDep, id: int,
+        current_user: User = Depends(get_current_active_superuser)) -> Any:
     delete_vector_store(session, id, current_user)
     return ApiResult.create()
 
 
 @router.get("/default", response_model=ApiResult[Optional[VectorStorePublic]])
-def get_default(session: SessionDep, current_user: CurrentUser,
+def _get_default(session: SessionDep, current_user: CurrentUser,
         workspace_id: int | None = None) -> Any:
     res = find_default_vector_store(session, workspace_id, current_user)
     return ApiResult.create(res)
 
 
 @router.post("/default", response_model=ApiResult[Any])
-def set_or_unset_default(session: SessionDep, params: SetupDefaultVectorStore,
+def _set_or_unset_default(session: SessionDep, params: SetupDefaultVectorStore,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     set_or_unset_default_vector_store(session, params, current_user)
     return ApiResult.create()

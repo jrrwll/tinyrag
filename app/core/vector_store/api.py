@@ -41,6 +41,25 @@ class VectorStoreCreate(BaseModel):
         return VectorStore(**entity_dict)
 
 
+class VectorStoreUpdateConfig(BaseModel):
+    id: int
+    config: dict  # type: ignore[type-arg]
+
+    def update_entity(self, entity: VectorStore) -> None:
+        update_dict = self.model_dump(exclude={"id"})
+        dump_and_update_dict(update_dict, "config")
+        entity.sqlmodel_update(update_dict)
+
+
+class VectorStoreUpdate(BaseModel):
+    id: int
+    name: str = Field(max_length=100)
+
+    def update_entity(self, entity: VectorStore) -> None:
+        update_dict = self.model_dump(exclude={"id"}, exclude_none=True)
+        entity.sqlmodel_update(update_dict)
+
+
 class SetupDefaultVectorStore(BaseModel):
     workspace_id: int | None = None
     vector_store_id: int | None = None

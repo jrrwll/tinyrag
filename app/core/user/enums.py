@@ -14,6 +14,10 @@ class UserRole(StrEnum):
     def implies(self, other: Self) -> bool:
         return self.level <= other.level
 
+    @classmethod
+    def super_roles(cls) -> list[Self]:
+        return [cls.Owner, cls.Admin]
+
 
 class UserStatus(StrEnum):
     WaitActive = "wait_active"

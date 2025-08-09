@@ -4,9 +4,11 @@ from app.common.deps import SessionDep
 from app.entities.file import File
 
 
-def get_files(session: SessionDep, file_ids: list[str]) -> dict[str, File]:
+def get_files(session: SessionDep, file_ids: list[str], tenant_id: int
+) -> dict[str, File]:
     statement = select(File).where(
         File.id.in_(file_ids),
+        File.tenant_id == tenant_id,
     )
 
     files = session.exec(statement).all()

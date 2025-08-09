@@ -16,6 +16,9 @@ class ApiSettings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
     ACCESS_TOKEN_RESET_EXPIRE_HOURS: int = 24
 
+    CRYPY_ALGORITHM: Literal["ChaCha20Poly1305", "AESGCM"] = "ChaCha20Poly1305"
+    CRYPY_KEY: str
+
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587

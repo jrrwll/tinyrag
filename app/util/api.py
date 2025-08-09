@@ -1,11 +1,11 @@
-from pydantic import BaseModel, JsonValue
+from typing import Optional, Union
 
-from app.common.error_code import ErrorCode
+from pydantic import BaseModel, JsonValue
 
 
 class ApiResult[T: BaseModel | JsonValue | None](BaseModel):
-    code: str = ErrorCode.ok.name
-    msg: str | None = None
+    err_code: str = 'ok'
+    err_args: Optional[dict[str, Union[str, int, list[str], list[int]]]] = None
     data: T = None
 
     @classmethod

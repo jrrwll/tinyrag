@@ -1,0 +1,51 @@
+GET http://{{origin}}{{api_prefix}}/storage/list
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/storage?id=1
+Authorization: Bearer {{auth_token}}
+
+###
+POST http://{{origin}}{{api_prefix}}/storage
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "opendal storage",
+  "type": "opendal",
+  "config": {
+    "endpoint": "{{OPENDAL_ENDPOINT}}",
+    "region": "{{OPENDAL_REGION}}",
+    "access_key": "{{OPENDAL_ACCESS_KEY}}",
+    "secret_key": "{{OPENDAL_SECRET_KEY}}"
+  }
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/storage
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "s3 storage",
+  "type": "s3",
+  "config": {
+    "endpoint": "{{S3_ENDPOINT}}",
+    "region": "{{S3_REGION}}",
+    "access_key": "{{S3_ACCESS_KEY}}",
+    "secret_key": "{{S3_SECRET_KEY}}"
+  }
+}
+
+###
+GET http://{{origin}}{{api_prefix}}/storage/default
+Authorization: Bearer {{auth_token}}
+
+###
+POST http://{{origin}}{{api_prefix}}/storage/default
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "storage_id": 1
+}

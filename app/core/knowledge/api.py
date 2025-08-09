@@ -1,8 +1,7 @@
 from datetime import datetime
-from pydoc import describe
 from typing import Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator, Field
 
 from app.config import settings
 from app.core.knowledge.base import EmbeddingModelConfig, ProcessRule, \
@@ -56,6 +55,13 @@ class KnowledgeUpdateConfig(BaseModel):
     vector_store_config: VectorStoreConfig | None = None
     retrieval_model_config: RetrievalModelConfig | None = None
 
+    @model_validator(mode="after")
+    def _validate(self) -> Self:
+        if (not self.llm_model_config and not self.embedding_model_config
+                and not self.vector_store_config and not self.retrieval_model_config):
+            raise ValueError("at least one config is required")
+        return self
+
     def update_entity(self, entity: Knowledge) -> None:
         update_dict = self.model_dump(exclude_none=True)
         dump_and_update_dict(update_dict, *self.model_fields_set)
@@ -63,10 +69,11 @@ class KnowledgeUpdateConfig(BaseModel):
 
 
 class KnowledgeImportFile(BaseModel):
-    file_ids: list[str]
+    file_ids: list[str] = Field(min_length=1, max_length=1000)
 
 
 class KnowledgeImportStorage(BaseModel):
+    storage_id: int | None = None
     file_path: str
 
 
@@ -77,9 +84,16 @@ class KnowledgeImportWebsite(BaseModel):
 class KnowledgeImport(BaseModel):
     id: int
 
+    process_rule: ProcessRule | None = None
     file: KnowledgeImportFile | None = None
     storage: KnowledgeImportStorage | None = None
     website: KnowledgeImportWebsite | None = None
+
+    @model_validator(mode="after")
+    def _validate(self) -> Self:
+        if not self.file and not self.storage and not self.website:
+            raise ValueError("file or storage or website is required")
+        return self
 
 
 class SimpleKnowledgePublic(BaseModel):
@@ -92,7 +106,6 @@ class SimpleKnowledgePublic(BaseModel):
 
 
 class KnowledgePublic(SimpleKnowledgePublic):
-    process_rule: ProcessRule
     llm_model_config: LlmModelConfig
     embedding_model_config: EmbeddingModelConfig
     vector_store_config: VectorStoreConfig
@@ -102,8 +115,7 @@ class KnowledgePublic(SimpleKnowledgePublic):
     def create(entity: Knowledge) -> "KnowledgePublic":
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
-            entity_dict, process_rule=ProcessRule,
-            llm_model_config=LlmModelConfig,
+            entity_dict, llm_model_config=LlmModelConfig,
             embedding_model_config=EmbeddingModelConfig,
             vector_store_config=VectorStoreConfig,
             retrieval_model_config=RetrievalModelConfig
@@ -112,8 +124,18 @@ class KnowledgePublic(SimpleKnowledgePublic):
 
 
 class DocumentPreviewChunk(BaseModel):
-    file_id: str
-    process_rule: ProcessRule
+    process_rule: ProcessRule | None = None
+
+    file_id: str | None = None
+
+    storage_id: int | None = None
+    storage_file_path: str | None = None
+
+    @model_validator(mode="after")
+    def _validate(self) -> Self:
+        if not self.file_id and self.storage_file_path is None:
+            raise ValueError("file_id or storage_file_path is required")
+        return self
 
 
 class DocumentPreviewChunkPublic(BaseModel):

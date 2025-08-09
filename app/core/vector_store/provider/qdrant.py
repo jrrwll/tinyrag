@@ -27,7 +27,7 @@ class QdrantVectorProvider(
     VectorProvider[QdrantVectorStoreConfig, QdrantClient]):
 
     @staticmethod
-    def get_config_type() -> Type[QdrantVectorStoreConfig]:
+    def get_config_type() -> type[QdrantVectorStoreConfig]:
         return QdrantVectorStoreConfig
 
     def _create_client(self) -> QdrantClient:

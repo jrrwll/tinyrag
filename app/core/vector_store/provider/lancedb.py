@@ -25,7 +25,7 @@ class LanceDBVectorProvider(
     VectorProvider[LanceDBVectorStoreConfig, ClientAPI]):
 
     @staticmethod
-    def get_config_type() -> Type[LanceDBVectorStoreConfig]:
+    def get_config_type() -> type[LanceDBVectorStoreConfig]:
         return LanceDBVectorStoreConfig
 
     def _create_client(self) -> DBConnection:

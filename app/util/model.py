@@ -1,12 +1,8 @@
 import json
 from typing import Any, Dict, Tuple, Type
 
-from pydantic import BaseModel, Field, create_model, JsonValue
+from pydantic import BaseModel, Field, create_model
 from pydantic.fields import FieldInfo
-
-
-class EmptyBaseModel(BaseModel):
-    pass
 
 
 def create_model_type( # type: ignore[no-untyped-def]
@@ -81,4 +77,3 @@ def get_extra_schema(model_cls: type[BaseModel]) -> dict[str, dict[str, Any]]:
             fields[field_name] = json_schema_extra
 
     return fields
-

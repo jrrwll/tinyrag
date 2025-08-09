@@ -1,37 +1,51 @@
 import logging
-from typing import Generator
+from typing import Generator, Literal
 
-from opendal import Operator
+from opendal import Operator, Metadata
+from pydantic import BaseModel
 
-from app.config import settings
-from app.core.file.enums import StorageType
-from app.core.file.storage.base import FileEntry, StorageProvider
+from app.common.constants import APP_NAME
+from app.core.storage.enums import StorageType
+from app.core.storage.provider.base import FileEntry, StorageProvider
 
 logger = logging.getLogger(__name__)
 
 
-class OpendalStorageProvider(StorageProvider):
-    client: Operator
+class OpendalStorageConfig(BaseModel):
+    scheme: Literal["s3"] = "s3"
+    endpoint: str
+    region: str | None = None
+    access_key: str | None = None
+    secret_key: str | None = None
+    bucket_name: str | None = APP_NAME
+
+
+class OpendalStorageProvider(StorageProvider[OpendalStorageConfig, Operator]):
+
+    def _create_client(self) -> Operator:
+        if self.config.endpoint == "*":
+            return Operator(
+                "fs", root=self._storage_local_dir
+            )
+        else:
+            # s3
+            options = {
+                "endpoint": self.config.endpoint,
+                "region": self.config.region,
+                "access_key_id": self.config.access_key,
+                "secret_access_key": self.config.secret_key,
+                "bucket": self.config.bucket_name,
+            }
+            options = {k: v for k, v in options.items() if v}
+            return Operator(self.config.scheme, **options)
 
     @staticmethod
     def get_storage_type() -> StorageType:
         return StorageType.Opendal
 
-    def __init__(self):
-        if settings.OPENDAL_SCHEME == "fs":
-            self.client = Operator(
-                "fs", root=settings.opendal_local_path
-            )
-        else:
-            options = {
-                "endpoint": settings.OPENDAL_ENDPOINT,
-                "region": settings.OPENDAL_REGION,
-                "access_key_id": settings.OPENDAL_ACCESS_KEY,
-                "secret_access_key": settings.OPENDAL_SECRET_KEY,
-                "bucket": settings.OPENDAL_BUCKET_NAME,
-            }
-            options = {k: v for k, v in options.items() if v}
-            self.client = Operator(settings.OPENDAL_SCHEME, **options)
+    @staticmethod
+    def get_config_type() -> type[OpendalStorageConfig]:
+        return OpendalStorageConfig
 
     def test_connect(self) -> None:
         entries = self.client.list("/", limit=1)
@@ -39,6 +53,16 @@ class OpendalStorageProvider(StorageProvider):
 
     def exists(self, key_or_prefix: str) -> bool:
         return self.client.exists(key_or_prefix)
+
+    def metadata(self, key_or_prefix: str) -> FileEntry | None:
+        metadata: Metadata = self.client.stat(key_or_prefix)
+        return FileEntry(
+            key=key_or_prefix,
+            is_dir=metadata.is_dir,
+            size=metadata.content_length,
+            last_modified=metadata.last_modified,
+            mime_type=metadata.content_type,
+        )
 
     def list_files(self, prefix: str, recursive: bool = False,
             limit: int | None = None) -> Generator[

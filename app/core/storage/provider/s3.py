@@ -5,29 +5,44 @@ from botocore.exceptions import ClientError, NoCredentialsError
 from mypy_boto3_s3 import ListObjectsV2Paginator, S3Client
 from mypy_boto3_s3.type_defs import CommonPrefixTypeDef, \
     ObjectTypeDef, PaginatorConfigTypeDef
+from pydantic import BaseModel
 
-from app.config import settings
-from app.core.file.enums import StorageType
-from app.core.file.storage.base import FileEntry, StorageProvider
+from app.common.constants import APP_NAME
+from app.core.storage.api import StoragePublic
+from app.core.storage.enums import StorageType
+from app.core.storage.provider.base import FileEntry, StorageProvider
 
 
-class S3StorageProvider(StorageProvider):
-    client: S3Client
-    bucket: str
+class S3StorageConfig(BaseModel):
+    endpoint: str
+    region: str | None = None
+    access_key: str | None = None
+    secret_key: str | None = None
+    bucket_name: str | None = APP_NAME
+
+
+class S3StorageProvider(StorageProvider[S3StorageConfig, S3Client]):
+
+    def __init__(self, storage: StoragePublic):
+        super().__init__(storage)
+        self.bucket = self.config.bucket_name
+
+    def _create_client(self) -> S3Client:
+        return boto3.client(
+            's3',
+            endpoint_url=self.config.endpoint,
+            region_name=self.config.region,
+            aws_access_key_id=self.config.access_key,
+            aws_secret_access_key=self.config.secret_key,
+        )
 
     @staticmethod
     def get_storage_type() -> StorageType:
         return StorageType.S3
 
-    def __init__(self):
-        self.client = boto3.client(
-            's3',
-            endpoint_url=settings.S3_ENDPOINT,
-            region_name=settings.S3_REGION,
-            aws_access_key_id=settings.S3_ACCESS_KEY,
-            aws_secret_access_key=settings.S3_SECRET_KEY,
-        )
-        self.bucket = settings.S3_BUCKET_NAME
+    @staticmethod
+    def get_config_type() -> type[S3StorageConfig]:
+        return S3StorageConfig
 
     def test_connect(self) -> None:
         try:
@@ -39,23 +54,30 @@ class S3StorageProvider(StorageProvider):
         except NoCredentialsError as e:
             raise Exception(f"S3 credentials not available: {e}")
 
-    def exists(self, key_or_prefix: str) -> bool:
+    def metadata(self, key_or_prefix: str) -> FileEntry | None:
         # file
         if not key_or_prefix.endswith('/'):
             try:
-                self.client.head_object(
+                head = self.client.head_object(
                     Bucket=self.bucket, Key=key_or_prefix)
-                return True
+
+                return FileEntry(
+                    key=key_or_prefix, size=head.get("ContentLength"),
+                    last_modified=head.get("LastModified"),
+                    mime_type=head.get("ContentType"))
             except ClientError as e:
                 if e.response['Error']['Code'] == '404':
-                    return False
+                    return None
                 raise Exception(
                     f"Error checking S3 object, key={key_or_prefix}: {e}")
         # dir
         else:
             res = self.client.list_objects_v2(
                 Bucket=self.bucket, Prefix=key_or_prefix, MaxKeys=1)
-            return "Contents" in res or 'CommonPrefixes' in res
+            if "Contents" in res or 'CommonPrefixes' in res:
+                return FileEntry(key=key_or_prefix, is_dir=True)
+            else:
+                return None
 
     def list_files(self, prefix: str, recursive: bool = False,
             limit: int | None = None) -> Generator[

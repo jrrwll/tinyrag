@@ -8,7 +8,7 @@ from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.enums import VectorStoreType
-from app.core.vector_store.provider.base import VectorProvideFactory
+from app.core.vector_store.provider.base import VectorProviderFactory
 from app.entities.repo.model import get_setup_model
 from app.entities.vector_store import VectorStore
 from app.tests.test_base import _find_first_file
@@ -61,7 +61,7 @@ def run_add_documents(vector_store_type: VectorStoreType):
     documents = list(text_processor.split_documents(docs))
 
     vector_store, model = _get_vector_store_and_model(vector_store_type)
-    vector = VectorProvideFactory.create_vector(
+    vector = VectorProviderFactory.create_vector(
         "tinyrag_test", vector_store, model)
 
     vector.add_documents(documents)
@@ -72,7 +72,7 @@ def run_add_documents(vector_store_type: VectorStoreType):
 def run_search(vector_store_type: VectorStoreType):
     print(f"\nvector_store_type={vector_store_type}")
     vector_store, model = _get_vector_store_and_model(vector_store_type)
-    vector = VectorProvideFactory.create_vector(
+    vector = VectorProviderFactory.create_vector(
         "tinyrag_test", vector_store, model)
 
     vec = vector.model_provider.embed_query("流沙")

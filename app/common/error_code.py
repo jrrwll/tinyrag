@@ -1,29 +1,28 @@
 from enum import Enum, auto
-from functools import cached_property
+from typing import Any, Self
 
-from fastapi import HTTPException, Response
+from fastapi import Response
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException
 
-from app.common.i18n import I18nMetaManager
 from app.config import settings
-
-_config = I18nMetaManager().error_codes(settings.DEFAULT_LANG)
+from app.util.api import ApiResult
 
 
 class ErrorCode(Enum):
-    ok = auto(), 200
-    unknown_error = auto(), 500
-    request_validation_error = auto()
-    request_validation_error_detail = auto()
+    unknown_error = auto(), 500, "msg"
+    request_error = auto(), "msg"
+    request_validation_error = auto(), "msg"
+    validation_error = auto(), "msg"
 
     # auth
     email_or_password_incorrect = auto(), 401
     same_new_password = auto()
-    login_user_inactive = auto(), 403
-    user_inactive = auto()
+    login_user_not_active = auto(), 403
+    user_not_active = auto()
     user_email_already_exists = auto()
     super_user_cannot_delete = auto()
-    invalid_email_domain = auto()
+    invalid_email_domain = auto(), "email_domain"
     login_user_not_found = auto(), 401
     user_not_found = auto()
     user_email_not_found = auto()
@@ -38,17 +37,24 @@ class ErrorCode(Enum):
     workspace_name_already_exists = auto()
 
     model_not_found = auto()
-    model_type_not_supported = auto()
-    model_provider_not_supported = auto()
-    model_provider_not_supported_to_create = auto()
+    model_id_not_found = auto(), "id"
+    model_type_not_supported = auto(), "model_type"
+    model_not_llm = auto(), "model_type"
+    model_not_text_embedding = auto(), "model_type"
+    model_provider_not_supported = auto(), "model_type", "provider_name"
+    model_provider_not_supported_to_edit = auto()
     model_not_set = auto()
-    need_specific_type_model = auto()
-    model_name_not_supported = auto()
+    model_name_not_supported = auto(), "model_name"
     model_is_set_in_default = auto()
 
     vector_store_not_found = auto()
+    vector_store_id_not_found = auto(), "id"
     vector_store_is_set_in_default = auto()
     vector_store_not_set = auto()
+
+    storage_not_found = auto()
+    storage_id_not_found = auto(), "id"
+    storage_not_set = auto()
 
     workflow_not_found = auto()
     workflow_run_not_found = auto()
@@ -57,76 +63,87 @@ class ErrorCode(Enum):
     node_not_found = auto()
 
     code_main_func_undefined = auto()
-    code_eval_error = auto()
+    code_eval_error = auto(), "msg"
 
     file_type_not_supported = auto()
     file_not_found = auto()
-    file_not_a_document = auto()
+    file_ids_not_found = auto(), "ids"
+    file_not_a_document = auto(), "file_type"
     storage_file_not_found = auto()
+    storage_file_not_file = auto()
+    storage_file_too_large = auto()
 
     knowledge_not_found = auto()
+    knowledge_id_not_found = auto(), "id"
     knowledge_conversation_not_found = auto()
 
-    def __new__(cls, value, status_code: int = 400):
+    def __new__(cls, value, *args):
         obj = object.__new__(cls)
         obj._value_ = value
-        obj.status_code = status_code
-        return obj
 
-    @cached_property
-    def message(self):
-        message = _config.get(self.name)
-        if not message:
-            message = self.name.replace("_", " ").capitalize()
-        return message
+        if not args:
+            obj.status_code = 400
+            obj.args = None
+            return obj
+
+        status_code = 400
+        if args:
+            if isinstance(args[0], int):
+                status_code = args[0]
+                args = args[1:]
+        if not args:
+            args = None
+
+        obj.status_code = status_code
+        obj.args = args
+        return obj
 
 
 class BizException(Exception):
-    error_code: str
-    message: str
-    status_code: int
 
-    def __init__(self, error_code: str, message: str, status_code: int):
-        self.error_code = error_code
-        self.message = message
+    def __init__(self, status_code: int,
+            error_code: str,
+            **error_args: str | int | list[str] | list[int]):
         self.status_code = status_code
+        self.error_code = error_code
+        self.error_args = error_args
 
-    @staticmethod
-    def create(error_code: ErrorCode, *args) -> "BizException":  # type: ignore[no-untyped-def]
-        status_code, message = error_code.status_code, error_code.message
-        try:
-            message = message.format(*args)
-        except KeyError:
-            pass
+    @classmethod
+    def create(cls, error_code: ErrorCode,
+            **error_args: str | int | list[str] | list[int]) -> Self:
+        if set(error_args.keys()) != set(error_code.args):
+            raise RuntimeError(f"error_args must be {error_code.args}")
 
-        return BizException(
-            error_code=error_code.name, message=message, status_code=status_code
+        return cls(
+            status_code=error_code.status_code,
+            error_code=error_code.name,
+            **error_args,
         )
 
-    @staticmethod
-    def unknown(exc: Exception) -> "BizException":
-
+    @classmethod
+    def unknown(cls, exc: Exception) -> Self:
         if isinstance(exc, HTTPException):
-            message = exc.detail
-            status_code=exc.status_code
+            msg = exc.detail
+            status_code = exc.status_code
         else:
-            message = ErrorCode.unknown_error.message
-            status_code=ErrorCode.unknown_error.status_code
+            msg = 'unknown error'
+            status_code = ErrorCode.unknown_error.status_code
 
         if settings.IS_TEST_ENV:
-            message = str(exc)
+            msg = str(exc)
 
-        return BizException(
-            error_code=ErrorCode.unknown_error.name,
-            message=message,
+        return cls(
             status_code=status_code,
+            error_code=ErrorCode.unknown_error.name,
+            msg=msg,
         )
 
-    def to_response(self) -> Response:
-        from app.util.api import ApiResult
+    def content(self) -> dict[str, Any]:
+        content = ApiResult(err_code=self.error_code, err_args=self.error_args)
+        return content.model_dump(exclude_none=True)
 
-        content = ApiResult(code=self.error_code, msg=self.message)
+    def to_response(self) -> Response:
         return JSONResponse(
-            content=content.model_dump(exclude_none=True),
+            content=self.content(),
             status_code=self.status_code,
         )

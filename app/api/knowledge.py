@@ -1,9 +1,8 @@
 from typing import Any
 
 from app.api import CustomAPIRouter
-from app.common.deps import CurrentUser, SessionDep
+from app.common.deps import CurrentUser, LogDep, SessionDep
 from app.common.error_code import BizException, ErrorCode
-from app.common.log import LogDep
 from app.config import settings
 from app.core.knowledge.api import DocumentPreviewChunk, \
     DocumentPreviewChunkPublic, \
@@ -50,7 +49,7 @@ def _list(
 def _get(session: SessionDep, id: str) -> Any:
     entity = session.get(Knowledge, id)
     if not entity:
-        raise BizException.create(ErrorCode.knowledge_not_found, id)
+        raise BizException.create(ErrorCode.knowledge_not_found)
 
     return ApiResult.create(KnowledgePublic.create(entity))
 
@@ -58,8 +57,8 @@ def _get(session: SessionDep, id: str) -> Any:
 @router.post("/preview-chunk",
              response_model=ApiResult[DocumentPreviewChunkPublic],
              dependencies=[LogDep])
-def _preview_chunk(params: DocumentPreviewChunk) -> Any:
-    res = preview_file_chunk(params)
+def _preview_chunk(params: DocumentPreviewChunk, current_user: CurrentUser) -> Any:
+    res = preview_file_chunk(params, current_user.tenant_id)
     return ApiResult.create(res)
 
 

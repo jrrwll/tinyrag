@@ -21,11 +21,11 @@ router = CustomAPIRouter(prefix="/workflow/run", tags=["workflow", "workflow_run
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(WorkflowRun, id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_run_not_found, id)
+        raise BizException.create(ErrorCode.workflow_run_not_found)
 
     workflow_entity = session.get(Workflow, entity.workflow_id)
     if not workflow_entity:
-        raise BizException.create(ErrorCode.related_workflow_not_found, entity.workflow_id)
+        raise BizException.create(ErrorCode.related_workflow_not_found)
 
     return ApiResult.create(WorkflowRunPublic.new(entity, workflow_entity))
 
@@ -34,7 +34,7 @@ def get(session: SessionDep, id: int) -> Any:
 def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
     workflow_entity = session.get(Workflow, params.workflow_id)
     if not workflow_entity:
-        raise BizException.create(ErrorCode.workflow_not_found, params.workflow_id)
+        raise BizException.create(ErrorCode.workflow_not_found)
 
     entity = params.to_entity()
 
@@ -49,11 +49,11 @@ def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
 def execute(session: SessionDep, params: WorkflowRunExecute) -> Any:
     entity = session.get(WorkflowRun, params.id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_run_not_found, params.id)
+        raise BizException.create(ErrorCode.workflow_run_not_found)
 
     workflow_entity = session.get(Workflow, entity.workflow_id)
     if not workflow_entity:
-        raise BizException.create(ErrorCode.related_workflow_not_found, entity.workflow_id)
+        raise BizException.create(ErrorCode.related_workflow_not_found)
 
     res = workflow_run_execute(session, entity, workflow_entity, params)
     return ApiResult.create(res)
@@ -63,11 +63,11 @@ def execute(session: SessionDep, params: WorkflowRunExecute) -> Any:
 def execute_step(session: SessionDep, params: WorkflowRunExecuteStep) -> Any:
     entity = session.get(WorkflowRun, params.id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_run_not_found, params.id)
+        raise BizException.create(ErrorCode.workflow_run_not_found)
 
     workflow_entity = session.get(Workflow, entity.workflow_id)
     if not workflow_entity:
-        raise BizException.create(ErrorCode.related_workflow_not_found, entity.workflow_id)
+        raise BizException.create(ErrorCode.related_workflow_not_found)
 
     res = workflow_run_execute_step(session, entity, workflow_entity, params)
     return ApiResult.create(res)

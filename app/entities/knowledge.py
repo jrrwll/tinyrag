@@ -11,7 +11,6 @@ class Knowledge(BizTableBase, table=True):
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
 
-    process_rule: str
     llm_model_config: str
     embedding_model_config: str
     vector_store_config: str
@@ -29,6 +28,7 @@ class KnowledgeDocument(LogTableBase, table=True):
     workspace_id: int
     knowledge_id: int
 
+    process_rule: str
     position: int
     word_count: int = 0
 

@@ -2,13 +2,13 @@ from typing import Type
 
 from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
-from pydantic import PositiveFloat
+from pydantic import PositiveFloat, SecretStr
 
 from app.core.model.embedding.base import BaseEmbeddingConfig, EmbeddingProvider
 
 
 class OpenaiEmbeddingConfig(BaseEmbeddingConfig):
-    api_key: str
+    api_key: SecretStr
     timeout: PositiveFloat | None = None
 
 

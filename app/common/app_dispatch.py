@@ -7,6 +7,7 @@ from fastapi import Request, Response
 from app.util.collection import first_not_none
 
 logger = logging.getLogger(__name__)
+
 request_id_var = contextvars.ContextVar("request_id", default="")
 lang_var = contextvars.ContextVar("lang_var", default="default")
 

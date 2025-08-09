@@ -20,7 +20,7 @@ class MilvusVectorStoreConfig(BaseModel):
 class MilvusVectorProvider(VectorProvider[MilvusVectorStoreConfig, MilvusClient]):
 
     @staticmethod
-    def get_config_type() -> Type[MilvusVectorStoreConfig]:
+    def get_config_type() -> type[MilvusVectorStoreConfig]:
         return MilvusVectorStoreConfig
 
     def _init(self) -> None:

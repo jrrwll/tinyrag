@@ -59,7 +59,7 @@ def config_workspace(
             and not params.embedding_model_config
             and not params.vector_store_config
             and not params.retrieval_model_config):
-        raise BizException.create(ErrorCode.request_validation_error_detail, "any config param is required")
+        raise BizException.create(ErrorCode.request_validation_error, "any config param is required")
 
     entity = get_workspace(session, params.id, current_user.tenant_id)
     if not entity:
@@ -96,7 +96,7 @@ def unset_config_workspace(
             and not params.embedding_model_config
             and not params.vector_store_config
             and not params.retrieval_model_config):
-        raise BizException.create(ErrorCode.request_validation_error_detail, "any config param is required")
+        raise BizException.create(ErrorCode.request_validation_error, "any config param is required")
 
     entity = get_workspace(session, params.id, current_user.tenant_id)
     if not entity:

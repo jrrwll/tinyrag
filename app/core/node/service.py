@@ -9,5 +9,6 @@ def get_node_runner(node: Node) -> NodeRunner:
         if cls.get_node_type() == node_type:
             return cls(node)
 
-    raise BizException.create(ErrorCode.unknown_error,
-                           f"NodeRunner implements not found: {node_type}")
+    raise BizException.create(
+        ErrorCode.unknown_error,
+        msg=f"NodeRunner implements not found: {node_type}")

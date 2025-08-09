@@ -37,7 +37,7 @@ def get_model(session: Session, id: int, tenant_id: int) -> Model | None:
     return session.exec(stmt).first()
 
 
-def get_default_model(session: Session, model_type: ModelType, workspace_id: int | None, tenant_id: int
+def get_tenant_default_model(session: Session, model_type: ModelType, workspace_id: int | None, tenant_id: int
 ) -> TenantDefaultModel | None:
     conditions = [
         TenantDefaultModel.model_type == model_type,

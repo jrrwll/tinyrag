@@ -8,3 +8,7 @@ Authorization: Bearer {{auth_token}}
 ###
 GET http://{{origin}}{{api_prefix}}/meta/vector-store/providers
 Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/meta/storage/providers
+Authorization: Bearer {{auth_token}}

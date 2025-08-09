@@ -14,8 +14,3 @@ class FileType(StrEnum):
 
 
 _documents = {FileType.TXT, FileType.Doc, FileType.Pdf}
-
-
-class StorageType(StrEnum):
-    S3 = "s3"
-    Opendal = "opendal"

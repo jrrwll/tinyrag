@@ -21,7 +21,7 @@ class PostgresVectorProvider(
     VectorProvider[PostgresVectorStoreConfig, PGEngine]):
 
     @staticmethod
-    def get_config_type() -> Type[PostgresVectorStoreConfig]:
+    def get_config_type() -> type[PostgresVectorStoreConfig]:
         return PostgresVectorStoreConfig
 
     def _create_client(self) -> PGEngine:

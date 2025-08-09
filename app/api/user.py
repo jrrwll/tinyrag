@@ -41,7 +41,7 @@ def list_users(session: SessionDep, current_user: CurrentUser,
 def get_user(session: SessionDep, email: str) -> Any:
     entity = get_user_by_email(session, email)
     if not entity:
-        raise BizException.create(ErrorCode.user_not_found, email)
+        raise BizException.create(ErrorCode.user_not_found)
 
     res = UserPublic.create(entity)
     return ApiResult.create(res)

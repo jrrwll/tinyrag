@@ -12,7 +12,7 @@ def start_conversation(session: Session, params: KnowledgeStartConversation, cur
 
     knowledge_entity = session.get(Knowledge, knowledge_id)
     if not knowledge_entity:
-        raise BizException.create(ErrorCode.knowledge_not_found, knowledge_id)
+        raise BizException.create(ErrorCode.knowledge_not_found)
 
     entity = KnowledgeConversation(knowledge_id=knowledge_id)
     session.add(entity)

@@ -38,7 +38,7 @@ def eval_main_func(code: str, *args, **kwargs) -> Any:  # type: ignore[no-untype
     try:
         return main_func(*args, **kwargs)
     except Exception as e:
-        raise BizException.create(ErrorCode.code_eval_error, str(e))
+        raise BizException.create(ErrorCode.code_eval_error, msg=str(e))
 
 
 def eval_code(code: str, **kwargs) -> Any:

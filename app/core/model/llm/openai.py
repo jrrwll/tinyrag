@@ -2,12 +2,13 @@ from typing import Type
 
 from langchain_core.language_models import BaseChatModel
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from app.core.model.llm.base import BaseModelConfig, LLMProvider
 
 
 class OpenaiModelConfig(BaseModelConfig):
-    api_key: str
+    api_key: SecretStr
     max_tokens: int | None = None
 
 
@@ -32,7 +33,7 @@ class OpenAILLMProvider(LLMProvider[OpenaiModelConfig]):
 
         return ChatOpenAI(
             model=model_name,
-            api_key=api_key,  # type: ignore[arg-type]
+            api_key=api_key,
             timeout=timeout,
             max_tokens=self.model_config.max_tokens,
         )

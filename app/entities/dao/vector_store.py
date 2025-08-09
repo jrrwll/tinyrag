@@ -37,7 +37,7 @@ def get_vector_store(
     return session.exec(stmt).first()
 
 
-def get_default_vector_store(
+def get_tenant_default_vector_store(
         session: Session, workspace_id: int | None, tenant_id: int
 ) -> TenantDefaultVectorStore | None:
     conditions = [

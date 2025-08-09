@@ -61,7 +61,7 @@ def update_knowledge(session: Session, params: KnowledgeUpdate,
     id = params.id
     entity = get_knowledge(session, id, current_user.tenant_id)
     if not entity:
-        raise BizException.create(ErrorCode.knowledge_not_found, id)
+        raise BizException.create(ErrorCode.knowledge_not_found)
 
     params.update_entity(entity)
 
@@ -71,17 +71,10 @@ def update_knowledge(session: Session, params: KnowledgeUpdate,
 
 def update_knowledge_config(session: Session, params: KnowledgeUpdateConfig,
         current_user: User):
-    if (not params.llm_model_config
-            and not params.embedding_model_config
-            and not params.vector_store_config
-            and not not params.retrieval_model_config):
-        raise BizException.create(ErrorCode.request_validation_error_detail,
-                                  "any config param is required")
-
     id = params.id
     entity = get_knowledge(session, id, current_user.tenant_id)
     if not entity:
-        raise BizException.create(ErrorCode.knowledge_not_found, id)
+        raise BizException.create(ErrorCode.knowledge_not_found)
 
     # check
     if params.process_rule:

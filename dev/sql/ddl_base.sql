@@ -9,23 +9,23 @@ create table workspace (
     llm_model_config       text,
     embedding_model_config text,
     vector_store_config    text,
-    retrieval_model_config  text,
+    retrieval_model_config text,
     unique key uk_tenant_id_name (tenant_id, name)
 ) default charset utf8mb4;
 
 
 create table model (
-    id            bigint       not null auto_increment primary key,
-    created_at    timestamp    not null default current_timestamp,
-    updated_at    timestamp    not null default current_timestamp on update current_timestamp,
-    deleted       tinyint      not null default 0,
-    tenant_id     bigint       not null,
-    provider_name varchar(255) not null,
-    model_name    varchar(255) not null,
-    type          varchar(50)  not null,
-    enable        tinyint      not null default 1,
-    config        longtext,
-    feature_config        longtext
+    id             bigint       not null auto_increment primary key,
+    created_at     timestamp    not null default current_timestamp,
+    updated_at     timestamp    not null default current_timestamp on update current_timestamp,
+    deleted        tinyint      not null default 0,
+    tenant_id      bigint       not null,
+    provider_name  varchar(255) not null,
+    model_name     varchar(255) not null,
+    type           varchar(50)  not null,
+    enable         tinyint      not null default 1,
+    config         longtext,
+    feature_config longtext
 ) default charset utf8mb4;
 
 
@@ -45,6 +45,7 @@ create table tenant_default_model (
 create table vector_store (
     id         bigint       not null auto_increment primary key,
     created_at timestamp    not null default current_timestamp,
+    updated_at     timestamp    not null default current_timestamp on update current_timestamp,
     tenant_id  bigint       not null,
     name       varchar(255) not null,
     type       varchar(50)  not null,
@@ -57,9 +58,31 @@ create table tenant_default_vector_store (
     created_at      timestamp not null default current_timestamp,
     updated_at      timestamp not null default current_timestamp on update current_timestamp,
     tenant_id       bigint    not null,
-    workspace_id bigint       not null default 0,
+    workspace_id    bigint    not null default 0,
     vector_store_id bigint    null     default null,
     unique key uk_tenant_id_workspace_id_vector_store_id (tenant_id, workspace_id, vector_store_id)
+) default charset utf8mb4;
+
+
+create table storage (
+    id         bigint       not null auto_increment primary key,
+    created_at timestamp    not null default current_timestamp,
+    updated_at     timestamp    not null default current_timestamp on update current_timestamp,
+    tenant_id  bigint       not null,
+    name       varchar(255) not null,
+    type       varchar(50)  not null,
+    config     longtext
+) default charset utf8mb4;
+
+
+create table tenant_default_storage (
+    id           bigint    not null auto_increment primary key,
+    created_at   timestamp not null default current_timestamp,
+    updated_at   timestamp not null default current_timestamp on update current_timestamp,
+    tenant_id    bigint    not null,
+    workspace_id bigint    not null default 0,
+    storage_id   bigint    null     default null,
+    unique key uk_tenant_id_workspace_id_storage_id (tenant_id, workspace_id, storage_id)
 ) default charset utf8mb4;
 
 

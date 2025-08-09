@@ -20,7 +20,7 @@ class ChromaVectorProvider(
     VectorProvider[ChromaVectorStoreConfig, ClientAPI]):
 
     @staticmethod
-    def get_config_type() -> Type[ChromaVectorStoreConfig]:
+    def get_config_type() -> type[ChromaVectorStoreConfig]:
         return ChromaVectorStoreConfig
 
     def _create_client(self) -> Client:

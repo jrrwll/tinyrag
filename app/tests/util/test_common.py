@@ -1,7 +1,7 @@
-from contextlib import AbstractContextManager
-from typing import Self
-from random import randint
 import traceback
+from contextlib import AbstractContextManager
+from random import randint
+from pydantic import BaseModel, SecretStr, EmailStr
 from app.core.knowledge.api import KnowledgeStreamChatPublic
 from app.core.user.enums import UserRole
 from app.util.api import ApiResult
@@ -50,3 +50,16 @@ def test_contextlib():
             raise ValueError("x is too big")
     except Exception as e:
         print(f"\nException handled: {type(e)} {e}")
+
+
+class SomeConfig(BaseModel):
+    user: str
+    email: EmailStr
+    password: SecretStr
+
+
+def test_secret_str():
+    cfg = SomeConfig(user="a", email="a@x.com", password="a")
+    print(f"\ncfg: {cfg}")
+    print(f"cfg.password: {cfg.password.get_secret_value()}")
+    print(f"\ncfg:\n{cfg.model_dump_json(indent=4)}")

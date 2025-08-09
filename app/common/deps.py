@@ -1,7 +1,8 @@
+import logging
 from collections.abc import Generator
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
 from sqlmodel import create_engine
@@ -9,8 +10,11 @@ from sqlmodel import create_engine
 from app.common.error_code import BizException, ErrorCode
 from app.common.security import decode_access_token
 from app.config import settings
+from app.core.user.enums import UserRole
 from app.entities.dao.user import get_user_by_email
 from app.entities.user import User
+
+logger = logging.getLogger(__name__)
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
@@ -41,7 +45,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
     if not user:
         raise BizException.create(ErrorCode.login_user_not_found)
     if not user.is_active:
-        raise BizException.create(ErrorCode.login_user_inactive)
+        raise BizException.create(ErrorCode.login_user_not_active)
     return user
 
 
@@ -50,6 +54,24 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 def get_current_active_superuser(current_user: CurrentUser) -> User:
     if not current_user.is_superuser:
-        raise BizException.create(ErrorCode.insufficient_permissions)
+        raise BizException.create(
+            ErrorCode.insufficient_permissions,
+            roles=UserRole.super_roles())
 
     return current_user
+
+
+def _request_logger(request: Request) -> None:
+    route: APIRoute = request.scope.get("route")  # type: ignore[assignment]
+    typ = request.scope.get("type", "")
+    http_version = request.scope.get("http_version")
+    request_str = f"{request.method} {route.path} {typ.upper()}/{http_version}"
+
+    client = request.client
+    if client:
+        logger.info(f"{request_str} - {client.host}:{client.port}")
+    else:
+        logger.info(request_str)
+
+
+LogDep = Depends(_request_logger)

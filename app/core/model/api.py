@@ -1,8 +1,9 @@
 import json
 from datetime import datetime
 from functools import cache
+from typing import Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.common.constants import MIN_UTC_DATETIME
 from app.core.model.base import ModelFeatureConfig
@@ -22,13 +23,14 @@ class ModelPublic(BaseModel):
     enable: bool
     provider_name: str
     model_name: str
-    config: dict # type: ignore[arg-type]
+    config: dict  # type: ignore[arg-type]
     feature_config: ModelFeatureConfig
 
     @staticmethod
     def create(entity: Model) -> "ModelPublic":
         entity_dict = entity.model_dump(exclude_none=True)
-        load_and_update_dict(entity_dict, "config", feature_config=ModelFeatureConfig)
+        load_and_update_dict(entity_dict, "config",
+                             feature_config=ModelFeatureConfig)
         return ModelPublic(**entity_dict)
 
     @staticmethod
@@ -65,10 +67,11 @@ class ModelPublic(BaseModel):
 
 
 class ModelCreate(BaseModel):
+    name: str = Field(max_length=100)
     type: ModelType
     provider_name: str
     model_name: str
-    config: dict = {} # type: ignore[type-arg]
+    config: dict = {}  # type: ignore[type-arg]
 
     def to_entity(self) -> Model:
         entity_dict = self.model_dump(exclude_none=True)
@@ -76,20 +79,30 @@ class ModelCreate(BaseModel):
         return Model(**entity_dict)
 
 
-class ModelUpdate(BaseModel):
+class ModelUpdateConfig(BaseModel):
     id: int
-    model_name: str
-    config: dict = {}  # type: ignore[type-arg]
+    config: dict  # type: ignore[type-arg]
 
     def update_entity(self, entity: Model) -> None:
-        update_dict = self.model_dump(exclude_none=True)
+        update_dict = self.model_dump(exclude={"id"})
         dump_and_update_dict(update_dict, "config")
         entity.sqlmodel_update(update_dict)
 
 
-class ModelUpdateEnablePublic(BaseModel):
+class ModelUpdate(BaseModel):
     id: int
-    enable: bool
+    name: str | None = Field(max_length=100, default=None)
+    enable: bool | None = None
+
+    def update_entity(self, entity: Model) -> None:
+        update_dict = self.model_dump(exclude={"id"}, exclude_none=True)
+        entity.sqlmodel_update(update_dict)
+
+    @model_validator(mode="after")
+    def _validate(self) -> Self:
+        if not self.name and self.enable is None:
+            raise ValueError("name or enable is required")
+        return self
 
 
 class ModelTestRun(BaseModel):

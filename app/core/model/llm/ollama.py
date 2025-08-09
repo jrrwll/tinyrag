@@ -1,15 +1,13 @@
 from typing import Type
 
-from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
-from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_ollama import ChatOllama
 
-from app.core.model.llm.base import LLMProvider, BaseModelConfig
+from app.core.model.llm.base import BaseModelConfig, LLMProvider
 
 
 class OllamaModelConfig(BaseModelConfig):
     base_url: str | None = None
-    api_key: str | None = None
     content_length: int = 4096
     max_tokens: int = 4096
     function_calling: bool = False
@@ -30,14 +28,6 @@ class OllamaLLMProvider(LLMProvider[OllamaModelConfig]):
         base_url = self.model_config.base_url
 
         return ChatOllama(
-            base_url=base_url, model=model_name,
-            client_kwargs=self._create_client_kwargs())
-
-    def _create_text_embedding(self) -> Embeddings:
-        model_name = self.model_name
-        base_url = self.model_config.base_url
-
-        return OllamaEmbeddings(
             base_url=base_url, model=model_name,
             client_kwargs=self._create_client_kwargs())
 

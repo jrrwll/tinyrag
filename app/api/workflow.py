@@ -41,7 +41,7 @@ def list(
 def get(session: SessionDep, id: int) -> Any:
     entity = session.get(Workflow, id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_not_found, id)
+        raise BizException.create(ErrorCode.workflow_not_found)
 
     return ApiResult.create(WorkflowPublic.new(entity))
 
@@ -61,7 +61,7 @@ def create(session: SessionDep, params: WorkflowCreate) -> Any:
 def update(session: SessionDep, params: WorkflowUpdate) -> Any:
     entity = session.get(Workflow, params.id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_not_found, params.id)
+        raise BizException.create(ErrorCode.workflow_not_found)
 
     params.update_entity(entity)
 
@@ -78,7 +78,7 @@ def update(session: SessionDep, params: WorkflowUpdate) -> Any:
 def check_list(session: SessionDep, id: int) -> Any:
     entity = session.get(Workflow, id)
     if not entity:
-        raise BizException.create(ErrorCode.workflow_not_found, id)
+        raise BizException.create(ErrorCode.workflow_not_found)
 
     res = workflow_check_list(session, entity)
     return ApiResult.create(res)

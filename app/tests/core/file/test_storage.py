@@ -4,7 +4,7 @@ import tempfile
 from uuid import uuid4
 
 from app.config import settings
-from app.core.file.storage.base import get_storage_provider
+from app.core.storage.provider.base import get_storage_provider
 
 
 def test_test_connect():

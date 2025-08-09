@@ -5,6 +5,7 @@ from typing import MutableMapping, Type
 from pydantic import BaseModel
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.meta.provider import ProviderMetaService
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.util.codec import md5
@@ -15,9 +16,11 @@ class BaseModelProvider[T: BaseModel, M](ABC):
 
     def __init__(self, model: ModelPublic):
         self.model_name: str = model.model_name
-        self.model_config: T = self.get_config_type().model_validate(
-            model.config)
-        self._model_footprint: str = md5(model.model_dump_json())
+
+        ProviderMetaService.from_model(model.type).decrypt_config_dict(
+            model.provider_name, model.config)
+        self.model_config: T = self.validate_config(model.config)
+        self._footprint: str = md5(model.model_dump_json())
 
     @staticmethod
     @abstractmethod
@@ -35,8 +38,8 @@ class BaseModelProvider[T: BaseModel, M](ABC):
         raise NotImplementedError()
 
     @classmethod
-    def validate_config(cls, config: dict):
-        cls.get_config_type().model_validate(config)
+    def validate_config(cls, config: dict) -> T:
+        return cls.get_config_type().model_validate(config)
 
     @abstractmethod
     def _create_model(self) -> M:
@@ -50,23 +53,23 @@ class BaseModelProvider[T: BaseModel, M](ABC):
     @property
     def model(self) -> M:
         cache = self._model_cache()
-        item = cache.get(self._model_footprint)
+        item = cache.get(self._footprint)
         if item:
             return item
         item = self._create_model()
-        cache[self._model_footprint] = item
+        cache[self._footprint] = item
         return item
 
 
 class ModelProviderFactory:
-
     _lock = threading.Lock()
     _initialized = False
     # model_type -> provider_name -> cls
     _implements: dict[ModelType, dict[str, type]] = {}
 
     @classmethod
-    def get_implements(cls, model_type: ModelType) -> dict[str, type[BaseModelProvider]]:
+    def get_implements(cls, model_type: ModelType) -> dict[
+        str, type[BaseModelProvider]]:
         cls._ensure_provider_classes()
 
         return cls._implements.get(model_type, {})
@@ -77,11 +80,11 @@ class ModelProviderFactory:
         cls._ensure_provider_classes()
 
         classes = cls._implements.get(model_type, {})
-        c =  classes.get(provider_name)
+        c = classes.get(provider_name)
         if not c:
             raise BizException.create(
                 ErrorCode.model_provider_not_supported,
-                model_type, provider_name)
+                model_type=model_type, provider_name=provider_name)
         return c
 
     @classmethod

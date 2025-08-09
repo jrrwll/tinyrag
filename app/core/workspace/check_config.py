@@ -17,10 +17,10 @@ def check_llm_model_config(
     model_id = llm_model_config.model_id
     model_entity = get_model(session, model_id, current_user.tenant_id)
     if not model_entity:
-        raise BizException.create(ErrorCode.model_not_found, model_id)
+        raise BizException.create(ErrorCode.model_id_not_found, id=model_id)
     elif model_entity.type != ModelType.LLM:
         raise BizException.create(
-            ErrorCode.model_type_not_supported, model_entity.type.name)
+            ErrorCode.model_not_llm, model_type=model_entity.type.name)
 
 
 def check_embedding_model_config(
@@ -30,16 +30,17 @@ def check_embedding_model_config(
         model_id = embedding_model_config.model_id
         model_entity = get_model(session, model_id, current_user.tenant_id)
         if not model_entity:
-            raise BizException.create(ErrorCode.model_not_found, model_id)
+            raise BizException.create(ErrorCode.model_id_not_found, id=model_id)
         elif model_entity.type != ModelType.TextEmbedding:
             raise BizException.create(
-                ErrorCode.model_type_not_supported, model_entity.type.name)
+                ErrorCode.model_not_text_embedding, model_type=model_entity.type.name)
     else:
         # transformer
         model_name = embedding_model_config.model_name
         if not is_valid_model_name(ModelType.TextEmbedding, model_name):
             raise BizException.create(
-                ErrorCode.model_name_not_supported, model_name)
+                ErrorCode.model_name_not_supported,
+                model_name=model_name)
 
 
 def check_vector_store_config(
@@ -50,7 +51,7 @@ def check_vector_store_config(
         session, vector_store_id, current_user.tenant_id)
     if not vector_store_entity:
         raise BizException.create(
-            ErrorCode.vector_store_not_found, vector_store_id)
+            ErrorCode.vector_store_id_not_found, id=vector_store_id)
 
 
 def check_retrieval_model_config(
@@ -59,4 +60,4 @@ def check_retrieval_model_config(
     reranking_model_id = retrieval_model_config.reranking_model_id
     model_entity = get_model(session, reranking_model_id, current_user.tenant_id)
     if not model_entity:
-        raise BizException.create(ErrorCode.model_not_found, reranking_model_id)
+        raise BizException.create(ErrorCode.model_id_not_found, id=reranking_model_id)

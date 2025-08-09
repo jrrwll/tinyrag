@@ -4,7 +4,7 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.knowledge.base import EmbeddingModelConfig
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
-from app.entities.dao.model import get_default_model, get_model
+from app.entities.dao.model import get_tenant_default_model, get_model
 from app.entities.model import Model, TenantDefaultModel
 
 
@@ -24,9 +24,9 @@ def get_setup_model(
         session: Session, model_type: ModelType,
         workspace_id: int, tenant_id: int,
         required: bool = False) -> ModelPublic | None:
-    entity = get_default_model(session, model_type, workspace_id, tenant_id)
+    entity = get_tenant_default_model(session, model_type, workspace_id, tenant_id)
     if not entity or entity.is_unset():
-        entity = get_default_model(session, model_type, None, tenant_id)
+        entity = get_tenant_default_model(session, model_type, None, tenant_id)
     if not entity or entity.is_unset():
         if required:
             raise BizException.create(ErrorCode.model_not_set, model_type)

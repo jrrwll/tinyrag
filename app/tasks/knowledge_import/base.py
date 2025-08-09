@@ -6,6 +6,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from app.core.knowledge.api import KnowledgePublic
+from app.core.knowledge.base import ProcessRule
 from app.core.knowledge.text_process.base import DocumentModel, \
     get_text_processor
 from app.core.knowledge.text_process.keywords import extract_keywords
@@ -13,7 +14,7 @@ from app.core.knowledge.text_process.tokens import get_word_count
 from app.core.model.api import ModelPublic
 from app.core.task.service import update_task_progress
 from app.core.vector_store.api import VectorStorePublic
-from app.core.vector_store.provider.base import VectorProvideFactory, \
+from app.core.vector_store.provider.base import VectorProviderFactory, \
     VectorProvider
 from app.entities.dao.knowledge import save_knowledge_document, \
     save_knowledge_document_chucks
@@ -35,15 +36,15 @@ class _FileTaskParams(BaseModel):
 
 def import_from_files(
         file_params: Iterable[Optional[_FileTaskParams]], file_count: int,
-        task_id: str, knowledge: KnowledgePublic,
+        knowledge: KnowledgePublic, process_rule: ProcessRule,
         model: ModelPublic, vector_store: VectorStorePublic,
-        tenant_id: int, workspace_id: int):
-    process_rule = knowledge.process_rule
+        task_id: str, tenant_id: int, workspace_id: int):
     text_processor = get_text_processor(process_rule)
+    process_rule_str = process_rule.model_dump_json()
 
     collection_name = Knowledge.get_collection_name(knowledge.id)
 
-    vector = VectorProvideFactory.create_vector(
+    vector = VectorProviderFactory.create_vector(
         collection_name, vector_store, model)
 
     task_raito, task_raito_step = 0.0, 1 / file_count
@@ -58,6 +59,7 @@ def import_from_files(
             doc_entity = KnowledgeDocument(
                 id=doc.id, tenant_id=tenant_id, workspace_id=workspace_id,
                 knowledge_id=knowledge.id, position=position,
+                process_rule=process_rule_str,
                 source_type=params.source_type, source_info=params.source_info)
             doc_entity = save_knowledge_document(doc_entity)
 

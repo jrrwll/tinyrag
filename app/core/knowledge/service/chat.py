@@ -12,12 +12,12 @@ def chat_knowledge(
     conversation_id = params.conversation_id
     entity = session.get(KnowledgeConversation, conversation_id)
     if not entity:
-        raise BizException.create(ErrorCode.knowledge_conversation_not_found, id)
+        raise BizException.create(ErrorCode.knowledge_conversation_not_found)
 
     knowledge_id = entity.knowledge_id
     knowledge_entity = session.get(Knowledge, knowledge_id)
     if not knowledge_entity:
-        raise BizException.create(ErrorCode.knowledge_not_found, id)
+        raise BizException.create(ErrorCode.knowledge_id_not_found, id=knowledge_id)
 
     raise NotImplementedError()
 

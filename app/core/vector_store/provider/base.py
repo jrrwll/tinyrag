@@ -7,6 +7,7 @@ from langchain_core.vectorstores import VectorStore
 from pydantic import BaseModel
 
 from app.core.knowledge.text_process.base import DocumentModel
+from app.core.meta.provider import ProviderMetaService
 from app.core.model.api import ModelPublic
 from app.core.model.embedding.base import EmbeddingProvider, \
     get_embedding_provider
@@ -22,7 +23,7 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
 
     @staticmethod
     @abstractmethod
-    def get_config_type() -> Type[Cfg]:
+    def get_config_type() -> type[Cfg]:
         raise NotImplementedError()
 
     @classmethod
@@ -41,13 +42,18 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
     def __init__(self, collection_name: str, vector_store: VectorStorePublic,
             model: ModelPublic):
         self.collection_name: str = collection_name
-        self.model_provider: EmbeddingProvider = get_embedding_provider(model)
         # model_feature_config
         self.vector_size = model.feature_config.vector_size
-
-        self._footprint = f"{model.footprint()}:{vector_store.footprint()}"
-        self.config: Cfg = self.get_config_type()(**vector_store.config)
         self.vector_store_local_dir = vector_store.local_dir()
+
+        ProviderMetaService.from_vector_store().decrypt_config_dict(
+            vector_store.type, vector_store.config)
+        self.config: Cfg = self.get_config_type()(**vector_store.config)
+        self._footprint = f"{model.footprint()}:{vector_store.footprint()}"
+
+        self.model_provider: EmbeddingProvider = get_embedding_provider(model)
+
+
         self._init()
 
     def _init(self) -> None:
@@ -82,21 +88,21 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
         return [DocumentModel.create(doc) for doc in docs]
 
 
-class VectorProvideFactory:
+class VectorProviderFactory:
 
-    @staticmethod
+    @classmethod
     def create_vector(
-            collection_name: str, vector_store: VectorStorePublic,
+            cls, collection_name: str, vector_store: VectorStorePublic,
             model: ModelPublic
     ) -> VectorProvider:
-        vector_class = VectorProvideFactory.get_vector_class(
+        provider_class = cls.get_provider_class(
             vector_store.type)
 
-        return vector_class(collection_name, vector_store, model)
+        return provider_class(collection_name, vector_store, model)
 
     @staticmethod
-    def get_vector_class[T: VectorProvider](
-            vector_store_type: VectorStoreType) -> Type[T]:
+    def get_provider_class[T: VectorProvider](
+            vector_store_type: VectorStoreType) -> type[T]:
         if vector_store_type == VectorStoreType.Qdrant:
             from app.core.vector_store.provider.qdrant import \
                 QdrantVectorProvider

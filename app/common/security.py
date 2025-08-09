@@ -1,14 +1,16 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Annotated
 
 import jwt
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import ValidationError
+from pydantic import SecretStr, BeforeValidator, PlainSerializer
 
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.user.base import TokenPayload
+from app.util.crypt import CryptProvider
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -62,3 +64,24 @@ def verify_password_reset_token(token: str) -> str | None:
         return payload.sub
     except BizException:
         return None
+
+
+if settings.CRYPY_ALGORITHM == "AESGCM":
+    _crypt_provider = CryptProvider.from_aes_gcm(settings.CRYPY_KEY)
+else:
+    _crypt_provider = CryptProvider.from_chacha20_poly1305(settings.CRYPY_KEY)
+
+
+def crypt_encrypt(plain: str) -> str:
+    return _crypt_provider.encrypt(plain)
+
+
+def crypt_decrypt(encrypted: str) -> str:
+    return _crypt_provider.decrypt(encrypted)
+
+
+# CryptStr = Annotated[
+#     SecretStr,
+#     BeforeValidator(crypt_decrypt), # model_validate
+#     PlainSerializer(crypt_encrypt, return_type=str), # model_dump
+# ]

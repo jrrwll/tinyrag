@@ -3,7 +3,7 @@ from uuid import uuid4
 from sqlmodel import select
 
 from app.common.deps import open_session
-from app.core.file.service.base import get_storage_files
+from app.core.storage.file import get_storage_files
 from app.core.knowledge.api import KnowledgePublic
 from app.core.model.enums import ModelType
 from app.core.task.enums import AsyncTaskStatus, AsyncTaskType

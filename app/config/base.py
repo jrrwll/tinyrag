@@ -13,7 +13,6 @@ _singleton_workdir = _root_dir / "workdir"
 
 class DeploymentSettings(BaseSettings):
     PROJECT_NAME: str
-    DEBUG: bool = False
     DEFAULT_LANG: str = "en"
 
     ENVIRONMENT: Literal["test", "production"] = "test"
@@ -23,6 +22,7 @@ class DeploymentSettings(BaseSettings):
     FILES_DIRECTORY: str = f"{_singleton_workdir}/files"
     # for test vector store only
     VECTOR_STORE_DIRECTORY: str = f"{_singleton_workdir}/vectorstore"
+    STORAGE_DIRECTORY: str = f"{_singleton_workdir}/storage"
     # embedding models
     MODEL_DIRECTORY: str = f"{_singleton_workdir}/models"
 
