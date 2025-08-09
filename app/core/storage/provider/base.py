@@ -127,8 +127,6 @@ class StorageProviderFactory:
 
             return S3StorageProvider
         else:
-            from app.cor
-
-            e.storage.provider.opendal import OpendalStorageProvider
+            from app.core.storage.provider.opendal import OpendalStorageProvider
 
             return OpendalStorageProvider
