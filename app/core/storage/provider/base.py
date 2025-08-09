@@ -122,12 +122,13 @@ class StorageProviderFactory:
     @staticmethod
     def get_provider_class[T: StorageProvider](
             vector_store_type: StorageType) -> type[T]:
-        if vector_store_type == StorageTy
-            pe.S3:
+        if vector_store_type == StorageType.S3:
             from app.core.storage.provider.s3 import S3StorageProvider
 
             return S3StorageProvider
         else:
-            from app.core.storage.provider.opendal import OpendalStorageProvider
+            from app.cor
+
+            e.storage.provider.opendal import OpendalStorageProvider
 
             return OpendalStorageProvider
