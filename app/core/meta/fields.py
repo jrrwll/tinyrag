@@ -37,10 +37,7 @@ def parse_meta_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
                 typ = FormInputType.Switch
             elif annotation_type == SecretStr:
                 typ = FormInputType.Password
-            elif get_origin(
-
-                
-            ) == Literal:
+            elif get_origin(annotation_type) == Literal:
                 field.select = list(get_args(annotation))
                 typ = FormInputType.Select
             else:
