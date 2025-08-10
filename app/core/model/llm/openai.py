@@ -25,15 +25,15 @@ class OpenAILLMProvider(LLMProvider[OpenaiModelConfig]):
     def _create_model(self) -> BaseChatModel:
         model_name = self.model_name
 
-        api_key = self.model_config.api_key
+        api_key = self.config.api_key
 
         timeout = None
-        if self.model_config.timeout:
-            timeout = float(self.model_config.timeout)
+        if self.config.timeout:
+            timeout = float(self.config.timeout)
 
         return ChatOpenAI(
             model=model_name,
             api_key=api_key,
             timeout=timeout,
-            max_tokens=self.model_config.max_tokens,
+            max_tokens=self.config.max_tokens,
         )

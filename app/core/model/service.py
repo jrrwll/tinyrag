@@ -1,7 +1,7 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.service import ProviderMetaService
 from app.core.model.api import ModelCreate, ModelPublic, ModelTestRun, \
     ModelTestRunPublic, \
     ModelUpdate, ModelUpdateConfig, SetupDefaultModel

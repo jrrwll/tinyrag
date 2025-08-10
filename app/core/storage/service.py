@@ -1,7 +1,7 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.service import ProviderMetaService
 from app.core.storage.api import SetupDefaultStorage, StorageCreate, \
     StoragePublic, StorageUpdate, StorageUpdateConfig
 from app.entities.dao.storage import get_tenant_default_storage, get_storage

@@ -25,7 +25,7 @@ class OllamaLLMProvider(LLMProvider[OllamaModelConfig]):
 
     def _create_model(self) -> BaseChatModel:
         model_name = self.model_name
-        base_url = self.model_config.base_url
+        base_url = self.config.base_url
 
         return ChatOllama(
             base_url=base_url, model=model_name,
@@ -33,6 +33,6 @@ class OllamaLLMProvider(LLMProvider[OllamaModelConfig]):
 
     def _create_client_kwargs(self) -> dict:  # type: ignore[type-arg]
         client_kwargs = {}
-        if self.model_config.timeout:
-            client_kwargs["timeout"] = self.model_config.timeout
+        if self.config.timeout:
+            client_kwargs["timeout"] = self.config.timeout
         return client_kwargs

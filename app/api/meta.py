@@ -2,7 +2,7 @@ from typing import Any
 
 from app.api import CustomAPIRouter
 from app.core.meta.api import MetaBaseEntity
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.service import ProviderMetaService
 from app.core.model.enums import ModelType
 from app.util.api import ApiResult, ListResult
 

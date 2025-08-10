@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, PositiveInt
 
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
-from app.core.model.provider import BaseModelProvider, ModelProviderFactory
+from app.core.model.provider import ModelProvider, ModelProviderFactory
 
 _model_cache: TTLCache[str, Embeddings] = TTLCache(
     maxsize=1000, ttl=10 * 60)  # 10min
@@ -18,7 +18,7 @@ class BaseEmbeddingConfig(BaseModel):
         default=None, json_schema_extra={"builtin": True})
 
 
-class EmbeddingProvider[T: BaseEmbeddingConfig](BaseModelProvider[T, Embeddings], ABC):
+class EmbeddingProvider[T: BaseEmbeddingConfig](ModelProvider[T, Embeddings], ABC):
 
     @staticmethod
     def get_model_type() -> ModelType:

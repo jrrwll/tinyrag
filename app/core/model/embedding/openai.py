@@ -25,11 +25,11 @@ class OpenAILLMProvider(EmbeddingProvider[OpenaiEmbeddingConfig]):
     def _create_model(self) -> Embeddings:
         model_name = self.model_name
 
-        api_key = self.model_config.api_key
+        api_key = self.config.api_key
 
         timeout = None
-        if self.model_config.timeout:
-            timeout = self.model_config.timeout
+        if self.config.timeout:
+            timeout = self.config.timeout
 
         return OpenAIEmbeddings(
             model=model_name,

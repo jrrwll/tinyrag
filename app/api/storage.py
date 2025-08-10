@@ -7,7 +7,7 @@ from app.common.deps import CurrentUser, SessionDep, \
     get_current_active_superuser
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.service import ProviderMetaService
 from app.core.storage.api import SetupDefaultStorage, StorageCreate, \
     StoragePublic, \
     StorageSimplePublic, StorageUpdate, StorageUpdateConfig

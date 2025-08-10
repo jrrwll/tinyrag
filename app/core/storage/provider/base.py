@@ -9,7 +9,7 @@ from typing import Any, Generator
 from cachetools import TTLCache
 from pydantic import BaseModel
 
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.provider import MetaProvider
 from app.core.storage.api import StoragePublic
 from app.core.storage.enums import StorageType
 
@@ -25,7 +25,7 @@ class FileEntry(BaseModel):
     mime_type: str | None = None
 
 
-class StorageProvider[Cfg: BaseModel, C](ABC):
+class StorageProvider[Cfg: BaseModel, C](MetaProvider[Cfg], ABC):
     _lock = threading.Lock()
 
     @staticmethod
@@ -33,23 +33,13 @@ class StorageProvider[Cfg: BaseModel, C](ABC):
     def get_storage_type() -> StorageType:
         raise NotImplementedError()
 
-    @staticmethod
-    @abstractmethod
-    def get_config_type() -> type[Cfg]:
-        raise NotImplementedError()
-
-    @classmethod
-    def validate_config(cls, config: dict):
-        cls.get_config_type().model_validate(config)
-
     @abstractmethod
     def _create_client(self) -> C:
         raise NotImplementedError()
 
     def __init__(self, storage: StoragePublic):
-        ProviderMetaService.from_storage().decrypt_config_dict(
-            storage.type, storage.config)
-        self.config = self.get_config_type()(**storage.config)
+        super().__init__(storage.config)
+
         self._footprint: str = storage.footprint()
         self._storage_local_dir = storage.local_dir()
         self._init()

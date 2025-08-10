@@ -1,25 +1,23 @@
 import threading
 from abc import ABC, abstractmethod
-from typing import MutableMapping, Type
+from typing import MutableMapping
 
 from pydantic import BaseModel
 
 from app.common.error_code import BizException, ErrorCode
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.provider import MetaProvider
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.util.codec import md5
 from app.util.lang import find_sub_types
 
 
-class BaseModelProvider[T: BaseModel, M](ABC):
+class ModelProvider[Cfg: BaseModel, M](MetaProvider[Cfg], ABC):
 
     def __init__(self, model: ModelPublic):
-        self.model_name: str = model.model_name
+        super().__init__(model.config)
 
-        ProviderMetaService.from_model(model.type).decrypt_config_dict(
-            model.provider_name, model.config)
-        self.model_config: T = self.validate_config(model.config)
+        self.model_name: str = model.model_name
         self._footprint: str = md5(model.model_dump_json())
 
     @staticmethod
@@ -31,15 +29,6 @@ class BaseModelProvider[T: BaseModel, M](ABC):
     @abstractmethod
     def get_provider_name() -> str:
         raise NotImplementedError()
-
-    @staticmethod
-    @abstractmethod
-    def get_config_type() -> Type[T]:
-        raise NotImplementedError()
-
-    @classmethod
-    def validate_config(cls, config: dict) -> T:
-        return cls.get_config_type().model_validate(config)
 
     @abstractmethod
     def _create_model(self) -> M:
@@ -69,7 +58,7 @@ class ModelProviderFactory:
 
     @classmethod
     def get_implements(cls, model_type: ModelType) -> dict[
-        str, type[BaseModelProvider]]:
+        str, type[ModelProvider]]:
         cls._ensure_provider_classes()
 
         return cls._implements.get(model_type, {})
@@ -101,7 +90,7 @@ class ModelProviderFactory:
             from app.core import model as model_mod
 
             provider_classes = find_sub_types(
-                BaseModelProvider, model_mod, exclude_abc=True)
+                ModelProvider, model_mod, exclude_abc=True)
             for c in provider_classes:
                 classes = cls._implements.get(c.get_model_type())
                 if not classes:

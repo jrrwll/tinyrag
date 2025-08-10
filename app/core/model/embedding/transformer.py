@@ -79,4 +79,4 @@ class TransformerEmbeddingProvider(
         return TransformerEmbeddingConfig
 
     def _create_model(self) -> Embeddings:
-        return TransformerEmbedding(self.model_name, self.model_config)
+        return TransformerEmbedding(self.model_name, self.config)

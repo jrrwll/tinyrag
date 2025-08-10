@@ -1,13 +1,13 @@
 import threading
-from abc import ABC, abstractmethod
-from typing import Any, Iterable, Type
+from abc import ABC
+from typing import Any, Iterable
 
 from cachetools import TTLCache
 from langchain_core.vectorstores import VectorStore
 from pydantic import BaseModel
 
 from app.core.knowledge.text_process.base import DocumentModel
-from app.core.meta.provider import ProviderMetaService
+from app.core.meta.provider import MetaProvider
 from app.core.model.api import ModelPublic
 from app.core.model.embedding.base import EmbeddingProvider, \
     get_embedding_provider
@@ -18,17 +18,8 @@ _client_cache: TTLCache[str, Any] = TTLCache(
     maxsize=1000, ttl=10 * 60)  # 10 min
 
 
-class VectorProvider[Cfg: BaseModel, C](ABC):
+class VectorProvider[Cfg: BaseModel, C](MetaProvider[Cfg], ABC):
     _lock = threading.Lock()
-
-    @staticmethod
-    @abstractmethod
-    def get_config_type() -> type[Cfg]:
-        raise NotImplementedError()
-
-    @classmethod
-    def validate_config(cls, config: dict):
-        cls.get_config_type().model_validate(config)
 
     def _create_client(self) -> C:
         raise NotImplementedError()
@@ -41,19 +32,15 @@ class VectorProvider[Cfg: BaseModel, C](ABC):
 
     def __init__(self, collection_name: str, vector_store: VectorStorePublic,
             model: ModelPublic):
+        super().__init__(vector_store.config)
+
         self.collection_name: str = collection_name
         # model_feature_config
         self.vector_size = model.feature_config.vector_size
         self.vector_store_local_dir = vector_store.local_dir()
-
-        ProviderMetaService.from_vector_store().decrypt_config_dict(
-            vector_store.type, vector_store.config)
-        self.config: Cfg = self.get_config_type()(**vector_store.config)
         self._footprint = f"{model.footprint()}:{vector_store.footprint()}"
 
         self.model_provider: EmbeddingProvider = get_embedding_provider(model)
-
-
         self._init()
 
     def _init(self) -> None:

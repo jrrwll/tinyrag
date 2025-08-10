@@ -11,7 +11,7 @@ from app.config import settings
 from app.core.model.api import ModelPublic
 from app.core.model.base import ModelParams
 from app.core.model.enums import ModelType
-from app.core.model.provider import BaseModelProvider, ModelProviderFactory
+from app.core.model.provider import ModelProvider, ModelProviderFactory
 from app.core.variable.base import Variable
 from app.util.langchain.callbacks import CompleteResponseHandler
 
@@ -22,7 +22,7 @@ class BaseModelConfig(BaseModel):
     timeout: int | None = None
 
 
-class LLMProvider[T: BaseModelConfig](BaseModelProvider[T, BaseChatModel], ABC):
+class LLMProvider[T: BaseModelConfig](ModelProvider[T, BaseChatModel], ABC):
 
     @staticmethod
     def get_model_type() -> ModelType:

@@ -7,7 +7,7 @@ from pydantic import BaseModel, PositiveInt
 
 from app.core.model.embedding.base import EmbeddingProvider
 from app.core.model.embedding.transformer import TransformerEmbeddingProvider
-from app.core.model.provider import BaseModelProvider
+from app.core.model.provider import ModelProvider
 from app.core.node.base import LLMConfig
 from app.core.node.runner.base import NodeRunner
 from app.util.lang import find_sub_types, strip_type, walk_and_import_modules
@@ -112,7 +112,7 @@ def test_find_sub_types():
     print("\nfind_sub_types")
     from app.core import model as model_mod
 
-    provider_classes = find_sub_types(BaseModelProvider, model_mod)
+    provider_classes = find_sub_types(ModelProvider, model_mod)
     for cls in provider_classes:
         print(cls)
 
@@ -125,7 +125,7 @@ def test_find_sub_types():
           f"{ABC in TransformerEmbeddingProvider.__bases__}")
     print("\nexclude_abc")
     provider_classes = find_sub_types(
-        BaseModelProvider, model_mod, exclude_abc=True)
+        ModelProvider, model_mod, exclude_abc=True)
     for cls in provider_classes:
         print(cls)
 
