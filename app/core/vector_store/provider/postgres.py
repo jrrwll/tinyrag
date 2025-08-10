@@ -1,9 +1,8 @@
 import asyncio
-from typing import Type
 
 from langchain_core.vectorstores import VectorStore
 from langchain_postgres import PGEngine, PGVectorStore
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, PositiveInt, SecretStr, PostgresDsn
 from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -12,7 +11,13 @@ from app.core.vector_store.provider.base import VectorProvider
 
 
 class PostgresVectorStoreConfig(BaseModel):
-    url: str  # postgresql+psycopg://user:password@host:port/database
+    user: str
+    password: SecretStr | None = None
+    host: str
+    port: PositiveInt | None = None
+    database: str
+    query: str
+
     pool_size: PositiveInt | None = None
     pool_timeout: PositiveInt | None = None
 
@@ -32,9 +37,19 @@ class PostgresVectorProvider(
         optional_params = {k: v for k, v in optional_params.items() if v}
         # engine = create_async_engine(settings.PGVECTOR_URL, **optional_params)
 
+        # postgresql+psycopg2://user:password@host:port/database?query
+        url  =str(PostgresDsn.build(
+            scheme="postgresql+psycopg2",
+            username=self.config.user,
+            password=self.config.password,
+            host=self.config.host,
+            port=self.config.port,
+            path=f"/{self.config.database}",
+            query=self.config.query,
+        ))
         # PGEngine.from_engine(engine)
         return PGEngine.from_connection_string(
-            url=self.config.url, **optional_params)
+            url=url, **optional_params)
 
     def _create_vector_store(self) -> VectorStore:
         return PGVectorStore.create_sync(

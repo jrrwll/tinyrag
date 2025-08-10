@@ -1,7 +1,7 @@
 from functools import cache
 
 from pydantic import BaseModel, SecretStr
-
+from typing import Literal, get_args, get_origin
 from app.core.meta.api import MetaBaseField
 from app.core.meta.enums import FormInputType
 from app.util.lang import strip_type
@@ -37,6 +37,12 @@ def parse_meta_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
                 typ = FormInputType.Switch
             elif annotation_type == SecretStr:
                 typ = FormInputType.Password
+            elif get_origin(
+
+                
+            ) == Literal:
+                field.select = list(get_args(annotation))
+                typ = FormInputType.Select
             else:
                 typ = FormInputType.Text
         field.type = typ

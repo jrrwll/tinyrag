@@ -48,6 +48,7 @@ def strip_type(typ: type) -> type:
         else:
             return typ
 
-    if get_origin(typ) is Annotated:
-        typ = get_args(typ)[0]
+    origin_typ = get_origin(typ)
+    if origin_typ is Annotated:
+        return get_args(typ)[0]
     return typ

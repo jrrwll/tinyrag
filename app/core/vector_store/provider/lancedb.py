@@ -5,14 +5,14 @@ from chromadb import ClientAPI
 from lancedb import DBConnection, connect
 from langchain_community.vectorstores import LanceDB
 from langchain_core.vectorstores import VectorStore
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from app.core.vector_store.provider.base import VectorProvider
 
 
 class LanceDBVectorStoreConfig(BaseModel):
     uri: str
-    api_key: str | None = None
+    api_key: SecretStr | None = None
     region: str | None = None
     host_override: str | None = None
     read_consistency_interval: timedelta | None = None

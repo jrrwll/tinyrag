@@ -1,7 +1,5 @@
-from typing import Type
-
 from langchain_milvus import Milvus
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pymilvus import MilvusClient
 
 from app.core.vector_store.provider.base import VectorProvider
@@ -10,9 +8,9 @@ from app.core.vector_store.provider.base import VectorProvider
 class MilvusVectorStoreConfig(BaseModel):
     uri: str
     user: str | None =  None
-    password: str | None =  None
+    password: SecretStr | None =  None
     db_name: str | None =  None
-    token: str | None =  None
+    token: SecretStr | None =  None
     timeout: float | None =  None
 
 

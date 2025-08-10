@@ -2,7 +2,7 @@ import logging
 from typing import Generator, Literal
 
 from opendal import Operator, Metadata
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from app.common.constants import APP_NAME
 from app.core.storage.enums import StorageType
@@ -15,8 +15,8 @@ class OpendalStorageConfig(BaseModel):
     scheme: Literal["s3"] = "s3"
     endpoint: str
     region: str | None = None
-    access_key: str | None = None
-    secret_key: str | None = None
+    access_key: SecretStr | None = None
+    secret_key: SecretStr | None = None
     bucket_name: str | None = APP_NAME
 
 

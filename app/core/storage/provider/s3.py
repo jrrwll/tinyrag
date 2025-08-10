@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError, NoCredentialsError
 from mypy_boto3_s3 import ListObjectsV2Paginator, S3Client
 from mypy_boto3_s3.type_defs import CommonPrefixTypeDef, \
     ObjectTypeDef, PaginatorConfigTypeDef
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from app.common.constants import APP_NAME
 from app.core.storage.api import StoragePublic
@@ -16,8 +16,8 @@ from app.core.storage.provider.base import FileEntry, StorageProvider
 class S3StorageConfig(BaseModel):
     endpoint: str
     region: str | None = None
-    access_key: str | None = None
-    secret_key: str | None = None
+    access_key: SecretStr | None = None
+    secret_key: SecretStr | None = None
     bucket_name: str | None = APP_NAME
 
 

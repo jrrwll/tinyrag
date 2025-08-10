@@ -3,7 +3,7 @@ from typing import Type
 from chromadb import Client, ClientAPI, HttpClient, Settings
 from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, PositiveInt, SecretStr
 from app.core.vector_store.provider.base import VectorProvider
 
 
@@ -13,7 +13,7 @@ class ChromaVectorStoreConfig(BaseModel):
     tenant: str | None = None
     database: str | None = None
     auth_provider: str | None = None
-    auth_credentials: str | None = None
+    auth_credentials: SecretStr | None = None
 
 
 class ChromaVectorProvider(

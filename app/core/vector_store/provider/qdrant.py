@@ -1,9 +1,8 @@
 import logging
-from typing import Type
 
 from langchain_core.vectorstores import VectorStore
 from langchain_qdrant import QdrantVectorStore
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, PositiveInt, SecretStr
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
@@ -18,7 +17,7 @@ class QdrantVectorStoreConfig(BaseModel):
     grpc_port: PositiveInt | None = None
     prefer_grpc: bool = False
 
-    api_key: str | None = None
+    api_key: SecretStr | None = None
     https: bool | None = None
     timeout: int | None = None
 
