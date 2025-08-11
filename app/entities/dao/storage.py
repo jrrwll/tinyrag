@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from sqlmodel import Session, func, select
 
 from app.entities.storage import Storage, TenantDefaultStorage
@@ -8,7 +6,10 @@ from app.entities.storage import Storage, TenantDefaultStorage
 def page_and_count_storages(
         session: Session, page_no: int, page_size: int, tenant_id: int
 ) -> tuple[list[dict], int]:
-    conditions = [Storage.tenant_id == tenant_id]
+    conditions = [
+        Storage.tenant_id == tenant_id,
+        Storage.deleted == False,
+    ]
 
     count_statement = (
         select(func.count()).select_from(Storage).where(*conditions)
@@ -19,12 +20,12 @@ def page_and_count_storages(
     limit = page_size
 
     page_statement = (
-        select( # type: ignore[call-overload]
+        select(  # type: ignore[call-overload]
             Storage.id,
-            Storage.name,
-            Storage.type,
             Storage.created_at,
             Storage.updated_at,
+            Storage.name,
+            Storage.type,
         )
         .select_from(Storage)
         .where(*conditions)
@@ -38,9 +39,11 @@ def page_and_count_storages(
 def get_storage(
         session: Session, id: int, tenant_id: int
 ) -> Storage | None:
-    stmt = select(Storage).where(
-        Storage.id == id, Storage.tenant_id == tenant_id
-    )
+    conditions = [
+        Storage.id == id,
+        Storage.tenant_id == tenant_id,
+    ]
+    stmt = select(Storage).where(*conditions)
     return session.exec(stmt).first()
 
 

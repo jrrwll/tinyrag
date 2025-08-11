@@ -1,5 +1,5 @@
 from app.config import settings
-from app.core.file.service.file_type import detect_file_type
+from app.core.file.file_type import detect_file_type
 import os
 
 def test_detect_file_type():

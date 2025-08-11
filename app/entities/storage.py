@@ -1,11 +1,11 @@
 from sqlmodel import Field
 
 from app.core.storage.enums import StorageType
-from app.entities.base import TableBase, \
+from app.entities.base import BizTableBase, TableBase, \
     enum_field_info
 
 
-class Storage(TableBase, table=True):
+class Storage(BizTableBase, table=True):
     id: int = Field(primary_key=True)
     tenant_id: int
 
@@ -17,7 +17,7 @@ class Storage(TableBase, table=True):
 class TenantDefaultStorage(TableBase, table=True):
 
     tenant_id: int
-    workspace_id: int
+    workspace_id: int = 0
     storage_id: int | None = None
 
     def is_unset(self) -> bool:

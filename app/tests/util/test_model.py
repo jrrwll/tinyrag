@@ -1,9 +1,9 @@
 from typing import Protocol
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from app.core.knowledge.api import KnowledgePublic
-from app.util.model import create_model_type
+from app.util.model import create_model_type, extract_validation_error
 
 
 def test_create_dynamic_model():
@@ -50,3 +50,26 @@ def test_model():
     print("\n")
     for field_name, field_info in KnowledgePublic.model_fields.items():
         print(f"{field_name} annotation={field_info.annotation} {field_info}")
+
+
+
+def test_extract_validation_error():
+    class Some(BaseModel):
+        id: int
+        name: str = Field(min_length=2, max_length=4)
+        age: int = Field(gt=0, le=120)
+        score: float
+
+    try:
+        Some.model_validate({
+            "name": "12345",
+            "age": -1, "score": "no"
+        })
+    except ValidationError as e:
+        print(e)
+        print(f"\nerrors:\n")
+        for err in e.errors():
+            print(f"{err}")
+
+        res = extract_validation_error(e)
+        print(f"\nres:\n{res}")

@@ -10,7 +10,10 @@ from app.entities.model import Model, TenantDefaultModel
 def page_and_count_models(
         session: Session, page_no: int, page_size: int, tenant_id: int
 ) -> tuple[Sequence[Model], int]:
-    conditions = [Model.tenant_id == tenant_id, Model.deleted == False]
+    conditions = [
+        Model.tenant_id == tenant_id,
+        Model.deleted == False,
+    ]
 
     count_statement = (
         select(func.count()).select_from(Model).where(*conditions)
@@ -31,9 +34,11 @@ def page_and_count_models(
 
 
 def get_model(session: Session, id: int, tenant_id: int) -> Model | None:
-    stmt = select(Model).where(
-        Model.id == id, Model.tenant_id == tenant_id
-    )
+    conditions = [
+        Model.id == id,
+        Model.tenant_id == tenant_id,
+    ]
+    stmt = select(Model).where(*conditions)
     return session.exec(stmt).first()
 
 

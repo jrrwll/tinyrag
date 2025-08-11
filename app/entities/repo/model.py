@@ -29,7 +29,7 @@ def get_setup_model(
         entity = get_tenant_default_model(session, model_type, None, tenant_id)
     if not entity or entity.is_unset():
         if required:
-            raise BizException.create(ErrorCode.model_not_set, model_type)
+            raise BizException.create(ErrorCode.model_not_set, model_type=model_type)
         else:
             return None
 
@@ -38,7 +38,7 @@ def get_setup_model(
     model_entity = get_model(session, entity.model_id, tenant_id)
     if not model_entity:
         if required:
-            raise BizException.create(ErrorCode.model_not_found, entity.model_id)
+            raise BizException.create(ErrorCode.model_id_not_found, id=entity.model_id)
         else:
             return None
     return ModelPublic.create(model_entity)

@@ -7,6 +7,7 @@ from app.common.deps import CurrentUser, SessionDep, \
     get_current_active_superuser
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
+from app.core.meta.service import ProviderMetaService
 from app.core.model.api import (
     ModelCreate,
     ModelPublic,
@@ -51,6 +52,9 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     if not entity:
         raise BizException.create(ErrorCode.model_not_found)
 
+    res = ModelPublic.create(entity)
+    ProviderMetaService.from_model(res.type).desensitizing_config_dict(
+        res.provider_name, res.config)
     return ApiResult.create(ModelPublic.create(entity))
 
 

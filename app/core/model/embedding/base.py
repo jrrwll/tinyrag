@@ -40,7 +40,3 @@ def get_embedding_provider(model: ModelPublic) -> EmbeddingProvider[Any]:
     cls = ModelProviderFactory.get_provider_class(
         ModelType.TextEmbedding, provider_name)
     return cls(model)
-
-
-def fill_default_fields():
-    pass

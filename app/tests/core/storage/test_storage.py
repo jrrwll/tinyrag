@@ -3,12 +3,23 @@ import os.path
 import tempfile
 from uuid import uuid4
 
+from app.common.deps import open_session
 from app.config import settings
-from app.core.storage.provider.base import get_storage_provider
+from app.core.storage.provider.base import StorageProvider, \
+    StorageProviderFactory
+from app.entities.repo.storage import get_setup_storage
+
+
+def _get_storage_provider() -> StorageProvider:
+    workspace_id, tenant_id = 1, 1
+    with open_session() as session:
+        storage = get_setup_storage(session, workspace_id, tenant_id,
+                                    required=True)
+    return StorageProviderFactory.create_storage(storage)
 
 
 def test_test_connect():
-    storage_provider = get_storage_provider()
+    storage_provider = _get_storage_provider()
     storage_provider.test_connect()
 
 
@@ -17,13 +28,13 @@ def test_upload_dir():
     if not os.path.exists(local_dir):
         return
     print(f"\nprepare to upload {local_dir}")
-    storage_provider = get_storage_provider()
+    storage_provider = _get_storage_provider()
     c = storage_provider.upload_dir("chinese-poetry/quantangshi", local_dir)
     print(f"\nc={c}")
 
 
 def test_download_file():
-    storage_provider = get_storage_provider()
+    storage_provider = _get_storage_provider()
 
     temp_path = f"{tempfile.gettempdir()}/{uuid4()}"
     print(f"\ntemp_path=\n{temp_path}")
@@ -37,7 +48,7 @@ def test_download_file():
 
 
 def test_list_files():
-    storage_provider = get_storage_provider()
+    storage_provider = _get_storage_provider()
     print("\nprepare to list_files /")
     files = storage_provider.list_files("/")
     for file in files:

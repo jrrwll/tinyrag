@@ -16,7 +16,7 @@ class PostgresVectorStoreConfig(BaseModel):
     host: str
     port: PositiveInt | None = None
     database: str
-    query: str
+    query: str | None = None
 
     pool_size: PositiveInt | None = None
     pool_timeout: PositiveInt | None = None

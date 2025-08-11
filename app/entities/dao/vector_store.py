@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from sqlmodel import Session, func, select
 
 from app.entities.vector_store import TenantDefaultVectorStore, VectorStore
@@ -7,8 +5,11 @@ from app.entities.vector_store import TenantDefaultVectorStore, VectorStore
 
 def page_and_count_vector_stores(
         session: Session, page_no: int, page_size: int, tenant_id: int
-) -> tuple[Sequence[VectorStore], int]:
-    conditions = [VectorStore.tenant_id == tenant_id]
+) -> tuple[list[dict], int]:
+    conditions = [
+        VectorStore.tenant_id == tenant_id,
+        VectorStore.deleted == False,
+    ]
 
     count_statement = (
         select(func.count()).select_from(VectorStore).where(*conditions)
@@ -19,21 +20,30 @@ def page_and_count_vector_stores(
     limit = page_size
 
     page_statement = (
-        select(VectorStore)
+        select(  # type: ignore[call-overload]
+            VectorStore.id,
+            VectorStore.created_at,
+            VectorStore.updated_at,
+            VectorStore.name,
+            VectorStore.type,
+        )
+        .select_from(VectorStore)
         .where(*conditions)
         .offset(offset)
         .limit(limit)
     )
-    entities = session.exec(page_statement).all()
-    return entities, count
+    entities = session.exec(page_statement).mappings().all()
+    return [dict(i) for i in entities], count
 
 
 def get_vector_store(
         session: Session, id: int, tenant_id: int
 ) -> VectorStore | None:
-    stmt = select(VectorStore).where(
-        VectorStore.id == id, VectorStore.tenant_id == tenant_id
-    )
+    conditions = [
+        VectorStore.id == id,
+        VectorStore.tenant_id == tenant_id,
+    ]
+    stmt = select(VectorStore).where(*conditions)
     return session.exec(stmt).first()
 
 

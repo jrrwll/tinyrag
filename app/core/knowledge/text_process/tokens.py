@@ -2,11 +2,14 @@ import re
 
 import jieba
 import jieba.analyse
-import nltk
 import tiktoken
 from nltk.corpus import stopwords
 
-# nltk.download('stopwords')
+"""
+import nltk
+
+nltk.download('stopwords')
+"""
 _stopwords = set(stopwords.words('english') + stopwords.words('chinese'))
 
 

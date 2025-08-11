@@ -2,7 +2,7 @@ GET http://{{origin}}{{api_prefix}}/vector-store/list
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store?id=1
+GET http://{{origin}}{{api_prefix}}/vector-store?id=3
 Authorization: Bearer {{auth_token}}
 
 ###
@@ -38,7 +38,11 @@ Content-Type: application/json
   "name": "pgvector vector store",
   "type": "pgvector",
   "config": {
-    "url": "{{PGVECTOR_URL}}"
+    "host": "{{PGVECTOR_HOST}}",
+    "port": "{{PGVECTOR_PORT}}",
+    "user": "{{PGVECTOR_USER}}",
+    "password": "{{PGVECTOR_PASSWORD}}",
+    "database": "{{PGVECTOR_DB_NAME}}"
   }
 }
 

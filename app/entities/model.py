@@ -17,7 +17,7 @@ class Model(BizTableBase, table=True):
 class TenantDefaultModel(BizTableBase, table=True):
 
     tenant_id: int
-    workspace_id: int
+    workspace_id: int = 0
     model_type: ModelType = enum_field_info(ModelType)
     model_id: int | None = None
     model_name: str | None = None

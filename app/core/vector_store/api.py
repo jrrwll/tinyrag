@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 from app.config import settings
@@ -9,10 +9,16 @@ from app.util.codec import md5
 from app.util.model import dump_and_update_dict
 
 
-class VectorStorePublic(BaseModel):
+class VectorStoreSimplePublic(BaseModel):
     id: int
+    created_at: datetime
+    updated_at: datetime
+
     name: str
     type: VectorStoreType
+
+
+class VectorStorePublic(VectorStoreSimplePublic):
     config: dict # type: ignore[arg-type]
 
     @staticmethod

@@ -12,7 +12,7 @@ def get_vector_store_from_config(session: Session, vector_store_config: VectorSt
     entity = get_vector_store(session, vector_store_id, tenant_id)
     if not entity:
         raise BizException.create(
-            ErrorCode.vector_store_not_found, vector_store_id)
+            ErrorCode.vector_store_not_found)
     return VectorStorePublic.create(entity)
 
 
@@ -24,11 +24,11 @@ def get_setup_vector_store(session: Session, workspace_id: int, tenant_id: int,
     if not entity or entity.is_unset():
         raise BizException.create(ErrorCode.vector_store_not_set)
 
-    model_entity = get_vector_store(session, entity.vector_store_id, tenant_id)
-    if not model_entity:
+    ref_entity = get_vector_store(session, entity.vector_store_id, tenant_id)
+    if not ref_entity:
         if required:
             raise BizException.create(
-                ErrorCode.vector_store_not_found, entity.model_id)
+                ErrorCode.vector_store_id_not_found, id=entity.vector_store_id)
         else:
             return None
-    return VectorStorePublic.create(model_entity)
+    return VectorStorePublic.create(ref_entity)

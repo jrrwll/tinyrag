@@ -13,7 +13,7 @@ class ErrorCode(Enum):
     unknown_error = auto(), 500, "msg"
     request_error = auto(), "msg"
     request_validation_error = auto(), "msg"
-    validation_error = auto(), "msg"
+    validation_error = auto(), "missing_fields", "invalid_fields"
 
     # auth
     email_or_password_incorrect = auto(), 401
@@ -43,7 +43,7 @@ class ErrorCode(Enum):
     model_not_text_embedding = auto(), "model_type"
     model_provider_not_supported = auto(), "model_type", "provider_name"
     model_provider_not_supported_to_edit = auto()
-    model_not_set = auto()
+    model_not_set = auto(), "model_type"
     model_name_not_supported = auto(), "model_name"
     model_is_set_in_default = auto()
 
@@ -83,7 +83,7 @@ class ErrorCode(Enum):
 
         if not args:
             obj.status_code = 400
-            obj.args = None
+            obj.args = []
             return obj
 
         status_code = 400
@@ -92,7 +92,7 @@ class ErrorCode(Enum):
                 status_code = args[0]
                 args = args[1:]
         if not args:
-            args = None
+            args = []
 
         obj.status_code = status_code
         obj.args = args

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Callable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from app.common.security import crypt_decrypt, crypt_encrypt
 from app.core.meta.enums import FormInputType
@@ -45,5 +45,8 @@ def _crypt_config_dict(config_type: type[BaseModel], config: dict,
             continue
         if not modified_config:
             modified_config = deepcopy(config)
+        # encrypt case
+        if isinstance(field_value, SecretStr):
+            field_value = field_value.get_secret_value()
         modified_config[field.name] = crypt_func(field_value)
     return modified_config or config

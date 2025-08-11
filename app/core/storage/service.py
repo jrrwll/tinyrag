@@ -80,8 +80,8 @@ def find_default_storage(
         if workspace_id:
             entity = get_tenant_default_storage(
                 session, None, current_user.tenant_id)
-            if not entity or entity.is_unset():
-                return None
+        if not entity or entity.is_unset():
+            return None
 
     storage_id = entity.storage_id
     storage_entity = get_storage(
@@ -117,8 +117,9 @@ def set_or_unset_default_storage(
     if not entity:
         entity = TenantDefaultStorage(
             tenant_id=tenant_id,
-            workspace_id=workspace_id,
         )
+        if workspace_id:
+            entity.workspace_id = workspace_id
 
     entity.storage_id = storage_id
 

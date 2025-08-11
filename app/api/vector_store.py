@@ -7,8 +7,10 @@ from app.common.deps import CurrentUser, SessionDep, \
     get_current_active_superuser
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
+from app.core.meta.service import ProviderMetaService
 from app.core.vector_store.api import SetupDefaultVectorStore, \
-    VectorStoreCreate, VectorStorePublic, VectorStoreUpdate, \
+    VectorStoreCreate, VectorStorePublic, VectorStoreSimplePublic, \
+    VectorStoreUpdate, \
     VectorStoreUpdateConfig
 from app.core.vector_store.service import create_vector_store, \
     delete_vector_store, \
@@ -23,7 +25,8 @@ from app.util.api import ApiResult, IdResult, PageResult
 router = CustomAPIRouter(prefix="/vector-store", tags=["vectorstore"])
 
 
-@router.get("/list", response_model=ApiResult[PageResult[VectorStorePublic]])
+@router.get("/list",
+            response_model=ApiResult[PageResult[VectorStoreSimplePublic]])
 def _list(
         session: SessionDep,
         current_user: CurrentUser,
@@ -32,11 +35,11 @@ def _list(
 ) -> Any:
     entities, count = page_and_count_vector_stores(
         session, page_no, page_size, current_user.tenant_id)
-    res = PageResult[VectorStorePublic](
+    res = PageResult[VectorStoreSimplePublic](
         page_no=page_no,
         page_size=page_size,
         total=count,
-        items=[VectorStorePublic.create(entity) for entity in entities],
+        items=[VectorStoreSimplePublic(**entity) for entity in entities],
     )
     return ApiResult.create(res)
 
@@ -47,7 +50,10 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     if not entity:
         raise BizException.create(ErrorCode.vector_store_not_found)
 
-    return ApiResult.create(VectorStorePublic.create(entity))
+    res = VectorStorePublic.create(entity)
+    ProviderMetaService.from_vector_store().desensitizing_config_dict(
+        res.type, res.config)
+    return ApiResult.create(res)
 
 
 @router.post("", response_model=ApiResult[IdResult])

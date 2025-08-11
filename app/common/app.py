@@ -12,6 +12,7 @@ from app.common.app_dispatch import add_request_vars
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import config_logging
 from app.config import settings
+from app.util.model import extract_validation_error
 
 config_logging("app", web_app=True)
 logger = logging.getLogger(__name__)
@@ -41,23 +42,27 @@ async def _exception_handler(_: Request, e: Exception) -> Response:
 @app.exception_handler(RequestValidationError)
 async def _request_validation_error_handler(
         _: Request, e: RequestValidationError) -> Response:
-    code = ErrorCode.request_validation_error
-    return BizException.create(code, str(e)).to_response()
+    return BizException.create(
+        ErrorCode.request_validation_error, msg=str(e)
+    ).to_response()
 
 
 @app.exception_handler(HTTPException)
 async def _http_exception_handler(_: Request, e: HTTPException) -> Response:
     logger.exception(f"http exception: {e}")
-    return BizException(ErrorCode.request_error.name, e.detail,
-                        e.status_code).to_response()
+    return BizException(
+        e.status_code, ErrorCode.request_error.name, msg=e.detail
+    ).to_response()
 
 
 @app.exception_handler(ValidationError)
 async def _validation_error_handler(_: Request, e: ValidationError) -> Response:
-    err_str = str(e)
-    logger.exception(f"validation error: {err_str}")
-    code = ErrorCode.validation_error
-    return BizException.create(code, err_str).to_response()
+    logger.exception(f"validation error: {e}")
+
+    error_args = extract_validation_error(e)
+    return BizException.create(
+        ErrorCode.validation_error, **error_args
+    ).to_response()
 
 
 @app.exception_handler(BizException)

@@ -1,11 +1,11 @@
 import json
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Literal, Tuple, Type
 
-from pydantic import BaseModel, Field, create_model
+from pydantic import BaseModel, Field, ValidationError, create_model
 from pydantic.fields import FieldInfo
 
 
-def create_model_type( # type: ignore[no-untyped-def]
+def create_model_type(  # type: ignore[no-untyped-def]
         model_name: str,
         fields: Dict[str, Tuple[Type[Any], Dict[str, Any] | FieldInfo]],
         base: Type[BaseModel] = BaseModel,
@@ -17,7 +17,7 @@ def create_model_type( # type: ignore[no-untyped-def]
             field_config = Field(**field_config)
         field_definitions[field_name] = (field_type, field_config)
 
-    return create_model( # type: ignore[no-any-return]
+    return create_model(  # type: ignore[no-any-return]
         model_name,
         __base__=base,
         **field_definitions,
@@ -67,6 +67,23 @@ def model_validate_dict[T: BaseModel](
         new_dict[k1] = new_d
 
     return new_dict
+
+
+def extract_validation_error(
+        e: ValidationError
+) -> dict[Literal["missing_fields", "invalid_fields"], list[str]]:
+    missing_fields, invalid_fields = [], []
+    for err in e.errors():
+        loc = err.get("loc", [])
+        if err.get("type") == "missing":
+            missing_fields.extend(loc)
+        else:
+            invalid_fields.extend(loc)
+
+    return {
+        "missing_fields": missing_fields,
+        "invalid_fields": invalid_fields,
+    }
 
 
 def get_extra_schema(model_cls: type[BaseModel]) -> dict[str, dict[str, Any]]:

@@ -142,9 +142,10 @@ def set_or_unset_default_model(
     if not entity:
         entity = TenantDefaultModel(
             tenant_id=current_user.tenant_id,
-            workspace_id=workspace_id,
             model_type=model_type,
         )
+        if workspace_id:
+            entity.workspace_id = workspace_id
 
     if model_name:
         if not is_valid_model_name(model_type, model_name):
