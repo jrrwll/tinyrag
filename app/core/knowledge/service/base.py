@@ -1,6 +1,7 @@
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
+from app.config import settings
 from app.core.knowledge.api import KnowledgeCreate, KnowledgeUpdate, \
     KnowledgeUpdateConfig
 from app.core.knowledge.base import EmbeddingModelConfig
@@ -21,6 +22,8 @@ def create_knowledge(session: Session, params: KnowledgeCreate,
         current_user: User) -> IdResult:
     workspace_id, tenant_id = params.workspace_id, current_user.tenant_id
 
+    if not params.process_rule:
+        params.process_rule = settings.default_process_rule
     if not params.llm_model_config:
         model = get_setup_model(session, ModelType.LLM, workspace_id, tenant_id)
         if model:

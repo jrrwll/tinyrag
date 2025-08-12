@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Type
+from typing import Any
 
 from chromadb import ClientAPI
 from lancedb import DBConnection, connect
@@ -30,6 +30,7 @@ class LanceDBVectorProvider(
 
     def _create_client(self) -> DBConnection:
         kwargs = self.config.model_dump(exclude_none=True)
+        kwargs["api_key"] = self.config.api_key and self.config.api_key.get_secret_value()
         return connect(**kwargs)
 
     def _create_vector_store(self) -> VectorStore:

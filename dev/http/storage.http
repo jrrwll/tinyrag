@@ -6,6 +6,10 @@ GET http://{{origin}}{{api_prefix}}/storage?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
+GET http://{{origin}}{{api_prefix}}/storage?id=2
+Authorization: Bearer {{auth_token}}
+
+###
 POST http://{{origin}}{{api_prefix}}/storage
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json

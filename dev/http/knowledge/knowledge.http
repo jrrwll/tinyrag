@@ -1,3 +1,4 @@
+###
 GET http://{{origin}}{{api_prefix}}/knowledge/list?workspace_id=1
 Authorization: Bearer {{auth_token}}
 
@@ -38,7 +39,7 @@ Content-Type: application/json
   "process_rule": {
     "text_splitter": {
       "chunk_overlap": 50,
-      "chunk_size": 256,
+      "chunk_size": 512,
       "separators": [
         "}"
       ]

@@ -11,6 +11,7 @@ class Knowledge(BizTableBase, table=True):
     description: str | None = Field(default=None, max_length=1000)
     enable: bool = True
 
+    process_rule: str
     llm_model_config: str
     embedding_model_config: str
     vector_store_config: str

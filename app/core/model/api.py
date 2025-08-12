@@ -46,6 +46,7 @@ class ModelPublic(ModelSimplePublic):
             id=model.id,
             created_at=MIN_UTC_DATETIME,
             updated_at=MIN_UTC_DATETIME,
+            name=model_name,
             type=model_type,
             enable=True,
             provider_name=BUILTIN_MODEL_PROVIDER_NAME,

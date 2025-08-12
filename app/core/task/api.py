@@ -6,18 +6,23 @@ from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
 from app.entities.task import AsyncTask
 
 
-class AsyncTaskPublic(BaseModel):
+class SimpleAsyncTaskPublic(BaseModel):
     id: str
     type: AsyncTaskType
     ref_id: str | None = None
-    payload: str | None = None
+    ref_name: str | None = None
     status: AsyncTaskStatus
 
     submitted_at: datetime
-    started_at: datetime | None = None
     completed_at: datetime | None = None
-    result: str | None = None
     progress: int | None = None
+
+
+class AsyncTaskPublic(SimpleAsyncTaskPublic):
+    payload: str | None = None
+
+    started_at: datetime | None = None
+    result: str | None = None
 
     @staticmethod
     def create(entity: AsyncTask) -> "AsyncTaskPublic":

@@ -23,6 +23,9 @@ class MilvusVectorProvider(VectorProvider[MilvusVectorStoreConfig, MilvusClient]
 
     def _init(self) -> None:
         connection_args = self.config.model_dump(exclude_none=True)
+        connection_args["password"] = self.config.password and self.config.password.get_secret_value()
+        connection_args["token"] = self.config.token and self.config.token.get_secret_value()
+        connection_args = {k: v for k, v in connection_args.items() if v is not None}
 
         self.vector_store = Milvus(
             connection_args=connection_args,

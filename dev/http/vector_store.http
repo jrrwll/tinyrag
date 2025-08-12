@@ -2,7 +2,19 @@ GET http://{{origin}}{{api_prefix}}/vector-store/list
 Authorization: Bearer {{auth_token}}
 
 ###
+GET http://{{origin}}{{api_prefix}}/vector-store?id=1
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/vector-store?id=2
+Authorization: Bearer {{auth_token}}
+
+###
 GET http://{{origin}}{{api_prefix}}/vector-store?id=3
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://{{origin}}{{api_prefix}}/vector-store?id=4
 Authorization: Bearer {{auth_token}}
 
 ###
@@ -14,6 +26,7 @@ Content-Type: application/json
   "name": "chroma vector store",
   "type": "chroma",
   "config": {
+    "host": "*"
   }
 }
 
@@ -26,6 +39,7 @@ Content-Type: application/json
   "name": "qdrant vector store",
   "type": "qdrant",
   "config": {
+    "url": "*"
   }
 }
 

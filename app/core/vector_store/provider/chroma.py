@@ -1,9 +1,9 @@
-from typing import Type
-
 from chromadb import Client, ClientAPI, HttpClient, Settings
 from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore
-from pydantic import BaseModel, PositiveInt, SecretStr
+from pydantic import BaseModel, PositiveInt, SecretStr, field_validator
+
+from app.config import settings
 from app.core.vector_store.provider.base import VectorProvider
 
 
@@ -14,6 +14,14 @@ class ChromaVectorStoreConfig(BaseModel):
     database: str | None = None
     auth_provider: str | None = None
     auth_credentials: SecretStr | None = None
+
+    @field_validator("host")
+    @staticmethod
+    def _validate(v: str) -> str:
+        if v == '*':
+            if not settings.IS_TEST_ENV:
+                raise ValueError("host cannot be * in production mode")
+        return v
 
 
 class ChromaVectorProvider(
@@ -38,7 +46,7 @@ class ChromaVectorProvider(
             "database": self.config.database,
             "settings": Settings(
                 chroma_client_auth_provider=self.config.auth_provider,
-                chroma_client_auth_credentials=self.config.auth_credentials,
+                chroma_client_auth_credentials=self.config.auth_credentials and self.config.auth_credentials.get_secret_value(),
             ),
         }
         kwargs = {k: v for k, v in kwargs.items() if v is not None}

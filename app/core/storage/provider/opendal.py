@@ -1,10 +1,11 @@
 import logging
 from typing import Generator, Literal
 
-from opendal import Operator, Metadata
-from pydantic import BaseModel, SecretStr
+from opendal import Metadata, Operator
+from pydantic import BaseModel, SecretStr, field_validator
 
 from app.common.constants import APP_NAME
+from app.config import settings
 from app.core.storage.enums import StorageType
 from app.core.storage.provider.base import FileEntry, StorageProvider
 
@@ -19,6 +20,14 @@ class OpendalStorageConfig(BaseModel):
     secret_key: SecretStr | None = None
     bucket_name: str | None = APP_NAME
 
+    @field_validator("endpoint")
+    @staticmethod
+    def _validate(v: str) -> str:
+        if v == '*':
+            if not settings.IS_TEST_ENV:
+                raise ValueError("endpoint cannot be * in production mode")
+        return v
+
 
 class OpendalStorageProvider(StorageProvider[OpendalStorageConfig, Operator]):
 
@@ -32,8 +41,8 @@ class OpendalStorageProvider(StorageProvider[OpendalStorageConfig, Operator]):
             options = {
                 "endpoint": self.config.endpoint,
                 "region": self.config.region,
-                "access_key_id": self.config.access_key,
-                "secret_access_key": self.config.secret_key,
+                "access_key_id": self.config.access_key and self.config.access_key.get_secret_value(),
+                "secret_access_key": self.config.secret_key and self.config.secret_key.get_secret_value(),
                 "bucket": self.config.bucket_name,
             }
             options = {k: v for k, v in options.items() if v}
@@ -55,6 +64,9 @@ class OpendalStorageProvider(StorageProvider[OpendalStorageConfig, Operator]):
         return self.client.exists(key_or_prefix)
 
     def metadata(self, key_or_prefix: str) -> FileEntry | None:
+        if not self.exists(key_or_prefix):
+            return None
+
         metadata: Metadata = self.client.stat(key_or_prefix)
         return FileEntry(
             key=key_or_prefix,

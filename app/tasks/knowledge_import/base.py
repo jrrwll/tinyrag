@@ -12,12 +12,12 @@ from app.core.knowledge.text_process.base import DocumentModel, \
 from app.core.knowledge.text_process.keywords import extract_keywords
 from app.core.knowledge.text_process.tokens import get_word_count
 from app.core.model.api import ModelPublic
-from app.core.task.service import update_task_progress
 from app.core.vector_store.api import VectorStorePublic
-from app.core.vector_store.provider.base import VectorProviderFactory, \
-    VectorProvider
+from app.core.vector_store.provider.base import VectorProvider, \
+    VectorProviderFactory
 from app.entities.dao.knowledge import save_knowledge_document, \
     save_knowledge_document_chucks
+from app.entities.dao.task import update_task_progress
 from app.entities.knowledge import Knowledge, KnowledgeDocument, \
     KnowledgeDocumentChunk
 from app.util.collection import partition_iterable

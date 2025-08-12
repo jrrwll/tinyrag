@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import Self
 
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field, model_validator
 
-from app.config import settings
 from app.core.knowledge.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
 from app.core.model.base import LlmModelConfig
@@ -25,9 +24,6 @@ class KnowledgeCreate(BaseModel):
 
     def to_entity(self) -> Knowledge:
         entity_dict = self.model_dump(exclude_none=True)
-        if not entity_dict.get("process_rule"):
-            entity_dict["process_rule"] = settings.default_process_rule
-
         dump_and_update_dict(
             entity_dict, "process_rule", "llm_model_config",
             "embedding_model_config", "vector_store_config",
@@ -57,7 +53,8 @@ class KnowledgeUpdateConfig(BaseModel):
 
     @model_validator(mode="after")
     def _validate(self) -> Self:
-        if (not self.llm_model_config and not self.embedding_model_config
+        if (not self.process_rule and not self.llm_model_config
+                and not self.embedding_model_config
                 and not self.vector_store_config and not self.retrieval_model_config):
             raise ValueError("at least one config is required")
         return self
@@ -106,6 +103,7 @@ class SimpleKnowledgePublic(BaseModel):
 
 
 class KnowledgePublic(SimpleKnowledgePublic):
+    process_rule: ProcessRule
     llm_model_config: LlmModelConfig
     embedding_model_config: EmbeddingModelConfig
     vector_store_config: VectorStoreConfig
@@ -115,7 +113,8 @@ class KnowledgePublic(SimpleKnowledgePublic):
     def create(entity: Knowledge) -> "KnowledgePublic":
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
-            entity_dict, llm_model_config=LlmModelConfig,
+            entity_dict, process_rule=ProcessRule,
+            llm_model_config=LlmModelConfig,
             embedding_model_config=EmbeddingModelConfig,
             vector_store_config=VectorStoreConfig,
             retrieval_model_config=RetrievalModelConfig

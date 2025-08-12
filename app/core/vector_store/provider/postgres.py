@@ -41,7 +41,7 @@ class PostgresVectorProvider(
         url  =str(PostgresDsn.build(
             scheme="postgresql+psycopg2",
             username=self.config.user,
-            password=self.config.password,
+            password=self.config.password and self.config.password.get_secret_value(),
             host=self.config.host,
             port=self.config.port,
             path=f"/{self.config.database}",

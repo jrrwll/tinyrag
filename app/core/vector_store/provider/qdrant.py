@@ -2,10 +2,11 @@ import logging
 
 from langchain_core.vectorstores import VectorStore
 from langchain_qdrant import QdrantVectorStore
-from pydantic import BaseModel, PositiveInt, SecretStr
+from pydantic import BaseModel, PositiveInt, SecretStr, field_validator
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
+from app.config import settings
 from app.core.vector_store.provider.base import VectorProvider
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,14 @@ class QdrantVectorStoreConfig(BaseModel):
     api_key: SecretStr | None = None
     https: bool | None = None
     timeout: int | None = None
+
+    @field_validator("url")
+    @staticmethod
+    def _validate(v: str) -> str:
+        if v == '*':
+            if not settings.IS_TEST_ENV:
+                raise ValueError("url cannot be * in production mode")
+        return v
 
 
 class QdrantVectorProvider(

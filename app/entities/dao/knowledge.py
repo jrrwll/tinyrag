@@ -52,6 +52,16 @@ def get_knowledge(session: Session, id: int, tenant_id: int) -> Knowledge | None
     )
     return session.exec(stmt).first()
 
+
+def get_knowledges(session: Session, ids: list[int], tenant_id: int) -> list[Knowledge]:
+    stmt = select(Knowledge).where(
+        Knowledge.id.in_(ids),
+        Knowledge.tenant_id == tenant_id,
+        Knowledge.deleted == False
+    )
+    return session.exec(stmt).all()
+
+
 def save_knowledge_document(entity: KnowledgeDocument) -> KnowledgeDocument:
     with open_session() as session:
         session.add(entity)

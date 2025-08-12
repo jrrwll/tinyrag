@@ -76,6 +76,8 @@ class ProviderMetaService:
         config_type = cls.get_config_type()
         fields = parse_meta_fields(config_type)
         for field in fields:
+            if field.name not in config:
+                continue
             if field.type == FormInputType.Password:
                 config[field.name] = "**********"
 
@@ -85,7 +87,8 @@ class ProviderMetaService:
             raise ValidationError(f"provider {provider_name} is unsupported")
 
         config_type = cls.get_config_type()
-        encrypt_config_dict(config_type, config)
+        encrypt_config = encrypt_config_dict(config_type, config)
+        config.update(encrypt_config)
 
     def decrypt_config_dict(self, provider_name: str, config: dict):
         cls = self.providers.get(provider_name)
@@ -93,4 +96,5 @@ class ProviderMetaService:
             raise ValidationError(f"provider {provider_name} is unsupported")
 
         config_type = cls.get_config_type()
-        decrypt_config_dict(config_type, config)
+        decrypt_config = decrypt_config_dict(config_type, config)
+        config.update(decrypt_config)

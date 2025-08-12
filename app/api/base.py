@@ -1,5 +1,5 @@
 from app.api import CustomAPIRouter, inner
-from app.api import auth, meta, permission, user
+from app.api import auth, meta, permission, user, task
 from app.api import file, knowledge, workflow, workflow_run
 from app.api import model, storage, vector_store, workspace
 from app.config import settings
@@ -10,6 +10,7 @@ api_router.include_router(auth.router)
 api_router.include_router(user.router)
 api_router.include_router(permission.router)
 api_router.include_router(meta.router)
+api_router.include_router(task.router)
 
 # resource
 api_router.include_router(workspace.router)

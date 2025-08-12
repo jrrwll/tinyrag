@@ -14,7 +14,7 @@ from app.common.constants import APP_NAME
 from app.common.app_dispatch import request_id_var
 from app.config import settings
 from app.core.task.enums import AsyncTaskStatus
-from app.core.task.service import update_task_status
+from app.entities.dao.task import update_task_status
 
 logger = logging.getLogger(__name__)
 

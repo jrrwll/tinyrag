@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Self
 
 
 class AsyncTaskStatus(StrEnum):
@@ -10,3 +11,7 @@ class AsyncTaskStatus(StrEnum):
 
 class AsyncTaskType(StrEnum):
     KnowledgeImport = "knowledge_import"
+
+    @classmethod
+    def knowledge_tasks(cls) -> list[Self]:
+        return [cls.KnowledgeImport]

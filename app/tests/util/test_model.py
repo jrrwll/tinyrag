@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from app.core.knowledge.api import KnowledgePublic
 from app.util.model import create_model_type, extract_validation_error
@@ -52,18 +52,28 @@ def test_model():
         print(f"{field_name} annotation={field_info.annotation} {field_info}")
 
 
-
 def test_extract_validation_error():
     class Some(BaseModel):
         id: int
         name: str = Field(min_length=2, max_length=4)
         age: int = Field(gt=0, le=120)
         score: float
+        host: str
+
+        @field_validator("host")
+        @staticmethod
+        def _validate(host: str) -> str:
+            if host == '*':
+                raise ValueError("host cannot be *")
+            return host
 
     try:
         Some.model_validate({
             "name": "12345",
-            "age": -1, "score": "no"
+            "age": -1,
+            "score": "no",
+            "host": "*"
+
         })
     except ValidationError as e:
         print(e)

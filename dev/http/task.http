@@ -1,0 +1,2 @@
+GET http://{{origin}}{{api_prefix}}/task/knowledge/list?workspace_id=1
+Authorization: Bearer {{auth_token}}
