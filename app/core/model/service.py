@@ -19,14 +19,15 @@ from app.util.api import IdResult
 def create_model(session: Session, params: ModelCreate,
         current_user: User) -> IdResult:
     # validate config
-    ProviderMetaService.from_model(params.type).validate_config_dict(
-        params.provider_name, params.config)
+    meta_service = ProviderMetaService.from_model(params.type)
+    meta_service.validate_config_dict(params.provider_name, params.config)
+    meta_service.encrypt_config_dict(params.provider_name, params.config)
 
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
 
     feature_config = compute_model_feature(entity)
-    entity.feature_config = feature_config.model_dump_json()
+    entity.feature_config = feature_config.model_dump_json(exclude_none=True)
 
     session.add(entity)
     session.commit()
@@ -42,8 +43,9 @@ def update_model_config(session: Session, params: ModelUpdateConfig,
         raise BizException.create(ErrorCode.model_not_found)
 
     # validate config
-    ProviderMetaService.from_model(entity.type).validate_config_dict(
-        entity.provider_name, params.config)
+    meta_service = ProviderMetaService.from_model(entity.type)
+    meta_service.validate_config_dict(entity.provider_name, params.config)
+    meta_service.encrypt_config_dict(entity.provider_name, params.config)
 
     params.update_entity(entity)
 

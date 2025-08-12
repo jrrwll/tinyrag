@@ -20,6 +20,7 @@ create table model (
     updated_at     timestamp    not null default current_timestamp on update current_timestamp,
     deleted        tinyint      not null default 0,
     tenant_id      bigint       not null,
+    name                   varchar(100)  not null,
     provider_name  varchar(255) not null,
     model_name     varchar(255) not null,
     type           varchar(50)  not null,

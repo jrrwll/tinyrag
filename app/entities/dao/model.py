@@ -1,5 +1,4 @@
 # ruff: noqa: E712
-from typing import Sequence
 
 from sqlmodel import Session, func, select
 
@@ -9,7 +8,7 @@ from app.entities.model import Model, TenantDefaultModel
 
 def page_and_count_models(
         session: Session, page_no: int, page_size: int, tenant_id: int
-) -> tuple[Sequence[Model], int]:
+) -> tuple[list[dict], int]:
     conditions = [
         Model.tenant_id == tenant_id,
         Model.deleted == False,
@@ -24,13 +23,23 @@ def page_and_count_models(
     limit = page_size
 
     page_statement = (
-        select(Model)
+        select( # type: ignore[call-overload]
+            Model.id,
+            Model.created_at,
+            Model.updated_at,
+            Model.name,
+            Model.type,
+            Model.model_name,
+            Model.provider_name,
+            Model.enable,
+        )
+        .select_from(Model)
         .where(*conditions)
         .offset(offset)
         .limit(limit)
     )
-    entities = session.exec(page_statement).all()
-    return entities, count
+    entities = session.exec(page_statement).mappings().all()
+    return [dict(i) for i in entities], count
 
 
 def get_model(session: Session, id: int, tenant_id: int) -> Model | None:

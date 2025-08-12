@@ -16,8 +16,9 @@ def create_vector_store(
         session: Session, params: VectorStoreCreate,
         current_user: User) -> IdResult:
     # validate config
-    ProviderMetaService.from_vector_store().validate_config_dict(
-        params.type, params.config)
+    meta_service = ProviderMetaService.from_vector_store()
+    meta_service.validate_config_dict(params.type, params.config)
+    meta_service.encrypt_config_dict(params.type, params.config)
 
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
@@ -38,8 +39,9 @@ def update_vector_store_config(session: Session,
         raise BizException.create(ErrorCode.vector_store_not_found)
 
     # validate config
-    ProviderMetaService.from_vector_store().validate_config_dict(
-        entity.type, params.config)
+    meta_service = ProviderMetaService.from_vector_store()
+    meta_service.validate_config_dict(entity.type, params.config)
+    meta_service.encrypt_config_dict(entity.type, params.config)
 
     params.update_entity(entity)
 

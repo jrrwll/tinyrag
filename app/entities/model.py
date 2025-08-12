@@ -6,10 +6,11 @@ from app.entities.base import BizTableBase, enum_field_info
 
 class Model(BizTableBase, table=True):
     tenant_id: int
+    name: str
     type: ModelType = enum_field_info(ModelType)
-    enable: bool = True
     provider_name: str = Field(max_length=100)
     model_name: str = Field(max_length=100)
+    enable: bool = True
     config: str
     feature_config: str
 

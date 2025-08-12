@@ -6,6 +6,7 @@ from app.core.meta.api import MetaBaseEntity
 from app.core.meta.base import MetaConfigProtocol
 from app.core.meta.enums import FormInputType
 from app.core.meta.fields import parse_meta_fields
+from app.core.meta.provider import decrypt_config_dict, encrypt_config_dict
 from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.core.model.provider import ModelProviderFactory
 from app.core.storage.enums import StorageType
@@ -77,3 +78,19 @@ class ProviderMetaService:
         for field in fields:
             if field.type == FormInputType.Password:
                 config[field.name] = "**********"
+
+    def encrypt_config_dict(self, provider_name: str, config: dict):
+        cls = self.providers.get(provider_name)
+        if not cls:
+            raise ValidationError(f"provider {provider_name} is unsupported")
+
+        config_type = cls.get_config_type()
+        encrypt_config_dict(config_type, config)
+
+    def decrypt_config_dict(self, provider_name: str, config: dict):
+        cls = self.providers.get(provider_name)
+        if not cls:
+            raise ValidationError(f"provider {provider_name} is unsupported")
+
+        config_type = cls.get_config_type()
+        decrypt_config_dict(config_type, config)

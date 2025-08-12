@@ -14,8 +14,9 @@ def create_storage(
         session: Session, params: StorageCreate,
         current_user: User) -> IdResult:
     # validate config
-    ProviderMetaService.from_storage().validate_config_dict(
-        params.type, params.config)
+    meta_service = ProviderMetaService.from_storage()
+    meta_service.validate_config_dict(params.type, params.config)
+    meta_service.encrypt_config_dict(params.type, params.config)
 
     entity = params.to_entity()
     entity.tenant_id = current_user.tenant_id
@@ -35,8 +36,9 @@ def update_storage_config(session: Session, params: StorageUpdateConfig,
         raise BizException.create(ErrorCode.storage_not_found)
 
     # validate config
-    ProviderMetaService.from_storage().validate_config_dict(
-        entity.type, params.config)
+    meta_service = ProviderMetaService.from_storage()
+    meta_service.validate_config_dict(entity.type, params.config)
+    meta_service.encrypt_config_dict(entity.type, params.config)
 
     params.update_entity(entity)
 

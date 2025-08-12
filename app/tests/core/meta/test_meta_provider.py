@@ -1,6 +1,7 @@
-from app.core.meta.provider import MetaProvider, encrypt_config_dict, decrypt_config_dict
-from app.core.model.llm.openai import OpenaiModelConfig
 from pydantic import SecretStr
+
+from app.core.meta.provider import decrypt_config_dict, encrypt_config_dict
+from app.core.model.llm.openai import OpenaiModelConfig
 
 
 def test_crypt_config_dict():

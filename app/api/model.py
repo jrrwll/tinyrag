@@ -11,7 +11,7 @@ from app.core.meta.service import ProviderMetaService
 from app.core.model.api import (
     ModelCreate,
     ModelPublic,
-    ModelTestRun,
+    ModelSimplePublic, ModelTestRun,
     ModelTestRunPublic,
     ModelUpdate, ModelUpdateConfig, SetupDefaultModel,
 )
@@ -27,7 +27,7 @@ from app.util.api import ApiResult, IdResult, PageResult
 router = CustomAPIRouter(prefix="/model", tags=["model"])
 
 
-@router.get("/list", response_model=ApiResult[PageResult[ModelPublic]])
+@router.get("/list", response_model=ApiResult[PageResult[ModelSimplePublic]])
 def _list(
         session: SessionDep,
         current_user: CurrentUser,
@@ -36,11 +36,11 @@ def _list(
 ) -> Any:
     entities, count = page_and_count_models(
         session, page_no, page_size, current_user.tenant_id)
-    res = PageResult[ModelPublic](
+    res = PageResult[ModelSimplePublic](
         page_no=page_no,
         page_size=page_size,
         total=count,
-        items=[ModelPublic.create(entity) for entity in entities],
+        items=[ModelSimplePublic(**entity) for entity in entities],
     )
     return ApiResult.create(res)
 

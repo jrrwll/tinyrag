@@ -14,15 +14,19 @@ from app.util.codec import md5
 from app.util.model import dump_and_update_dict, load_and_update_dict
 
 
-class ModelPublic(BaseModel):
+class ModelSimplePublic(BaseModel):
     id: int
     created_at: datetime
     updated_at: datetime
 
+    name: str
     type: ModelType
-    enable: bool
-    provider_name: str
     model_name: str
+    provider_name: str
+    enable: bool
+
+
+class ModelPublic(ModelSimplePublic):
     config: dict  # type: ignore[arg-type]
     feature_config: ModelFeatureConfig
 
@@ -31,7 +35,7 @@ class ModelPublic(BaseModel):
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(entity_dict, "config",
                              feature_config=ModelFeatureConfig)
-        return ModelPublic(**entity_dict)
+        return ModelPublic.model_construct(**entity_dict)
 
     @staticmethod
     @cache
