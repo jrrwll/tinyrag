@@ -58,3 +58,15 @@ create table knowledge_document_chunk (
     keywords     text,
     index idx_tenant_id_knowledge_id_document_id (tenant_id, knowledge_id, document_id)
 ) default charset utf8mb4;
+
+
+create table knowledge_conversation (
+    id           varchar(100) not null primary key,
+    created_at   timestamp    not null default current_timestamp,
+    updated_at   timestamp    not null default current_timestamp on update current_timestamp,
+    deleted                tinyint      not null default 0,
+    tenant_id    bigint       not null,
+    workspace_id bigint       not null,
+    knowledge_id bigint       not null,
+    index idx_tenant_id_knowledge_id (tenant_id, knowledge_id)
+) default charset utf8mb4;

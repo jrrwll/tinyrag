@@ -5,7 +5,7 @@ from app.core.file.file_type import detect_file_type
 from app.core.file.upload import get_file_path
 from app.core.knowledge.api import DocumentPreviewChunk, \
     DocumentPreviewChunkPublic
-from app.core.knowledge.text_process.base import get_text_processor
+from app.core.knowledge.text.process import TextProcessor
 from app.core.storage.default_storage import get_default_storage
 from app.core.storage.file import download_storage_file
 from app.core.storage.provider.base import StorageProviderFactory
@@ -19,6 +19,7 @@ def preview_file_chunk(
     file_id = params.file_id
     storage_id = params.storage_id
     storage_file_path = params.storage_file_path
+    process_rule = params.process_rule
 
     if file_id:
         with open_session() as session:
@@ -50,12 +51,15 @@ def preview_file_chunk(
     if not file_type:
         raise BizException.create(ErrorCode.file_type_not_supported)
     if not file_type.is_document():
-        raise BizException.create(ErrorCode.file_not_a_document, file_type=file_type)
+        raise BizException.create(
+            ErrorCode.file_not_a_document, file_type=file_type)
 
-    text_processor = get_text_processor(params.process_rule)
-    docs = text_processor.load_documents(file_path, file_type)
+    docs = TextProcessor.load_documents(file_path, file_type)
+    sample_docs = take_limit(docs, 1)
 
-    all_splits = text_processor.split_documents(take_limit(docs, 1))
+    text_processor = TextProcessor.get_processor(process_rule)
+    all_splits = text_processor.split_documents(sample_docs)
 
-    contents = [all_split.content for all_split in all_splits]
+    sample_splits = take_limit(all_splits, 100)
+    contents = [all_split.content for all_split in sample_splits]
     return DocumentPreviewChunkPublic(content=contents)

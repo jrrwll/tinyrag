@@ -10,8 +10,8 @@ from rq import Queue
 from rq.job import Job
 from rq.serializers import JSONSerializer
 
-from app.common.constants import APP_NAME
 from app.common.app_dispatch import request_id_var
+from app.common.constants import APP_NAME
 from app.config import settings
 from app.core.task.enums import AsyncTaskStatus
 from app.entities.dao.task import update_task_status
@@ -105,12 +105,17 @@ class RQManager:
                            serializer=JSONSerializer)
 
 
-def send_rq_task(job_id: str, func: Callable[..., Any], *args, **kwargs):
-    RQManager().submit_task(func, *args, **kwargs, job_id=job_id)
+def send_rq_task(
+        func: Callable[..., Any], func_args: list[Any],
+        job_id: str, job_timeout: int = None):
+    RQManager().submit_task(func, *func_args, job_id=job_id,
+                            job_timeout=job_timeout)
 
 
-def send_rq_scheduled_task(job_id: str, scheduled_time: datetime,
-        func: Callable[..., Any], *args, **kwargs):
+def send_rq_scheduled_task(
+        func: Callable[..., Any], func_args: list[Any],
+        scheduled_time: datetime,
+        job_id: str, job_timeout: int = None):
     RQManager().schedule_task(
-        scheduled_time, func, *args, **kwargs,
-        job_id=job_id)
+        scheduled_time, func, *func_args,
+        job_id=job_id, job_timeout=job_timeout)

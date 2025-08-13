@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
@@ -14,9 +16,15 @@ def start_conversation(session: Session, params: KnowledgeStartConversation, cur
     if not knowledge_entity:
         raise BizException.create(ErrorCode.knowledge_not_found)
 
-    entity = KnowledgeConversation(knowledge_id=knowledge_id)
+    id = str(uuid4())
+    entity = KnowledgeConversation(
+        id=id,
+        knowledge_id=knowledge_id,
+        tenant_id=current_user.tenant_id,
+        workspace_id=knowledge_entity.workspace_id
+    )
+
     session.add(entity)
     session.commit()
-    session.refresh(entity)
 
-    return IdResult(id=entity.id)
+    return IdResult(id=id)

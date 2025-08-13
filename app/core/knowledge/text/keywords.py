@@ -3,7 +3,7 @@ import re
 import jieba
 import jieba.analyse
 
-from app.core.knowledge.text_process.tokens import _stopwords
+from app.core.knowledge.text.tokens import _stopwords
 
 
 def extract_keywords(text: str, top_k: int = 10) -> list[str]:

@@ -49,7 +49,8 @@ def send_knowledge_import_task(
         session.commit()
         session.refresh(entity)
 
-    send_rq_task(task_id, knowledge_import_task, task_id, task_params_json)
+    send_rq_task(knowledge_import_task, func_args=[task_id, task_params_json],
+                 job_id=task_id, job_timeout=3600 * 2) # 2h
     return AsyncTaskPublic.create(entity)
 
 

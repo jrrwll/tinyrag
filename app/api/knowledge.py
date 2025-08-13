@@ -54,14 +54,6 @@ def _get(session: SessionDep, id: str) -> Any:
     return ApiResult.create(KnowledgePublic.create(entity))
 
 
-@router.post("/preview-chunk",
-             response_model=ApiResult[DocumentPreviewChunkPublic],
-             dependencies=[LogDep])
-def _preview_chunk(params: DocumentPreviewChunk, current_user: CurrentUser) -> Any:
-    res = preview_file_chunk(params, current_user.tenant_id)
-    return ApiResult.create(res)
-
-
 @router.post("", response_model=ApiResult[IdResult],
              dependencies=[LogDep])
 def _create(session: SessionDep, params: KnowledgeCreate,
@@ -84,6 +76,14 @@ def _update_config(session: SessionDep, params: KnowledgeUpdateConfig,
     return ApiResult.create()
 
 
+@router.post("/preview-chunk",
+             response_model=ApiResult[DocumentPreviewChunkPublic],
+             dependencies=[LogDep])
+def _preview_chunk(params: DocumentPreviewChunk, current_user: CurrentUser) -> Any:
+    res = preview_file_chunk(params, current_user.tenant_id)
+    return ApiResult.create(res)
+
+
 @router.post("/import", response_model=ApiResult[AsyncTaskPublic],
              dependencies=[LogDep])
 def _import_document(session: SessionDep, params: KnowledgeImport,
@@ -100,7 +100,7 @@ def _conversation(session: SessionDep, params: KnowledgeStartConversation,
 
 
 @router.post("/chat", response_model=ApiResult[KnowledgeChatPublic])
-def chat(session: SessionDep, params: KnowledgeChat,
+def _chat(session: SessionDep, params: KnowledgeChat,
         current_user: CurrentUser):
     res = chat_knowledge(session, params, current_user)
     return ApiResult.create(res)
@@ -108,7 +108,7 @@ def chat(session: SessionDep, params: KnowledgeChat,
 
 @router.post("/stream-chat",
              response_model=ApiResult[KnowledgeStreamChatPublic])
-def stream_chat(session: SessionDep, params: KnowledgeChat,
+def _stream_chat(session: SessionDep, params: KnowledgeChat,
         current_user: CurrentUser):
     res = stream_chat_knowledge(session, params, current_user)
     return ApiResult.create(res)

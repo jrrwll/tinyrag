@@ -35,7 +35,7 @@ def import_documents(session: Session, params: KnowledgeImport,
 
     process_rule = params.process_rule
     if not process_rule:
-        process_rule = settings.default_process_rule
+        process_rule = settings.DEFAULT_PROCESS_RULE
 
     task_params = ImportTaskParams(
         tenant_id=tenant_id, workspace_id=workspace_id,

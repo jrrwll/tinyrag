@@ -1,11 +1,22 @@
 from sqlmodel import Session, or_, select
 
 from app.common.error_code import BizException, ErrorCode
+from app.core.model.base import LlmModelConfig
 from app.core.knowledge.base import EmbeddingModelConfig
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.entities.dao.model import get_tenant_default_model, get_model
 from app.entities.model import Model, TenantDefaultModel
+
+
+def get_llm_model_from_config(
+        session: Session,
+        llm_model_config: LlmModelConfig, tenant_id: int) -> ModelPublic:
+    model_id = llm_model_config.model_id
+    model = get_model(session, model_id, tenant_id)
+    if not model:
+        raise BizException.create(ErrorCode.model_id_not_found, id=model_id)
+    return ModelPublic.create(model)
 
 
 def get_embedding_model_from_config(
@@ -16,7 +27,7 @@ def get_embedding_model_from_config(
     model_id = embedding_model_config.model_id
     model = get_model(session, model_id, tenant_id)
     if not model:
-        raise BizException.create(ErrorCode.model_not_found, model_id)
+        raise BizException.create(ErrorCode.model_id_not_found, id=model_id)
     return ModelPublic.create(model)
 
 

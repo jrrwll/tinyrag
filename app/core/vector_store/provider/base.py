@@ -6,7 +6,7 @@ from cachetools import TTLCache
 from langchain_core.vectorstores import VectorStore
 from pydantic import BaseModel
 
-from app.core.knowledge.text_process.base import DocumentModel
+from app.core.knowledge.text.process import DocumentModel
 from app.core.meta.provider import MetaProvider
 from app.core.model.api import ModelPublic
 from app.core.model.embedding.base import EmbeddingProvider, \

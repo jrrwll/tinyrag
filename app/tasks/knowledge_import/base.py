@@ -7,10 +7,10 @@ from pydantic import BaseModel
 
 from app.core.knowledge.api import KnowledgePublic
 from app.core.knowledge.base import ProcessRule
-from app.core.knowledge.text_process.base import DocumentModel, \
-    get_text_processor
-from app.core.knowledge.text_process.keywords import extract_keywords
-from app.core.knowledge.text_process.tokens import get_word_count
+from app.core.knowledge.text.base import DocumentModel
+from app.core.knowledge.text.keywords import extract_keywords
+from app.core.knowledge.text.process import TextProcessor
+from app.core.knowledge.text.tokens import get_word_count
 from app.core.model.api import ModelPublic
 from app.core.vector_store.api import VectorStorePublic
 from app.core.vector_store.provider.base import VectorProvider, \
@@ -39,7 +39,7 @@ def import_from_files(
         knowledge: KnowledgePublic, process_rule: ProcessRule,
         model: ModelPublic, vector_store: VectorStorePublic,
         task_id: str, tenant_id: int, workspace_id: int):
-    text_processor = get_text_processor(process_rule)
+    text_processor = TextProcessor.get_processor(process_rule)
     process_rule_str = process_rule.model_dump_json()
 
     collection_name = Knowledge.get_collection_name(knowledge.id)
@@ -52,7 +52,7 @@ def import_from_files(
         if not params:
             continue
 
-        docs = text_processor.load_documents(params.file_path, params.file_type)
+        docs = TextProcessor.load_documents(params.file_path, params.file_type)
 
         position = 0
         for doc in docs:

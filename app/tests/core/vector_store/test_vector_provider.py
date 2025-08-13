@@ -3,7 +3,7 @@ from sqlmodel import select
 from app.common.deps import open_session
 from app.config import settings
 from app.core.file.enums import FileType
-from app.core.knowledge.text_process.base import get_text_processor
+from app.core.knowledge.text.process import TextProcessor
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
 from app.core.vector_store.api import VectorStorePublic
@@ -53,11 +53,10 @@ def run_add_documents(vector_store_type: VectorStoreType):
     if not local_path:
         return
 
-    text_processor = get_text_processor(settings.default_process_rule)
-
-    docs = list(text_processor.load_documents(local_path, FileType.TXT))
+    docs = list(TextProcessor.load_documents(local_path, FileType.TXT))
     print(f"\ndocs len {len(docs)}")
 
+    text_processor = TextProcessor.get_processor(settings.DEFAULT_PROCESS_RULE)
     documents = list(text_processor.split_documents(docs))
 
     vector_store, model = _get_vector_store_and_model(vector_store_type)
@@ -82,6 +81,7 @@ def run_search(vector_store_type: VectorStoreType):
     for d in matched_dcos:
         print(f"{d}")
 
+
 def _get_vector_store_and_model(
         vector_store_type: VectorStoreType
 ) -> tuple[VectorStorePublic, ModelPublic]:
@@ -93,12 +93,15 @@ def _get_vector_store_and_model(
         if not model:
             raise RuntimeError("No embedding model")
 
-        stmt = select(VectorStore).where(VectorStore.type == vector_store_type).limit(1)
+        stmt = select(VectorStore).where(
+            VectorStore.type == vector_store_type).limit(1)
         vector_store_entity = session.exec(stmt).first()
         if not vector_store_entity:
-            raise ValueError(f"Vector store {vector_store_type} not found in db")
+            raise ValueError(
+                f"Vector store {vector_store_type} not found in db")
         vector_store = VectorStorePublic.create(vector_store_entity)
 
-        print(f"\nvector_store={vector_store.model_dump_json(exclude_defaults=True)}")
+        print(
+            f"\nvector_store={vector_store.model_dump_json(exclude_defaults=True)}")
         print(f"\nmodel={model.model_dump_json(exclude_defaults=True)}")
         return vector_store, model

@@ -2,14 +2,9 @@ from typing import Self
 
 from pydantic import BaseModel, model_validator
 
+from app.core.knowledge.text.base import TextSplitterRule
 from app.core.model.builtin_models import is_valid_model_name
 from app.core.model.enums import ModelType
-
-
-class TextSplitterRule(BaseModel):
-    chunk_overlap: int | None = None
-    chunk_size: int | None = None
-    separators: list[str] | None = None
 
 
 class ProcessRule(BaseModel):

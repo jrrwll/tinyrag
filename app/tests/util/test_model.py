@@ -1,9 +1,13 @@
-from typing import Protocol
+from typing import Protocol, Self
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, ValidationError, \
+    model_validator, field_validator
+from pydantic_core import InitErrorDetails
+from pydantic_core._pydantic_core import PydanticCustomError
 
 from app.core.knowledge.api import KnowledgePublic
-from app.util.model import create_model_type, extract_validation_error
+from app.util.model import create_model_type, extract_validation_error, \
+    new_validation_error
 
 
 def test_create_dynamic_model():
@@ -62,7 +66,7 @@ def test_extract_validation_error():
 
         @field_validator("host")
         @staticmethod
-        def _validate(host: str) -> str:
+        def _validate_host(host: str) -> str:
             if host == '*':
                 raise ValueError("host cannot be *")
             return host
@@ -83,3 +87,30 @@ def test_extract_validation_error():
 
         res = extract_validation_error(e)
         print(f"\nres:\n{res}")
+
+        err = new_validation_error(Box(name="x"), ["a", "b"])
+        print(f"\nerr:\n{err}")
+
+
+    class Awesome(BaseModel):
+        id: int
+
+        @model_validator(mode="after")
+        def _validate(self) -> Self:
+            if self.id == 1:
+                raise PydanticCustomError(
+                    "missing", "Field required",
+                )
+            elif self.id == 2:
+                raise new_validation_error(self, ["a", "b"])
+            return self
+
+    try:
+        Awesome.model_validate({"id": 1})
+    except ValidationError as e:
+        print(f"\nAwesome1:\n{e}")
+
+    try:
+        Awesome.model_validate({"id": 2})
+    except ValidationError as e:
+        print(f"\nAwesome2:\n{e}")

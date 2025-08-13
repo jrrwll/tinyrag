@@ -1,7 +1,7 @@
 import this
 
-from app.core.knowledge.text_process.tokens import get_token_count, get_word_count
-from app.core.knowledge.text_process.keywords import extract_keywords
+from app.core.knowledge.text.tokens import get_token_count, get_word_count
+from app.core.knowledge.text.keywords import extract_keywords
 from app.tests import print_time
 
 

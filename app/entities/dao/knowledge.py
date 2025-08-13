@@ -2,7 +2,8 @@
 from sqlmodel import Session, and_, func, select
 
 from app.common.deps import open_session
-from app.entities.knowledge import Knowledge, KnowledgeDocument, \
+from app.entities.knowledge import Knowledge, KnowledgeConversation, \
+    KnowledgeDocument, \
     KnowledgeDocumentChunk
 
 
@@ -75,3 +76,14 @@ def save_knowledge_document_chucks(
     with open_session() as session:
         session.add_all(entities)
         session.commit()
+
+
+def get_knowledge_conversation(
+        session: Session, id: str, tenant_id: int
+) -> KnowledgeConversation | None:
+    stmt = select(KnowledgeConversation).where(
+        KnowledgeConversation.id == id,
+        KnowledgeConversation.tenant_id == tenant_id,
+        KnowledgeConversation.deleted == False
+    )
+    return session.exec(stmt).first()

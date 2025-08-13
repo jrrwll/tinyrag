@@ -100,7 +100,7 @@ def test_scheduled_task() -> Any:
 
     scheduled_time = datetime.now() + timedelta(seconds=5)
     logger.info(f"test scheduled task, start send: {job_id} {scheduled_time}")
-    send_rq_scheduled_task(job_id, scheduled_time, test_write_file)
+    send_rq_scheduled_task(test_write_file, scheduled_time, job_id)
     logger.info(f"test scheduled task, finish sent")
     return job_id
 

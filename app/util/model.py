@@ -3,6 +3,7 @@ from typing import Any, Dict, Literal, Tuple, Type
 
 from pydantic import BaseModel, Field, ValidationError, create_model
 from pydantic.fields import FieldInfo
+from pydantic_core import ErrorDetails
 
 
 def create_model_type(  # type: ignore[no-untyped-def]
@@ -84,6 +85,26 @@ def extract_validation_error(
         "missing_fields": missing_fields,
         "invalid_fields": invalid_fields,
     }
+
+
+def new_validation_error(instance: BaseModel,
+        missing_fields: list[str] | None = None,
+        invalid_fields: list[str] | None = None) -> ValidationError:
+    line_errors = []
+    if missing_fields:
+        line_errors.append(ErrorDetails(
+            type="missing", loc=tuple(missing_fields),
+            input=instance, msg="Field required"))
+
+    if invalid_fields:
+        line_errors.append(ErrorDetails(
+            type="value_error", loc=tuple(invalid_fields),
+            input=instance, msg="Value error"))
+
+    return ValidationError.from_exception_data(
+        title=type(instance).__name__,
+        line_errors=line_errors
+    )
 
 
 def get_extra_schema(model_cls: type[BaseModel]) -> dict[str, dict[str, Any]]:

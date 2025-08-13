@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlmodel import Field
 
 from app.core.knowledge.enums import DocumentSourceType
@@ -52,7 +54,11 @@ class KnowledgeDocumentChunk(LogTableBase, table=True):
     keywords: str | None = None
 
 
-class KnowledgeConversation(BizTableBase, table=True):
+class KnowledgeConversation(LogTableBase, table=True):
+    id: str = Field(primary_key=True)
+    updated_at: datetime
+    deleted: bool = False
+
     tenant_id: int
     workspace_id: int
     knowledge_id: int
