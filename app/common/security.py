@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
 
 import jwt
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import ValidationError
-from pydantic import SecretStr, BeforeValidator, PlainSerializer
 
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings

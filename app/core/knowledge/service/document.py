@@ -2,19 +2,20 @@ from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
-from app.core.knowledge.api import KnowledgeImport, \
+from app.core.knowledge.api import KnowledgeDocumentPublic, KnowledgeImport, \
     KnowledgePublic
 from app.core.storage.default_storage import get_default_storage
 from app.core.storage.file import list_storage_files
 from app.core.storage.provider.base import StorageProviderFactory
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.file import get_files
-from app.entities.dao.knowledge import get_knowledge
+from app.entities.dao.knowledge import get_knowledge, page_and_count_documents
 from app.entities.repo.model import get_embedding_model_from_config
 from app.entities.repo.vector_store import get_vector_store_from_config
 from app.entities.user import User
 from app.tasks.knowledge_import import ImportTaskParams, \
     send_knowledge_import_task
+from app.util.api import PageResult
 
 
 def import_documents(session: Session, params: KnowledgeImport,
@@ -35,7 +36,7 @@ def import_documents(session: Session, params: KnowledgeImport,
 
     process_rule = params.process_rule
     if not process_rule:
-        process_rule = settings.DEFAULT_PROCESS_RULE
+        process_rule = knowledge.process_rule
 
     task_params = ImportTaskParams(
         tenant_id=tenant_id, workspace_id=workspace_id,
@@ -65,3 +66,22 @@ def import_documents(session: Session, params: KnowledgeImport,
 
     # import task
     return send_knowledge_import_task(task_params)
+
+
+def list_documents(
+        session: Session, knowledge_id: int,
+        page_no: int, page_size: int,
+        current_user: User
+) -> PageResult[KnowledgeDocumentPublic]:
+    tenant_id = current_user.tenant_id
+
+    entities, count = page_and_count_documents(
+        session, page_no, page_size,
+        knowledge_id, tenant_id)
+
+    return PageResult[KnowledgeDocumentPublic](
+        page_no=page_no,
+        page_size=page_size,
+        total=count,
+        items=[KnowledgeDocumentPublic.create(entity) for entity in entities],
+    )

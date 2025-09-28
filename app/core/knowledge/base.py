@@ -15,8 +15,6 @@ class EmbeddingModelConfig(BaseModel):
     model_id: int | None = None
     model_name: str | None = None # sentence-transformers
 
-    top_k: int = 4
-
     @model_validator(mode="after")
     def _validate(self) -> Self:
         if not self.model_id and not self.model_name:
@@ -31,5 +29,5 @@ class EmbeddingModelConfig(BaseModel):
 
 
 class RetrievalModelConfig(BaseModel):
-    top_k: int
-    reranking_model_id: int
+    top_k: int | None = None
+    reranking_model_id: int | None = None

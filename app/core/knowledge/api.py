@@ -5,9 +5,10 @@ from pydantic import BaseModel, Field, model_validator
 
 from app.core.knowledge.base import EmbeddingModelConfig, ProcessRule, \
     RetrievalModelConfig
+from app.core.knowledge.enums import DocumentSourceType
 from app.core.model.base import LlmModelConfig
 from app.core.vector_store.base import VectorStoreConfig
-from app.entities.knowledge import Knowledge
+from app.entities.knowledge import Knowledge, KnowledgeDocument
 from app.util.model import dump_and_update_dict, load_and_update_dict
 
 
@@ -109,8 +110,8 @@ class KnowledgePublic(SimpleKnowledgePublic):
     vector_store_config: VectorStoreConfig
     retrieval_model_config: RetrievalModelConfig | None = None
 
-    @staticmethod
-    def create(entity: Knowledge) -> "KnowledgePublic":
+    @classmethod
+    def create(cls, entity: Knowledge) -> Self:
         entity_dict = entity.model_dump(exclude_none=True)
         load_and_update_dict(
             entity_dict, process_rule=ProcessRule,
@@ -119,7 +120,7 @@ class KnowledgePublic(SimpleKnowledgePublic):
             vector_store_config=VectorStoreConfig,
             retrieval_model_config=RetrievalModelConfig
         )
-        return KnowledgePublic(**entity_dict)
+        return cls(**entity_dict)
 
 
 class DocumentPreviewChunk(BaseModel):
@@ -139,6 +140,21 @@ class DocumentPreviewChunk(BaseModel):
 
 class DocumentPreviewChunkPublic(BaseModel):
     content: list[str]
+
+
+class KnowledgeDocumentPublic(BaseModel):
+    process_rule: str
+    position: int
+    word_count: int = 0
+
+    source_type: DocumentSourceType
+    source_info: str | None = None
+    indexing: bool = False
+
+    @classmethod
+    def create(cls, entity: KnowledgeDocument) -> Self:
+        entity_dict = entity.model_dump(exclude_none=True)
+        return cls(**entity_dict)
 
 
 class KnowledgeStartConversation(BaseModel):

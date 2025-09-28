@@ -104,6 +104,10 @@ Content-Type: application/json
 > {% client.global.set("task_id", response.body.data.id); %}
 
 ###
+GET http://{{origin}}{{api_prefix}}/knowledge/document/list?knowledge_id=1
+Authorization: Bearer {{auth_token}}
+
+###
 POST http://{{origin}}{{api_prefix}}/knowledge/conversation
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
@@ -121,5 +125,15 @@ Content-Type: application/json
 
 {
   "conversation_id": "{{conversation_id}}",
-  "query": "请给我三首有关杀人的唐诗"
+  "query": "请给我三首关于江山的唐诗，以json list格式返回"
+}
+
+###
+POST http://{{origin}}{{api_prefix}}/knowledge/stream-chat
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "conversation_id": "{{conversation_id}}",
+  "query": "请给我三首关于江山的唐诗，以json list格式返回"
 }

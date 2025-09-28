@@ -70,6 +70,10 @@ class VectorProvider[Cfg: BaseModel, C](MetaProvider[Cfg], ABC):
 
         self.vector_store.add_texts(ids=ids, texts=texts, metadatas=metadatas)
 
+    def delete_by_ids(self, ids: list[str]) -> bool:
+        res = self.vector_store.delete(ids)
+        return res is True
+
     def similarity_search(self, query: str, k: int = 4) -> list[DocumentModel]:
         docs = self.vector_store.similarity_search(query, k)
         return [DocumentModel.create(doc) for doc in docs]

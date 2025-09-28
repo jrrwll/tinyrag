@@ -12,12 +12,24 @@ from app.core.model.base import LLMPrompt
 from app.core.model.base import StructuredOutput
 from app.core.model.enums import PromptRoleType
 from app.core.model.llm.base import get_llm_provider
-from app.core.node.base import LLMConfig
-from app.core.node.runner.base import NodeRunner
-from app.core.variable.base import Variable
+from app.core.node.base import ExceptionConfig, ModelParams
+from app.core.node.runner2.base import NodeRunner
+from app.core.variable.base import ContextVariable, Variable
 from app.core.workflow.enums import NodeType
 from app.entities.dao.model import get_model_required
 from app.util.model import create_model_type
+
+
+class LLMConfig(BaseModel):
+    model_id: int
+    model_params: ModelParams | None = None
+    user_prompt: str
+    advanced_prompts: list[LLMPrompt] | None = None
+    structured_output: list[StructuredOutput] | None = None
+    context_variables: list[ContextVariable] | None = None
+    output_variable: str | None = None
+
+    exception_config: ExceptionConfig | None = None
 
 
 class LLMNodeRunner(NodeRunner):

@@ -59,4 +59,5 @@ class ChromaVectorProvider(
             client=self.client,
         )
 
-        # self.vector_store._client.get_or_create_collection(self.collection_name)
+    def create_collection_if_absent(self):
+        self.client.get_or_create_collection(self.collection_name)

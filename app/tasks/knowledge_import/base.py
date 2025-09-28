@@ -112,5 +112,5 @@ def to_document_chuck(index: int, doc: DocumentModel,
         position=index,
         content=doc.content,
         word_count=word_count,
-        keywords=json.dumps(keywords),
+        keywords=json.dumps(keywords, ensure_ascii=False),
     )

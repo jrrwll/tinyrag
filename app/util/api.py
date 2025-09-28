@@ -1,4 +1,5 @@
-from typing import Optional, Union
+import json
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, JsonValue
 
@@ -31,3 +32,9 @@ class PageResult[T: BaseModel | JsonValue](BaseModel):
     page_size: int
     total: int
     items: list[T]
+
+
+async def sse_format(data: Any) -> str:
+    if isinstance(data, BaseModel):
+        data = data.model_dump()
+    return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"

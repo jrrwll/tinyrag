@@ -41,7 +41,12 @@ def chat_knowledge(
     vector_provider = VectorProviderFactory.create_vector(
         collection_name, vector_store, embedding_model)
 
-    docs = vector_provider.similarity_search(query)
+    search_kwargs = {}
+    retrieval_model_config = knowledge.retrieval_model_config
+    if retrieval_model_config:
+        if retrieval_model_config.top_k is not None:
+            search_kwargs["k"] = retrieval_model_config.top_k
+    docs = vector_provider.similarity_search(query, **search_kwargs)
 
     llm_model = get_llm_model_from_config(session, knowledge.llm_model_config, tenant_id)
     llm_provider = get_llm_provider(llm_model)

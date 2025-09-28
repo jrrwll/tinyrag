@@ -1,6 +1,7 @@
+import asyncio
 import logging
 from abc import ABC
-from typing import Any, MutableMapping, Type
+from typing import Any, Iterable, AsyncIterable, MutableMapping, Type
 
 from cachetools import TTLCache
 from langchain_core.language_models import BaseChatModel
@@ -8,11 +9,12 @@ from langchain_core.messages import BaseMessage
 from pydantic import BaseModel
 
 from app.config import settings
-from app.core.model.api import ModelPublic
+from app.core.model.api import ModelChatResult, ModelPublic
 from app.core.model.base import ModelParams
 from app.core.model.enums import ModelType
 from app.core.model.provider import ModelProvider, ModelProviderFactory
 from app.core.variable.base import Variable
+from app.util.api import sse_format
 from app.util.langchain.callbacks import CompleteResponseHandler
 
 logger = logging.getLogger(__name__)
@@ -41,6 +43,25 @@ class LLMProvider[T: BaseModelConfig](ModelProvider[T, BaseChatModel], ABC):
         logger.info(f"Test run with prompt: {prompt}")
         msg = self.model.invoke(prompt)
         return msg.model_dump()
+
+    async def arun(self,
+            prompt: str | None = None
+    ) -> AsyncIterable[str]:  # type: ignore[type-arg]
+        if not prompt:
+            prompt = settings.DEFAULT_TEST_PROMPT
+
+        logger.info(f"Test run with prompt: {prompt}")
+        async for chunk in self.model.astream(prompt):
+            if not chunk.content:
+                continue
+            yield await sse_format(ModelChatResult(
+                token=chunk.content,
+            ))
+
+            # rate limiting
+            await asyncio.sleep(0.01)
+
+        yield await sse_format(ModelChatResult(done=True))
 
     def run(self, model_params: ModelParams,
             messages: list[BaseMessage]) -> str:

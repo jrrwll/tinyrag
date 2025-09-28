@@ -78,6 +78,34 @@ def save_knowledge_document_chucks(
         session.commit()
 
 
+def page_and_count_documents(
+        session: Session, page_no: int, page_size: int,
+        knowledge_id: int, tenant_id: int
+) -> tuple[list[KnowledgeDocument], int]:  # type: ignore[type-arg]
+    conditions = [
+        KnowledgeDocument.tenant_id == tenant_id,
+        KnowledgeDocument.knowledge_id == knowledge_id,
+    ]
+
+    count_statement = (
+        select(func.count()).select_from(KnowledgeDocument).where(*conditions)
+    )
+    count = session.exec(count_statement).one()
+
+    offset = (page_no - 1) * page_size
+    limit = page_size
+
+    page_statement = (
+        select(KnowledgeDocument)
+        .where(*conditions)
+        .order_by(KnowledgeDocument.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+    )
+    entities = session.exec(page_statement).all()
+    return entities, count
+
+
 def get_knowledge_conversation(
         session: Session, id: str, tenant_id: int
 ) -> KnowledgeConversation | None:

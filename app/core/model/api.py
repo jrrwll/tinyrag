@@ -124,3 +124,8 @@ class SetupDefaultModel(BaseModel):
     model_type: ModelType
     model_id: int | None = None
     model_name: str | None = None
+
+
+class ModelChatResult(BaseModel):
+    token: str | None = None
+    done: bool = False

@@ -3,10 +3,10 @@ from typing import Self
 from pydantic import BaseModel, ValidationError
 
 from app.core.meta.api import MetaBaseEntity
-from app.core.meta.base import MetaConfigProtocol
 from app.core.meta.enums import FormInputType
 from app.core.meta.fields import parse_meta_fields
-from app.core.meta.provider import decrypt_config_dict, encrypt_config_dict
+from app.core.meta.provider import MetaProvider, decrypt_config_dict, \
+    encrypt_config_dict
 from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.core.model.provider import ModelProviderFactory
 from app.core.storage.enums import StorageType
@@ -39,7 +39,7 @@ class ProviderMetaService:
             providers[typ] = provider_class
         return cls(providers)
 
-    def __init__(self, providers: dict[str, type[MetaConfigProtocol]]):
+    def __init__(self, providers: dict[str, type[MetaProvider]]):
         self.providers = providers
 
     def list(self) -> list[MetaBaseEntity]:
