@@ -15,7 +15,7 @@ from app.entities.dao.knowledge import get_knowledge
 from app.entities.repo.model import get_setup_model
 from app.entities.repo.vector_store import get_setup_vector_store
 from app.entities.user import User
-from corepy.api import IdResult
+from corepy.api.result import IdResult
 
 
 def create_knowledge(session: Session, params: KnowledgeCreate,

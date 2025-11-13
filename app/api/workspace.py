@@ -15,7 +15,7 @@ from app.core.workspace.service import config_workspace, \
     unset_config_workspace, update_workspace
 from app.entities.dao.workspace import get_workspace, page_and_count_workspaces
 from app.entities.user import User
-from corepy.api import ApiResult, IdResult, PageResult
+from corepy.api.result import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/workspace", tags=["workspace"])
 

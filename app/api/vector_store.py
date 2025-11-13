@@ -20,7 +20,7 @@ from app.core.vector_store.service import create_vector_store, \
 from app.entities.dao.vector_store import get_vector_store, \
     page_and_count_vector_stores
 from app.entities.user import User
-from corepy.api import ApiResult, IdResult, PageResult
+from corepy.api.result import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/vector-store", tags=["vectorstore"])
 

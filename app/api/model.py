@@ -22,7 +22,7 @@ from app.core.model.service import create_model, delete_model, \
 from app.entities.dao.model import get_model, \
     page_and_count_models
 from app.entities.user import User
-from corepy.api import ApiResult, IdResult, PageResult
+from corepy.api.result import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/model", tags=["model"])
 

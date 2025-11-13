@@ -5,7 +5,7 @@ from app.common.deps import CurrentUser, SessionDep
 from app.config import settings
 from app.core.task.api import SimpleAsyncTaskPublic
 from app.core.task.service import list_knowledge_task
-from corepy.api import ApiResult, PageResult
+from corepy.api.result import ApiResult, PageResult
 
 router = CustomAPIRouter(prefix="/task", tags=["task"])
 

@@ -15,7 +15,7 @@ from app.entities.repo.vector_store import get_vector_store_from_config
 from app.entities.user import User
 from app.tasks.knowledge_import import ImportTaskParams, \
     send_knowledge_import_task
-from corepy.api import PageResult
+from corepy.api.result import PageResult
 
 
 def import_documents(session: Session, params: KnowledgeImport,

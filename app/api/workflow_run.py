@@ -12,7 +12,7 @@ from app.core.workflow_run.service.run_step import workflow_run_execute, \
     workflow_run_execute_step
 from app.entities.workflow import Workflow
 from app.entities.workflow_run import WorkflowRun
-from corepy.api import ApiResult, IdResult
+from corepy.api.result import ApiResult, IdResult
 
 router = CustomAPIRouter(prefix="/workflow/run", tags=["workflow", "workflow_run"])
 

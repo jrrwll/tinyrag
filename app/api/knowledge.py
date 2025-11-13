@@ -21,7 +21,7 @@ from app.core.knowledge.service.stream_chat import stream_chat_knowledge
 from app.core.task.api import AsyncTaskPublic
 from app.entities.dao.knowledge import page_and_count_knowledges
 from app.entities.knowledge import Knowledge
-from corepy.api import ApiResult, IdResult, PageResult
+from corepy.api.result import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/knowledge", tags=["knowledge"])
 

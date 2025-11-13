@@ -5,7 +5,7 @@ from app.core.task.enums import AsyncTaskType
 from app.entities.dao.knowledge import get_knowledges
 from app.entities.dao.task import page_and_count_tasks
 from app.entities.user import User
-from corepy.api import PageResult
+from corepy.api.result import PageResult
 
 
 def list_knowledge_task(

@@ -13,7 +13,7 @@ from app.entities.dao.model import get_model, get_tenant_default_model, \
     is_set_in_default_model
 from app.entities.model import TenantDefaultModel
 from app.entities.user import User
-from corepy.api import IdResult
+from corepy.api.result import IdResult
 
 
 def create_model(session: Session, params: ModelCreate,

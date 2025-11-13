@@ -9,7 +9,7 @@ from app.core.file.api import FilePublic, FileUploadPublic
 from app.core.file.service import get_upload_rule
 from app.core.file.upload import delete_file, upload_file
 from app.entities.file import File as FileEntity
-from corepy.api import ApiResult
+from corepy.api.result import ApiResult
 
 router = CustomAPIRouter(prefix="/file", tags=["file"])
 

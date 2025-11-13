@@ -4,7 +4,7 @@ from app.api import CustomAPIRouter
 from app.core.meta.api import MetaBaseEntity
 from app.core.meta.service import ProviderMetaService
 from app.core.model.enums import ModelType
-from corepy.api import ApiResult, ListResult
+from corepy.api.result import ApiResult, ListResult
 
 router = CustomAPIRouter(prefix="/meta", tags=["meta"])
 

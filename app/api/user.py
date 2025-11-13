@@ -13,7 +13,7 @@ from app.core.user.api import UserCreate, UserPublic, UserUpdate, \
 from app.core.user.service import create_user, delete_user, update_my_password, \
     update_user
 from app.entities.dao.user import get_user_by_email, page_and_count_users
-from corepy.api import ApiResult, PageResult
+from corepy.api.result import ApiResult, PageResult
 
 router = CustomAPIRouter(prefix="/user", tags=["user"])
 
