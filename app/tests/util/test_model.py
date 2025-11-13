@@ -1,13 +1,12 @@
 from typing import Protocol, Self
 
-from pydantic import BaseModel, Field, ValidationError, \
-    model_validator, field_validator
-from pydantic_core import InitErrorDetails
+from corepy.model import create_model_type, extract_validation_error, \
+    new_validation_error
+from pydantic import BaseModel, Field, ValidationError, field_validator, \
+    model_validator
 from pydantic_core._pydantic_core import PydanticCustomError
 
 from app.core.knowledge.api import KnowledgePublic
-from app.util.model import create_model_type, extract_validation_error, \
-    new_validation_error
 
 
 def test_create_dynamic_model():

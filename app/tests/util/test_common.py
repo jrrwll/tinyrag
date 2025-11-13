@@ -4,7 +4,7 @@ from random import randint
 from pydantic import BaseModel, SecretStr, EmailStr
 from app.core.knowledge.api import KnowledgeStreamChatPublic
 from app.core.user.enums import UserRole
-from app.util.api import ApiResult
+from corepy.api import ApiResult
 
 
 def test_model():

@@ -6,8 +6,8 @@ from sqlalchemy.orm import declared_attr
 from sqlmodel import Column, Enum, Field, SQLModel
 from sqlmodel.main import FieldInfo
 
-from app.util.lang import enum_values
-from app.util.text import camel_to_snake
+from corepy.lang import enum_values
+from corepy.text import camel_to_snake
 
 
 class LogTableBase(SQLModel):

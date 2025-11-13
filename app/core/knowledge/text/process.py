@@ -15,7 +15,7 @@ from app.core.knowledge.base import ProcessRule
 from app.core.knowledge.enums import DocumentFormatType
 from app.core.knowledge.text.base import DocumentModel
 from app.core.knowledge.text.tokens import split_text
-from app.util.codec import md5
+from corepy.codec import md5
 
 
 class TextProcessor():

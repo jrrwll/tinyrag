@@ -9,7 +9,7 @@ from app.core.knowledge.enums import DocumentSourceType
 from app.core.model.base import LlmModelConfig
 from app.core.vector_store.base import VectorStoreConfig
 from app.entities.knowledge import Knowledge, KnowledgeDocument
-from app.util.model import dump_and_update_dict, load_and_update_dict
+from corepy.model import dump_and_update_dict, load_and_update_dict
 
 
 class KnowledgeCreate(BaseModel):

@@ -4,7 +4,7 @@ from app.core.node.base import ConditionConfig
 from app.core.node.runner.base import NodeRunner
 from app.core.variable.base import Variable
 from app.core.workflow.enums import NodeType
-from app.util.expression import eval_code
+from corepy.expression import eval_code
 
 
 class ConditionNodeRunner(NodeRunner[ConditionConfig]):

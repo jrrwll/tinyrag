@@ -14,7 +14,7 @@ from app.core.model.base import ModelParams
 from app.core.model.enums import ModelType
 from app.core.model.provider import ModelProvider, ModelProviderFactory
 from app.core.variable.base import Variable
-from app.util.api import sse_format
+from corepy.net.sse import sse_format
 from app.util.langchain.callbacks import CompleteResponseHandler
 
 logger = logging.getLogger(__name__)

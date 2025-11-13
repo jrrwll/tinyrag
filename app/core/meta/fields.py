@@ -4,7 +4,7 @@ from pydantic import BaseModel, SecretStr
 from typing import Literal, get_args, get_origin
 from app.core.meta.api import MetaBaseField
 from app.core.meta.enums import FormInputType
-from app.util.lang import strip_type
+from corepy.lang import strip_type
 
 
 @cache

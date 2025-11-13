@@ -17,7 +17,7 @@ from app.core.node.runner.base import NodeRunner
 from app.core.variable.base import Variable
 from app.core.workflow.enums import NodeType
 from app.entities.dao.model import get_model_required
-from app.util.model import create_model_type
+from corepy.model import create_model_type
 
 
 class LLMNodeRunner(NodeRunner):

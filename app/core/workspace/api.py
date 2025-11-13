@@ -6,7 +6,7 @@ from app.core.knowledge.base import EmbeddingModelConfig, RetrievalModelConfig
 from app.core.model.base import LlmModelConfig
 from app.core.vector_store.base import VectorStoreConfig
 from app.entities.workspace import Workspace
-from app.util.model import load_and_update_dict
+from corepy.model import load_and_update_dict
 
 
 class SimpleWorkspacePublic(BaseModel):

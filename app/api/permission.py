@@ -10,7 +10,7 @@ from app.core.user.enums import PermissionResourceType
 from app.core.user.service import grant_permission, \
     revoke_permission
 from app.entities.dao.user import page_and_count_permissions
-from app.util.api import ApiResult, PageResult
+from corepy.api import ApiResult, PageResult
 
 router = CustomAPIRouter(prefix="/permission", tags=["permission"])
 

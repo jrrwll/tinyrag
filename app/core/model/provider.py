@@ -8,8 +8,8 @@ from app.common.error_code import BizException, ErrorCode
 from app.core.meta.provider import MetaProvider
 from app.core.model.api import ModelPublic
 from app.core.model.enums import ModelType
-from app.util.codec import md5
-from app.util.lang import find_sub_types
+from corepy.codec import md5
+from corepy.lang import find_sub_types
 
 
 class ModelProvider[Cfg: BaseModel, M](MetaProvider[Cfg], ABC):

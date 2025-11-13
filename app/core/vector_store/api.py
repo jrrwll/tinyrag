@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field
 from app.config import settings
 from app.core.vector_store.enums import VectorStoreType
 from app.entities.vector_store import VectorStore
-from app.util.codec import md5
-from app.util.model import dump_and_update_dict
+from corepy.codec import md5
+from corepy.model import dump_and_update_dict
 
 
 class VectorStoreSimplePublic(BaseModel):

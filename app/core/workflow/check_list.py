@@ -9,7 +9,7 @@ from app.core.workflow.api import (
 from app.core.workflow.enums import NodeType
 from app.entities.model import Model
 from app.entities.workflow import Workflow
-from app.util.model import get_extra_schema
+from corepy.model import get_extra_schema
 
 
 def workflow_check_list(

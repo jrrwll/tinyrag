@@ -10,8 +10,8 @@ from app.core.model.embedding.transformer import TransformerEmbeddingProvider
 from app.core.model.provider import ModelProvider
 from app.core.node.base import LLMConfig
 from app.core.node.runner.base import NodeRunner
-from app.util.lang import find_sub_types, strip_type, walk_and_import_modules
-from app.util.model import get_extra_schema
+from corepy.lang import find_sub_types, strip_type, walk_and_import_modules
+from corepy.model import get_extra_schema
 
 
 class Type(StrEnum):

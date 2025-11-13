@@ -12,7 +12,7 @@ from app.common.app_dispatch import add_request_vars
 from app.common.error_code import BizException, ErrorCode
 from app.common.log import config_logging
 from app.config import settings
-from app.util.model import extract_validation_error
+from corepy.model import extract_validation_error
 
 config_logging("app", web_app=True)
 logger = logging.getLogger(__name__)

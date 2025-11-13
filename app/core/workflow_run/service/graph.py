@@ -11,7 +11,7 @@ from app.core.variable.base import ContextVariable, Variable
 from app.core.workflow.base import Edge, WorkflowGraph
 from app.core.workflow.enums import NodeType
 from app.core.workflow_run.api import NodeRun
-from app.util.graph import MutableGraph
+from corepy.graph import MutableGraph
 
 
 class GraphRunner:

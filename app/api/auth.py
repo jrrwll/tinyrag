@@ -3,12 +3,13 @@ from typing import Any
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
+
 from app.api import CustomAPIRouter
 from app.common.deps import SessionDep
 from app.core.user.api import AccessTokenPublic, UserResetPassword
 from app.core.user.service import generate_access_token, recover_user_password, \
     reset_user_password
-from app.util.api import ApiResult
+from corepy.api import ApiResult
 
 router = CustomAPIRouter(prefix="/auth", tags=["auth"])
 

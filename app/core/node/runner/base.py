@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from app.core.variable.base import Variable
 from app.core.workflow.base import Node
 from app.core.workflow.enums import NodeType
-from app.util.lang import walk_and_import_modules
+from corepy.lang import walk_and_import_modules
 
 
 class NodeRunnerRegistry(ABCMeta):

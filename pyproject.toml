@@ -10,6 +10,7 @@ dependencies = [
     "boto3>=1.39.6",
     "boto3-stubs[s3]>=1.39.10",
     "cachetools>=6.1.0",
+    "corepy",
     "cryptography>=45.0.5",
     "email-validator>=2.2.0",
     "emails>=0.6",
@@ -55,6 +56,9 @@ dependencies = [
 [[tool.uv.index]]
 url = "https://mirrors.aliyun.com/pypi/simple"
 default = true
+
+[tool.uv.sources]
+corepy = { path = "../corepy" }
 
 [dependency-groups]
 dev = [

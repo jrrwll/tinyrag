@@ -1,4 +1,6 @@
-from app.util.expression import eval_code, eval_main_func
+from corepy.expression import eval_code, eval_main_func
+
+from app.common.error_code import BizException, ErrorCode
 
 corrected_code = """
 def main(arg1: str) -> list[str]:
@@ -13,10 +15,21 @@ arg1 = '{"models": [{"name": "Model1"}, {"name": "Model2"}]}'
 arg1_not_dict = '["SingleModel"]'
 
 
-def test_eval_main_func():
-    print(f"\narg1: {eval_main_func(corrected_code, arg1)}")
+def eval_main_func_unwrap(code: str, *args, **kwargs) -> Any: # type: ignore[no-untyped-def]
+    try:
+        res = eval_main_func(code, *args, **kwargs)
+    except Exception as e:
+        raise BizException.create(ErrorCode.code_eval_error, msg=str(e))
 
-    print(f"\narg1_not_dict: {eval_main_func(corrected_code, arg1_not_dict)}")
+    if res.is_empty():
+        raise BizException.create(ErrorCode.code_main_func_undefined)
+    return res.value
+
+
+def test_eval_main_func():
+    print(f"\narg1: {eval_main_func_unwrap(corrected_code, arg1)}")
+
+    print(f"\narg1_not_dict: {eval_main_func_unwrap(corrected_code, arg1_not_dict)}")
 
 
 def test_eval_code():

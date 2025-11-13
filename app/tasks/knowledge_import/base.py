@@ -20,7 +20,7 @@ from app.entities.dao.knowledge import save_knowledge_document, \
 from app.entities.dao.task import update_task_progress
 from app.entities.knowledge import Knowledge, KnowledgeDocument, \
     KnowledgeDocumentChunk
-from app.util.collection import partition_iterable
+from corepy.collection import partition_iterable
 
 logger = logging.getLogger(__name__)
 from app.core.file.enums import FileType

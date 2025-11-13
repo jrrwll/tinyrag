@@ -10,7 +10,7 @@ from app.core.storage.default_storage import get_default_storage
 from app.core.storage.file import download_storage_file
 from app.core.storage.provider.base import StorageProviderFactory
 from app.entities.dao.file import get_files
-from app.util.collection import take_limit
+from corepy.collection import take_limit
 
 
 def preview_file_chunk(

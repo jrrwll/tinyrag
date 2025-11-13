@@ -13,8 +13,8 @@ from app.core.task.enums import AsyncTaskType
 from app.core.user.email import generate_test_email, send_email
 from app.entities.task import AsyncTask
 from app.tasks.base import RQManager, send_rq_scheduled_task
-from app.util.api import ApiResult, PageResult
-from app.util.datetime import isoformat_dict
+from corepy.api import ApiResult, PageResult
+from corepy.datetime import isoformat_dict
 
 router = APIRouter(tags=["inner"], prefix="/inner")
 

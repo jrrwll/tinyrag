@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field
 from app.config import settings
 from app.core.storage.enums import StorageType
 from app.entities.storage import Storage
-from app.util.codec import md5
-from app.util.model import dump_and_update_dict, load_and_update_dict
+from corepy.codec import md5
+from corepy.model import dump_and_update_dict, load_and_update_dict
 
 
 class StorageSimplePublic(BaseModel):

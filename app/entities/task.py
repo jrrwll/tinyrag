@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 from app.core.task.enums import AsyncTaskStatus, AsyncTaskType
 from app.entities.base import enum_field_info
-from app.util.text import camel_to_snake
+from corepy.text import camel_to_snake
 
 
 class AsyncTask(SQLModel, table=True):

@@ -1,11 +1,10 @@
 import logging
 
+from corepy.crypto import get_password_hash, verify_password
 from sqlmodel import Session
 
 from app.common.error_code import BizException, ErrorCode
-from app.common.security import create_access_token, \
-    generate_password_reset_token, verify_password_reset_token
-from app.common.security import get_password_hash, verify_password
+from app.common.security import jwt_provider
 from app.config import settings
 from app.core.user.api import AccessTokenPublic, PermissionGrant, \
     PermissionRevoke, UserCreate, \
@@ -110,8 +109,10 @@ def generate_access_token(session: Session, username: str,
     elif not user.is_active:
         raise BizException.create(ErrorCode.user_not_active)
 
+    access_token = jwt_provider.create_access_token(
+        user.email, settings.token_expire_timedelta)
     return AccessTokenPublic(
-        access_token=create_access_token(user.email)
+        access_token=access_token
     )
 
 
@@ -120,7 +121,8 @@ def recover_user_password(session: Session, email: str):
     if not user:
         raise BizException.create(ErrorCode.user_not_found)
 
-    password_reset_token = generate_password_reset_token(email)
+    password_reset_token = jwt_provider.create_access_token(
+        email, settings.token_reset_expire_timedelta)
     subject, html_content = generate_reset_password_email(
         email_to=user.email, email=email, token=password_reset_token
     )
@@ -132,10 +134,11 @@ def recover_user_password(session: Session, email: str):
 
 
 def reset_user_password(session: Session, params: UserResetPassword):
-    email = verify_password_reset_token(params.token)
-    if not email:
+    payload = jwt_provider.decode_access_token(params.token)
+    if not payload:
         raise BizException.create(ErrorCode.invalid_token)
 
+    email = payload.subject
     user = get_user_by_email(session, email)
     if not user:
         raise BizException.create(ErrorCode.user_email_not_found)

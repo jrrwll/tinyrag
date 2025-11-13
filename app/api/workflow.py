@@ -15,7 +15,7 @@ from app.core.workflow.check_list import workflow_check_list
 from app.core.workflow.enums import WorkflowStatus
 from app.entities.dao.workflow import page_and_count_workflows
 from app.entities.workflow import Workflow
-from app.util.api import ApiResult, IdResult, PageResult
+from corepy.api import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/workflow", tags=["workflow"])
 

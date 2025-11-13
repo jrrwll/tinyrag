@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from app.config import settings
-from app.util.api import ApiResult
+from corepy.api import ApiResult
 
 
 class ErrorCode(Enum):

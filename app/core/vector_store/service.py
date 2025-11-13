@@ -9,7 +9,7 @@ from app.entities.dao.vector_store import get_tenant_default_vector_store, \
     get_vector_store
 from app.entities.user import User
 from app.entities.vector_store import TenantDefaultVectorStore
-from app.util.api import ApiResult, IdResult
+from corepy.api import ApiResult, IdResult
 
 
 def create_vector_store(

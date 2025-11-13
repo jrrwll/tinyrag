@@ -5,7 +5,7 @@ from langchain_core.documents import Document
 from pydantic import BaseModel, model_validator
 
 from app.core.knowledge.enums import DocumentFormatType
-from app.util.model import new_validation_error
+from corepy.model import new_validation_error
 
 
 class DocumentModel(BaseModel):

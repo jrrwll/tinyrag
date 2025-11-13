@@ -12,8 +12,8 @@ from app.core.file.api import FilePublic
 from app.core.file.file_type import detect_file_type
 from app.entities.file import File
 from app.entities.user import User
-from app.util.codec import get_file_md5
-from app.util.datetime import format_date_compact
+from corepy.codec import file_md5
+from corepy.datetime import format_date_compact
 
 
 def upload_file(file: UploadFile, workspace_id: int, current_user: User) -> FilePublic:
@@ -31,7 +31,7 @@ def upload_file(file: UploadFile, workspace_id: int, current_user: User) -> File
     else:
         file_type, mime_type = file_type
 
-    md5 = get_file_md5(file_path)
+    md5 = file_md5(file_path)
     with open_session() as session:
         existing_entity = session.get(File, md5)
 

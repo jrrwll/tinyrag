@@ -7,7 +7,7 @@ from app.core.storage.api import SetupDefaultStorage, StorageCreate, \
 from app.entities.dao.storage import get_tenant_default_storage, get_storage
 from app.entities.storage import TenantDefaultStorage
 from app.entities.user import User
-from app.util.api import ApiResult, IdResult
+from corepy.api import ApiResult, IdResult
 
 
 def create_storage(

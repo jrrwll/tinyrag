@@ -16,7 +16,7 @@ from app.core.storage.service import create_storage, delete_storage, \
     update_storage_config
 from app.entities.dao.storage import get_storage, page_and_count_storages
 from app.entities.user import User
-from app.util.api import ApiResult, IdResult, PageResult
+from corepy.api import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/storage", tags=["storage"])
 

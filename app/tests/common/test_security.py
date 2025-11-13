@@ -1,9 +1,10 @@
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from app.common.security import create_access_token, get_password_hash, \
+from app.common.security import jwt_provider, \
     decode_access_token
 from app.config import settings
+from corepy.crypto import get_password_hash
 
 
 def generate_rsa_keys() -> tuple[str, str]:
@@ -31,7 +32,7 @@ def generate_rsa_keys() -> tuple[str, str]:
 def test_security() -> None:
     print(f"\npassword_hash={get_password_hash('tinyrag')}")
 
-    access_token = create_access_token("test")
+    access_token = jwt_provider.create_access_token("test", settings.token_expire_timedelta)
     print(f"\naccess_token={access_token}")
 
     payload = decode_access_token(access_token)

@@ -4,7 +4,7 @@ import uuid
 
 from fastapi import Request, Response
 
-from app.util.collection import first_not_none
+from corepy.collection import first_not_none
 
 logger = logging.getLogger(__name__)
 

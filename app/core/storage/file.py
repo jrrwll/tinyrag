@@ -4,7 +4,7 @@ from uuid import uuid4
 from app.common.error_code import BizException, ErrorCode
 from app.config import settings
 from app.core.storage.provider.base import StorageProvider
-from app.util.datetime import format_date_compact
+from corepy.datetime import format_date_compact
 
 
 def download_storage_file(file_key: str,

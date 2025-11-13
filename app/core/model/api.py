@@ -10,8 +10,8 @@ from app.core.model.base import ModelFeatureConfig
 from app.core.model.builtin_models import get_builtin_model
 from app.core.model.enums import BUILTIN_MODEL_PROVIDER_NAME, ModelType
 from app.entities.model import Model
-from app.util.codec import md5
-from app.util.model import dump_and_update_dict, load_and_update_dict
+from corepy.codec import md5
+from corepy.model import dump_and_update_dict, load_and_update_dict
 
 
 class ModelSimplePublic(BaseModel):

@@ -40,7 +40,7 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
     payload = decode_access_token(token)
 
-    email = payload.sub
+    email = payload.subject
     user = get_user_by_email(session, email)
     if not user:
         raise BizException.create(ErrorCode.login_user_not_found)
