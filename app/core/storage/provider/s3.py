@@ -20,6 +20,13 @@ class S3StorageConfig(BaseModel):
     secret_key: SecretStr | None = None
     bucket_name: str | None = APP_NAME
 
+    # void mypy warnings
+    def get_access_key(self) -> str | None:
+        return self.access_key and self.access_key.get_secret_value()
+
+    def get_secret_key(self) -> str | None:
+        return self.secret_key and self.secret_key.get_secret_value()
+
 
 class S3StorageProvider(StorageProvider[S3StorageConfig, S3Client]):
 
@@ -32,8 +39,8 @@ class S3StorageProvider(StorageProvider[S3StorageConfig, S3Client]):
             's3',
             endpoint_url=self.config.endpoint,
             region_name=self.config.region,
-            aws_access_key_id=self.config.access_key and self.config.access_key.get_secret_value(),
-            aws_secret_access_key=self.config.secret_key and self.config.secret_key.get_secret_value(),
+            aws_access_key_id=self.config.get_access_key(),
+            aws_secret_access_key=self.config.get_secret_key(),
         )
 
     @staticmethod

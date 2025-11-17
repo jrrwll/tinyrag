@@ -1,9 +1,8 @@
 import re
 
-import jieba
-import jieba.analyse
+import jieba # type: ignore[import-untyped]
 import tiktoken
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords # type: ignore[import-untyped]
 
 """
 import nltk

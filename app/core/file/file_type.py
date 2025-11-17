@@ -23,7 +23,7 @@ def detect_file_type(file_path: str) -> Tuple[FileType, str] | None:
         return FileType.TXT, "text/plain"
 
     def match(typ: Type) -> bool:
-        return typ.match(buf)
+        return typ.match(buf) # type: ignore[no-any-return]
 
     typ = any_match(VIDEO, match)
     if typ:
