@@ -13,5 +13,5 @@ class AsyncTaskType(StrEnum):
     KnowledgeImport = "knowledge_import"
 
     @classmethod
-    def knowledge_tasks(cls) -> list[Self]:
+    def knowledge_tasks(cls) -> list["AsyncTaskType"]:
         return [cls.KnowledgeImport]

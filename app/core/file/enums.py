@@ -9,7 +9,7 @@ class FileType(StrEnum):
     Audio = "audio"
     Video = "video"
 
-    def is_document(self):
+    def is_document(self) -> bool:
         return self in _documents
 
 

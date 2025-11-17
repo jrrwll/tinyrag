@@ -1,11 +1,13 @@
 from typing import Tuple
 
-import filetype
-from filetype.types import AUDIO, IMAGE, Type, VIDEO, archive, document
-
-from app.core.file.enums import FileType
+import filetype  # type: ignore[import-untyped]
 from corepy.collection import any_match
 from corepy.file import is_binary_file
+from filetype.types import ( # type: ignore[import-untyped]
+    AUDIO, IMAGE, Type, VIDEO, archive, document
+)
+
+from app.core.file.enums import FileType
 
 
 def detect_file_type(file_path: str) -> Tuple[FileType, str] | None:

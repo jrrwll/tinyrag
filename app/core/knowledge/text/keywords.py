@@ -1,7 +1,7 @@
 import re
 
-import jieba
-import jieba.analyse
+import jieba # type: ignore[import-untyped]
+import jieba.analyse # type: ignore[import-untyped]
 
 from app.core.knowledge.text.tokens import _stopwords
 

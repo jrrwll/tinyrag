@@ -8,14 +8,14 @@ class UserRole(StrEnum):
     Write = "write"
     Read = "read"
 
-    def __init__(self, _):
+    def __init__(self, _: str):
         self.level: int = len(self.__class__.__members__)
 
     def implies(self, other: Self) -> bool:
         return self.level <= other.level
 
     @classmethod
-    def super_roles(cls) -> list[Self]:
+    def super_roles(cls) -> list["UserRole"]:
         return [cls.Owner, cls.Admin]
 
 

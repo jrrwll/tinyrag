@@ -7,8 +7,7 @@ from pydantic import BaseModel
 from app.api import CustomAPIRouter
 from app.common.deps import SessionDep
 from app.core.user.api import AccessTokenPublic, UserResetPassword
-from app.core.user.service import generate_access_token, recover_user_password, \
-    reset_user_password
+from app.core.user.service import generate_access_token, recover_user_password, reset_user_password
 from corepy.api.result import ApiResult
 
 router = CustomAPIRouter(prefix="/auth", tags=["auth"])
