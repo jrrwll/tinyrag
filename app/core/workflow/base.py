@@ -18,7 +18,7 @@ class Node(BaseModel):
     description: str | None = None
     type: NodeType
 
-    config: dict # type: ignore[arg-type]
+    config: dict # type: ignore[type-arg]
     front_info: str | None = None
 
     def __hash__(self) -> int:

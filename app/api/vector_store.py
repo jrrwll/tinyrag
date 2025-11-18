@@ -41,7 +41,7 @@ def _list(
         total=count,
         items=[VectorStoreSimplePublic(**entity) for entity in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("", response_model=ApiResult[VectorStorePublic])
@@ -53,14 +53,14 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     res = VectorStorePublic.create(entity)
     ProviderMetaService.from_vector_store().desensitizing_config_dict(
         res.type, res.config)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("", response_model=ApiResult[IdResult])
 def _create(session: SessionDep, params: VectorStoreCreate,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     res = create_vector_store(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("/config",
@@ -68,32 +68,32 @@ def _create(session: SessionDep, params: VectorStoreCreate,
 def _update_config(session: SessionDep, current_user: CurrentUser,
         params: VectorStoreUpdateConfig) -> Any:
     res = update_vector_store_config(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("", response_model=ApiResult[Any])
 def _update(session: SessionDep, current_user: CurrentUser,
         params: VectorStoreUpdate) -> Any:
     update_vector_store(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.delete("", response_model=ApiResult[Any])
 def _delete(session: SessionDep, id: int,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     delete_vector_store(session, id, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.get("/default", response_model=ApiResult[Optional[VectorStorePublic]])
 def _get_default(session: SessionDep, current_user: CurrentUser,
         workspace_id: int | None = None) -> Any:
     res = find_default_vector_store(session, workspace_id, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/default", response_model=ApiResult[Any])
 def _set_or_unset_default(session: SessionDep, params: SetupDefaultVectorStore,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     set_or_unset_default_vector_store(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()

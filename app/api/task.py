@@ -20,7 +20,7 @@ def _list_knowledge(
         page_size: int = settings.page_size_query,
 ) -> Any:
     res = list_knowledge_task(session, page_no, page_size, workspace_id, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("/knowledge",
@@ -33,4 +33,4 @@ def _get_knowledge(
         page_size: int = settings.page_size_query,
 ) -> Any:
     res = list_knowledge_task(session, page_no, page_size, workspace_id, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)

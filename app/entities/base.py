@@ -1,13 +1,11 @@
 import enum
 from datetime import datetime
-from typing import Type
-
-from sqlalchemy.orm import declared_attr
-from sqlmodel import Column, Enum, Field, SQLModel
-from sqlmodel.main import FieldInfo
+from typing import Any, Type
 
 from corepy.lang import enum_values
 from corepy.text import camel_to_snake
+from sqlalchemy.orm import declared_attr
+from sqlmodel import Column, Enum, Field, SQLModel
 
 
 class LogTableBase(SQLModel):
@@ -30,6 +28,6 @@ class BizTableBase(TableBase):
 
 
 def enum_field_info[T: enum.Enum](enum_type: Type[T],
-        default: T | None = None) -> FieldInfo:
+        default: T | None = None) -> Any:
     return Field(sa_column=Column(Enum(enum_type, values_callable=enum_values)),
                  default=default)

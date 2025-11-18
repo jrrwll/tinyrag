@@ -36,7 +36,7 @@ def _list(
         total=count,
         items=[SimpleWorkspacePublic(**entity) for entity in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("", response_model=ApiResult[WorkspacePublic])
@@ -45,32 +45,32 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     if not entity:
         raise BizException.create(ErrorCode.workspace_not_found)
 
-    return ApiResult.create(WorkspacePublic.create(entity))
+    return ApiResult.ok(WorkspacePublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
 def _create(session: SessionDep, params: WorkspaceCreate,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     workspace_id = create_workspace(session, params, current_user)
-    return ApiResult.create(IdResult(id=workspace_id))
+    return ApiResult.ok(IdResult(id=workspace_id))
 
 
 @router.put("", response_model=ApiResult[Any])
 def _update(session: SessionDep, current_user: CurrentUser,
         params: WorkspaceUpdate) -> Any:
     update_workspace(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/config", response_model=ApiResult[Any])
 def _config(session: SessionDep, current_user: CurrentUser,
         params: WorkspaceUpdateConfig) -> Any:
     config_workspace(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.delete("/config", response_model=ApiResult[Any])
 def _config(session: SessionDep, current_user: CurrentUser,
         params: WorkspaceUnsetConfig) -> Any:
     unset_config_workspace(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()

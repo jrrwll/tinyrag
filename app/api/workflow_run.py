@@ -27,7 +27,7 @@ def get(session: SessionDep, id: int) -> Any:
     if not workflow_entity:
         raise BizException.create(ErrorCode.related_workflow_not_found)
 
-    return ApiResult.create(WorkflowRunPublic.new(entity, workflow_entity))
+    return ApiResult.ok(WorkflowRunPublic.new(entity, workflow_entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
@@ -42,7 +42,7 @@ def create(session: SessionDep, params: WorkflowRunCreate) -> Any:
     session.commit()
     session.refresh(entity)
 
-    return ApiResult.create(IdResult(id=entity.id))
+    return ApiResult.ok(IdResult(id=entity.id))
 
 
 @router.post("/execute", response_model=ApiResult[WorkflowRunExecutePublic])
@@ -56,7 +56,7 @@ def execute(session: SessionDep, params: WorkflowRunExecute) -> Any:
         raise BizException.create(ErrorCode.related_workflow_not_found)
 
     res = workflow_run_execute(session, entity, workflow_entity, params)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/execute-step", response_model=ApiResult[WorkflowRunExecuteStepPublic])
@@ -70,4 +70,4 @@ def execute_step(session: SessionDep, params: WorkflowRunExecuteStep) -> Any:
         raise BizException.create(ErrorCode.related_workflow_not_found)
 
     res = workflow_run_execute_step(session, entity, workflow_entity, params)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)

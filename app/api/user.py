@@ -33,7 +33,7 @@ def list_users(session: SessionDep, current_user: CurrentUser,
         total=count,
         items=[UserPublic.create(i) for i in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("", response_model=ApiResult[UserPublic],
@@ -44,7 +44,7 @@ def get_user(session: SessionDep, email: str) -> Any:
         raise BizException.create(ErrorCode.user_not_found)
 
     res = UserPublic.create(entity)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("", response_model=ApiResult[UserPublic],
@@ -52,28 +52,28 @@ def get_user(session: SessionDep, email: str) -> Any:
 def create(session: SessionDep, current_user: CurrentUser,
         params: UserCreate) -> Any:
     user = create_user(session, params, current_user)
-    return ApiResult.create(user)
+    return ApiResult.ok(user)
 
 
 @router.put("", response_model=ApiResult[UserPublic],
             dependencies=[Depends(get_current_active_superuser)])
 def update(session: SessionDep, params: UserUpdate) -> Any:
     user = update_user(session, params)
-    return ApiResult.create(user)
+    return ApiResult.ok(user)
 
 
 @router.delete("", response_model=ApiResult[Any],
                dependencies=[Depends(get_current_active_superuser)])
 def delete(session: SessionDep, email: str, current_user: CurrentUser) -> Any:
     delete_user(session, email, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 # for me
 @router.get("/me", response_model=ApiResult[UserPublic])
 def get_me(current_user: CurrentUser) -> Any:
     res = UserPublic.create(current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("/me", response_model=ApiResult[Any])
@@ -85,11 +85,11 @@ def update_me(session: SessionDep, params: UserUpdateMe,
     session.add(current_user)
     session.commit()
 
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/me/update-password", response_model=ApiResult[Any])
 def me_update_password(session: SessionDep, params: UserUpdatePassword,
         current_user: CurrentUser) -> Any:
     update_my_password(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()

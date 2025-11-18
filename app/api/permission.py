@@ -32,7 +32,7 @@ def _list(
         total=count,
         items=[PermissionPublic.create(entity) for entity in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("", response_model=ApiResult[Any])
@@ -42,7 +42,7 @@ def _grant(
         current_user: CurrentUser,
 ) -> Any:
     grant_permission(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.delete("", response_model=ApiResult[Any])
@@ -52,4 +52,4 @@ def _revoke(
         params: PermissionRevoke,
 ) -> Any:
     revoke_permission(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()

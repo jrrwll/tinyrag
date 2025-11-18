@@ -44,7 +44,7 @@ def _list(
         total=count,
         items=[SimpleKnowledgePublic(**entity) for entity in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("", response_model=ApiResult[KnowledgePublic])
@@ -53,7 +53,7 @@ def _get(session: SessionDep, id: str) -> Any:
     if not entity:
         raise BizException.create(ErrorCode.knowledge_not_found)
 
-    return ApiResult.create(KnowledgePublic.create(entity))
+    return ApiResult.ok(KnowledgePublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult],
@@ -61,21 +61,21 @@ def _get(session: SessionDep, id: str) -> Any:
 def _create(session: SessionDep, params: KnowledgeCreate,
         current_user: CurrentUser) -> Any:
     res = create_knowledge(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("", response_model=ApiResult[Any], dependencies=[LogDep])
 def _update(session: SessionDep, params: KnowledgeUpdate,
         current_user: CurrentUser) -> Any:
     update_knowledge(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/config", response_model=ApiResult[Any], dependencies=[LogDep])
 def _update_config(session: SessionDep, params: KnowledgeUpdateConfig,
         current_user: CurrentUser) -> Any:
     update_knowledge_config(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/document/preview-chunk",
@@ -83,7 +83,7 @@ def _update_config(session: SessionDep, params: KnowledgeUpdateConfig,
              dependencies=[LogDep])
 def _preview_chunk(params: DocumentPreviewChunk, current_user: CurrentUser) -> Any:
     res = preview_file_chunk(params, current_user.tenant_id)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/document/import", response_model=ApiResult[AsyncTaskPublic],
@@ -91,7 +91,7 @@ def _preview_chunk(params: DocumentPreviewChunk, current_user: CurrentUser) -> A
 def _import_document(session: SessionDep, params: KnowledgeImport,
         current_user: CurrentUser) -> Any:
     res = import_documents(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("/document/list", response_model=ApiResult[PageResult[KnowledgeDocumentPublic]])
@@ -103,21 +103,21 @@ def _list_document(
         page_size: int = settings.page_size_query,
 ) -> Any:
     res = list_documents(session, knowledge_id, page_no, page_size, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/conversation", response_model=ApiResult[IdResult])
 def _conversation(session: SessionDep, params: KnowledgeStartConversation,
         current_user: CurrentUser):
     res = start_conversation(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/chat", response_model=ApiResult[KnowledgeChatPublic])
 def _chat(session: SessionDep, params: KnowledgeChat,
         current_user: CurrentUser):
     res = chat_knowledge(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/stream-chat")

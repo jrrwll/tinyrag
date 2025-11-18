@@ -5,7 +5,7 @@ from app.entities.storage import Storage, TenantDefaultStorage
 
 def page_and_count_storages(
         session: Session, page_no: int, page_size: int, tenant_id: int
-) -> tuple[list[dict], int]:
+) -> tuple[list[dict], int]: # type: ignore[type-arg]
     conditions = [
         Storage.tenant_id == tenant_id,
         Storage.deleted == False,

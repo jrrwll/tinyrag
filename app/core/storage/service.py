@@ -107,13 +107,13 @@ def set_or_unset_default_storage(
     # unset case
     if not storage_id:
         if not entity or entity.is_unset():
-            return ApiResult.create()
+            return ApiResult.ok()
 
         entity.storage_id = None
 
         session.add(entity)
         session.commit()
-        return ApiResult.create()
+        return ApiResult.ok()
 
     # set case
     if not entity:

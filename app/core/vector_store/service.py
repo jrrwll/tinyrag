@@ -112,13 +112,13 @@ def set_or_unset_default_vector_store(
     # unset case
     if not vector_store_id:
         if not entity or entity.is_unset():
-            return ApiResult.create()
+            return ApiResult.ok()
 
         entity.vector_store_id = None
 
         session.add(entity)
         session.commit()
-        return ApiResult.create()
+        return ApiResult.ok()
 
     # set case
     if not entity:

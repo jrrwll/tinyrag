@@ -87,7 +87,7 @@ class HttpConfig(BaseModel):
     exception_config: ExceptionConfig | None = None
 
     @property
-    def request_url(self):
+    def request_url(self) -> str:
         if not self.params:
             return self.url
         return self.url + "?" + "&".join(

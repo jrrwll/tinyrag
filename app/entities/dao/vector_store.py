@@ -5,7 +5,7 @@ from app.entities.vector_store import TenantDefaultVectorStore, VectorStore
 
 def page_and_count_vector_stores(
         session: Session, page_no: int, page_size: int, tenant_id: int
-) -> tuple[list[dict], int]:
+) -> tuple[list[dict], int]: # type: ignore[type-arg]
     conditions = [
         VectorStore.tenant_id == tenant_id,
         VectorStore.deleted == False,

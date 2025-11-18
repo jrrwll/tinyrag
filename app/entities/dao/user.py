@@ -11,7 +11,7 @@ def get_user_by_email(session: Session, email: EmailStr | str,
         include_deleted: bool = False) -> User | None:
     conditions = [User.email == str(email)]
     if include_deleted:
-        conditions.append(User.is_deleted == False)
+        conditions.append(User.deleted == False)
 
     statement = select(User).where(*conditions)
     return session.exec(statement).first()
@@ -20,7 +20,10 @@ def get_user_by_email(session: Session, email: EmailStr | str,
 def page_and_count_users(session: Session,
         page_no: int, page_size: int, tenant_id: int
 ) -> tuple[Sequence[User], int]:
-    conditions = [User.tenant_id == tenant_id]
+    conditions = [
+        User.tenant_id == tenant_id,
+        User.deleted == False
+    ]
 
     count_statement = (
         select(func.count()).select_from(User).where(*conditions)
@@ -33,7 +36,7 @@ def page_and_count_users(session: Session,
     page_statement = (
         select(User)
         .where(*conditions)
-        .order_by(User.updated_at.desc())
+        .order_by(User.updated_at.desc()) # type: ignore[attr-defined]
         .offset(offset)
         .limit(limit)
     )
@@ -84,7 +87,7 @@ def page_and_count_permissions(session: Session,
     page_statement = (
         select(Permission)
         .where(*conditions)
-        .order_by(Permission.updated_at.desc())
+        .order_by(Permission.updated_at.desc()) # type: ignore[attr-defined]
         .offset(offset)
         .limit(limit)
     )

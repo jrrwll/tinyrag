@@ -15,7 +15,7 @@ def parse_meta_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
 
     for name, field_info in config_type.model_fields.items():
         json_schema_extra = field_info.json_schema_extra or {}
-        if json_schema_extra.get("builtin"):
+        if not isinstance(json_schema_extra, dict) or json_schema_extra.get("builtin"):
             continue
 
         field = MetaBaseField(
@@ -27,7 +27,7 @@ def parse_meta_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
         typ = json_schema_extra.get("type")
         if typ:
             if typ == FormInputType.Select:
-                field.select = json_schema_extra.get("select")
+                field.select = json_schema_extra.get("select") # type: ignore[assignment]
         else:
             annotation = field_info.annotation
             annotation_type = strip_type(annotation)
@@ -42,6 +42,6 @@ def parse_meta_fields(config_type: type[BaseModel]) -> list[MetaBaseField]:
                 typ = FormInputType.Select
             else:
                 typ = FormInputType.Text
-        field.type = typ
+        field.type = typ # type: ignore[assignment]
 
     return fields

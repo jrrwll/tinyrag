@@ -14,7 +14,7 @@ class Tenant(TableBase, table=True):
     is_setup: bool = False
 
 
-class User(TableBase, table=True):
+class User(BizTableBase, table=True):
     tenant_id: int
     name: str = Field(max_length=255)
     email: str = Field(max_length=255)

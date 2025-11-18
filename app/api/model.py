@@ -42,7 +42,7 @@ def _list(
         total=count,
         items=[ModelSimplePublic(**entity) for entity in entities],
     )
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("", response_model=ApiResult[ModelPublic],
@@ -55,14 +55,14 @@ def _get(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     res = ModelPublic.create(entity)
     ProviderMetaService.from_model(res.type).desensitizing_config_dict(
         res.provider_name, res.config)
-    return ApiResult.create(ModelPublic.create(entity))
+    return ApiResult.ok(ModelPublic.create(entity))
 
 
 @router.post("", response_model=ApiResult[IdResult])
 def _create(session: SessionDep, current_user: CurrentUser,
         params: ModelCreate) -> Any:
     res = create_model(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("/config",
@@ -70,38 +70,38 @@ def _create(session: SessionDep, current_user: CurrentUser,
 def _update_config(session: SessionDep, current_user: CurrentUser,
         params: ModelUpdateConfig) -> Any:
     res = update_model_config(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.put("", response_model=ApiResult[Any])
 def _update(session: SessionDep, current_user: CurrentUser,
         params: ModelUpdate) -> Any:
     update_model(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.delete("", response_model=ApiResult[Any])
 def _delete(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     delete_model(session, id, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/test-run", response_model=ApiResult[ModelTestRunPublic])
 def _test_run(session: SessionDep, current_user: CurrentUser,
         params: ModelTestRun) -> Any:
     res = test_run_model(session, params, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.get("/default", response_model=ApiResult[Optional[ModelPublic]])
 def _get_default(session: SessionDep, current_user: CurrentUser,
         model_type: ModelType, workspace_id: int | None = None) -> Any:
     res = find_default_model(session, model_type, workspace_id, current_user)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/default", response_model=ApiResult[Any])
 def _set_or_unset_default(session: SessionDep, params: SetupDefaultModel,
         current_user: User = Depends(get_current_active_superuser)) -> Any:
     set_or_unset_default_model(session, params, current_user)
-    return ApiResult.create()
+    return ApiResult.ok()

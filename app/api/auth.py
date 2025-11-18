@@ -21,16 +21,16 @@ def access_token(
     OAuth2 compatible token login, get an access token for future requests
     """
     res = generate_access_token(session, form_data.username, form_data.password)
-    return ApiResult.create(res)
+    return ApiResult.ok(res)
 
 
 @router.post("/password-recovery", response_model=ApiResult[BaseModel])
 def recover_password(session: SessionDep, email: str):
     recover_user_password(session, email)
-    return ApiResult.create()
+    return ApiResult.ok()
 
 
 @router.post("/reset-password/", response_model=ApiResult[Any])
 def reset_password(session: SessionDep, params: UserResetPassword) -> Any:
     reset_user_password(session, params)
-    return ApiResult.create()
+    return ApiResult.ok()

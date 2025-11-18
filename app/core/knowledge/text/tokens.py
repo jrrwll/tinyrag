@@ -1,8 +1,8 @@
 import re
 
-import jieba # type: ignore[import-untyped]
+import jieba  # type: ignore[import-untyped]
 import tiktoken
-from nltk.corpus import stopwords # type: ignore[import-untyped]
+from nltk.corpus import stopwords  # type: ignore[import-untyped]
 
 """
 import nltk
@@ -27,7 +27,7 @@ def get_word_count(text: str) -> int:
     return len(en) + len(zh)
 
 
-def split_text(text: str, max_len=1024) -> list[str]:
+def split_text(text: str, max_len: int = 1024) -> list[str]:
     words = list(jieba.cut(text))
     chunks, cur = [], []
     cur_len = 0

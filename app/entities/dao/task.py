@@ -11,7 +11,7 @@ from app.entities.task import AsyncTask
 def page_and_count_tasks(
         session: Session, page_no: int, page_size: int,
         types: list[AsyncTaskType], workspace_id: int, tenant_id: int
-) -> tuple[list[dict], int]:
+) -> tuple[list[dict], int]: # type: ignore[type-arg]
     conditions = [
         AsyncTask.tenant_id == tenant_id,
         AsyncTask.workspace_id == workspace_id,
