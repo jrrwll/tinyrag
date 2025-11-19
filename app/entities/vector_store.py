@@ -18,6 +18,3 @@ class TenantDefaultVectorStore(TableBase, table=True):
     tenant_id: int
     workspace_id: int = 0
     vector_store_id: int | None = None
-
-    def is_unset(self) -> bool:
-        return not self.vector_store_id

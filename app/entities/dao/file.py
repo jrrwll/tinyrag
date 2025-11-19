@@ -7,7 +7,7 @@ from app.entities.file import File
 def get_files(session: SessionDep, file_ids: list[str], tenant_id: int
 ) -> dict[str, File]:
     statement = select(File).where(
-        File.id.in_(file_ids),
+        File.id.in_(file_ids), # type: ignore[attr-defined]
         File.tenant_id == tenant_id,
     )
 

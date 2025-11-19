@@ -15,7 +15,7 @@ def page_and_count_tasks(
     conditions = [
         AsyncTask.tenant_id == tenant_id,
         AsyncTask.workspace_id == workspace_id,
-        AsyncTask.type.in_(types),
+        AsyncTask.type.in_(types), # type: ignore[attr-defined]
     ]
 
     count_statement = (
@@ -39,7 +39,7 @@ def page_and_count_tasks(
         )
         .select_from(AsyncTask)
         .where(*conditions)
-        .order_by(AsyncTask.submitted_at.desc())
+        .order_by(AsyncTask.submitted_at.desc()) # type: ignore[attr-defined]
         .offset(offset)
         .limit(limit)
     )
@@ -62,11 +62,12 @@ def update_task_status(task_id: str, expect_status: AsyncTaskStatus,
     elif target_status == AsyncTaskStatus.Started:
         values["started_at"] = datetime.now()
 
+    conditions = [
+        AsyncTask.id == task_id,
+        AsyncTask.status == expect_status
+    ]
     with open_session() as session:
-        update_sql = update(AsyncTask).where(
-            AsyncTask.id == task_id,
-            AsyncTask.status == expect_status,
-        ).values(values)
+        update_sql = update(AsyncTask).where(*conditions).values(values)
         res = session.exec(update_sql)
         session.commit()
         return res.rowcount > 0

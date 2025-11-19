@@ -82,7 +82,7 @@ def get_setup_models(
     model_ids = [m.model_id for m in entity_dict.values() if m.model_id]
     if model_ids:
         select_in_statement = select(Model).where(
-            Model.id.in_(model_ids),
+            Model.id.in_(model_ids), # type: ignore[attr-defined]
             Model.tenant_id == tenant_id,
             Model.deleted == False
         )

@@ -5,7 +5,7 @@ from app.common.error_code import BizException, ErrorCode
 
 def test_biz_exception():
     e = BizException.create(ErrorCode.unknown_error, msg=1)
-    print(f"\ncontent:\n{e.content()}")
+    print(f"\ncontent:\n{e.to_result().model_dump_json(indent=4)}")
 
     with pytest.raises(RuntimeError) as exc_info:
         BizException.create(ErrorCode.unknown_error)

@@ -1,4 +1,6 @@
 # ruff: noqa: E712
+from typing import Sequence
+
 from sqlmodel import Session, and_, func, select
 
 from app.common.deps import open_session
@@ -54,9 +56,9 @@ def get_knowledge(session: Session, id: int, tenant_id: int) -> Knowledge | None
     return session.exec(stmt).first()
 
 
-def get_knowledges(session: Session, ids: list[int], tenant_id: int) -> list[Knowledge]:
+def get_knowledges(session: Session, ids: list[int], tenant_id: int) -> Sequence[Knowledge]:
     stmt = select(Knowledge).where(
-        Knowledge.id.in_(ids),
+        Knowledge.id.in_(ids), # type: ignore[attr-defined]
         Knowledge.tenant_id == tenant_id,
         Knowledge.deleted == False
     )
@@ -81,7 +83,7 @@ def save_knowledge_document_chucks(
 def page_and_count_documents(
         session: Session, page_no: int, page_size: int,
         knowledge_id: int, tenant_id: int
-) -> tuple[list[KnowledgeDocument], int]:  # type: ignore[type-arg]
+) -> tuple[Sequence[KnowledgeDocument], int]:
     conditions = [
         KnowledgeDocument.tenant_id == tenant_id,
         KnowledgeDocument.knowledge_id == knowledge_id,
@@ -98,7 +100,7 @@ def page_and_count_documents(
     page_statement = (
         select(KnowledgeDocument)
         .where(*conditions)
-        .order_by(KnowledgeDocument.created_at.desc())
+        .order_by(KnowledgeDocument.created_at.desc()) # type: ignore[attr-defined]
         .offset(offset)
         .limit(limit)
     )

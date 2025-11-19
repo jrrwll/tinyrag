@@ -78,11 +78,11 @@ def find_default_storage(
 ) -> StoragePublic | None:
     entity = get_tenant_default_storage(
         session, workspace_id, current_user.tenant_id)
-    if not entity or entity.is_unset():
+    if not entity or entity.storage_id is None:
         if workspace_id:
             entity = get_tenant_default_storage(
                 session, None, current_user.tenant_id)
-        if not entity or entity.is_unset():
+        if not entity or entity.storage_id is None:
             return None
 
     storage_id = entity.storage_id
@@ -106,7 +106,7 @@ def set_or_unset_default_storage(
 
     # unset case
     if not storage_id:
-        if not entity or entity.is_unset():
+        if not entity or entity.storage_id is None:
             return ApiResult.ok()
 
         entity.storage_id = None

@@ -9,7 +9,7 @@ def get_default_storage(session: Session, storage_id: int | None,
         tenant_id: int) -> StoragePublic:
     if not storage_id:
         default_storage = get_tenant_default_storage(session, None, tenant_id)
-        if not default_storage or default_storage.is_unset():
+        if not default_storage or default_storage.storage_id is None:
             raise BizException.create(ErrorCode.storage_not_set)
         storage_id = default_storage.storage_id
 

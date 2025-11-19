@@ -19,6 +19,3 @@ class TenantDefaultStorage(TableBase, table=True):
     tenant_id: int
     workspace_id: int = 0
     storage_id: int | None = None
-
-    def is_unset(self) -> bool:
-        return not self.storage_id

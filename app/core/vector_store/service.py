@@ -82,11 +82,11 @@ def find_default_vector_store(
 ) -> VectorStorePublic | None:
     entity = get_tenant_default_vector_store(
         session, workspace_id, current_user.tenant_id)
-    if not entity or entity.is_unset():
+    if not entity or entity.vector_store_id is None:
         if workspace_id:
             entity = get_tenant_default_vector_store(
                 session, None, current_user.tenant_id)
-        if not entity or entity.is_unset():
+        if not entity or entity.vector_store_id is None:
             return None
 
     vector_store_id = entity.vector_store_id
@@ -111,7 +111,7 @@ def set_or_unset_default_vector_store(
 
     # unset case
     if not vector_store_id:
-        if not entity or entity.is_unset():
+        if not entity or entity.vector_store_id is None:
             return ApiResult.ok()
 
         entity.vector_store_id = None
