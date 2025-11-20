@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 from fastapi.responses import StreamingResponse
 
 from app.api import CustomAPIRouter
@@ -32,8 +32,8 @@ def _list(
         session: SessionDep,
         current_user: CurrentUser,
         workspace_id: int,
-        page_no: int = settings.page_no_query,
-        page_size: int = settings.page_size_query,
+        page_no: Annotated[int, settings.page_no_query],
+        page_size: Annotated[int, settings.page_size_query],
         enable: bool | None = None,
 ) -> Any:
     entities, count = page_and_count_knowledges(
@@ -99,8 +99,8 @@ def _list_document(
         session: SessionDep,
         current_user: CurrentUser,
         knowledge_id: int,
-        page_no: int = settings.page_no_query,
-        page_size: int = settings.page_size_query,
+        page_no: Annotated[int, settings.page_no_query],
+        page_size: Annotated[int, settings.page_size_query],
 ) -> Any:
     res = list_documents(session, knowledge_id, page_no, page_size, current_user)
     return ApiResult.ok(res)

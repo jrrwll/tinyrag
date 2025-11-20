@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Annotated, Any
 from uuid import uuid4
 
 from fastapi import APIRouter
@@ -50,8 +50,8 @@ def queue_stat() -> Any:
 
 
 @router.get("/queue-jobs", response_model=ApiResult[PageResult[Any]])
-def queue_stat(page_no: int = settings.page_no_query,
-        page_size: int = settings.page_size_query) -> Any:
+def queue_stat(page_no: Annotated[int, settings.page_no_query],
+        page_size: Annotated[int, settings.page_size_query]) -> Any:
     queue = RQManager().queue
 
     total = queue.count
@@ -100,7 +100,7 @@ def test_scheduled_task() -> Any:
 
     scheduled_time = datetime.now() + timedelta(seconds=5)
     logger.info(f"test scheduled task, start send: {job_id} {scheduled_time}")
-    send_rq_scheduled_task(test_write_file, scheduled_time, job_id)
+    send_rq_scheduled_task(test_write_file, func_args=[], scheduled_time=scheduled_time, job_id=job_id)
     logger.info(f"test scheduled task, finish sent")
     return job_id
 

@@ -1,5 +1,6 @@
-from typing import Any, Optional
+from typing import Annotated, Any, Optional
 
+from corepy.api.result import ApiResult, IdResult, PageResult
 from fastapi import Depends
 
 from app.api import CustomAPIRouter
@@ -22,7 +23,6 @@ from app.core.model.service import create_model, delete_model, \
 from app.entities.dao.model import get_model, \
     page_and_count_models
 from app.entities.user import User
-from corepy.api.result import ApiResult, IdResult, PageResult
 
 router = CustomAPIRouter(prefix="/model", tags=["model"])
 
@@ -31,8 +31,8 @@ router = CustomAPIRouter(prefix="/model", tags=["model"])
 def _list(
         session: SessionDep,
         current_user: CurrentUser,
-        page_no: int = settings.page_no_query,
-        page_size: int = settings.page_size_query,
+        page_no: Annotated[int, settings.page_no_query],
+        page_size: Annotated[int, settings.page_size_query],
 ) -> Any:
     entities, count = page_and_count_models(
         session, page_no, page_size, current_user.tenant_id)
