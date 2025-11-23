@@ -25,8 +25,8 @@ router = CustomAPIRouter(prefix="/storage", tags=["storage"])
 def _list(
         session: SessionDep,
         current_user: CurrentUser,
-        page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query],
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query,
 ) -> Any:
     entities, count = page_and_count_storages(
         session, page_no, page_size, current_user.tenant_id)

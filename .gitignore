@@ -29,3 +29,5 @@ celerybeat.pid
 /workdir/
 
 templates/build/
+
+http-client.private.env.json

@@ -16,8 +16,8 @@ def _list_knowledge(
         session: SessionDep,
         current_user: CurrentUser,
         workspace_id: int,
-        page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query],
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query,
 ) -> Any:
     res = list_knowledge_task(session, page_no, page_size, workspace_id, current_user)
     return ApiResult.ok(res)
@@ -29,8 +29,8 @@ def _get_knowledge(
         session: SessionDep,
         current_user: CurrentUser,
         workspace_id: int,
-        page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query],
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query,
 ) -> Any:
     res = list_knowledge_task(session, page_no, page_size, workspace_id, current_user)
     return ApiResult.ok(res)

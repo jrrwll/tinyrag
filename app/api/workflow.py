@@ -23,8 +23,8 @@ router = CustomAPIRouter(prefix="/workflow", tags=["workflow"])
 @router.get("/list", response_model=ApiResult[PageResult[SimpleWorkflowPublic]])
 def list(
     session: SessionDep,
-    page_no: Annotated[int, settings.page_no_query],
-    page_size: Annotated[int, settings.page_size_query],
+    page_no: int = settings.page_no_query,
+    page_size: int = settings.page_size_query,
     status: WorkflowStatus | None = None,
 ) -> Any:
     entities, count = page_and_count_workflows(session, page_no, page_size, status)

@@ -4,7 +4,6 @@ from sqlalchemy.schema import CreateTable
 from sqlmodel import SQLModel, Session, create_engine, select
 
 from app.config import settings
-from app.entities.model import Model
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -19,7 +18,7 @@ def test_ddl() -> None:
 
     for table in SQLModel.metadata.tables.values():
         c = CreateTable(table).compile(engine)
-        print(c.string)
+        print(c.string.lower())
 
 
 if __name__ == "__main__":

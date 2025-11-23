@@ -21,8 +21,8 @@ def _list(
         session: SessionDep,
         current_user: CurrentUser,
         resource_type: PermissionResourceType,
-        page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query],
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query,
 ) -> Any:
     entities, count = page_and_count_permissions(
         session, page_no, page_size, resource_type, current_user.tenant_id)

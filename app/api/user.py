@@ -22,8 +22,8 @@ router = CustomAPIRouter(prefix="/user", tags=["user"])
 @router.get("/list", response_model=ApiResult[PageResult[UserPublic]],
             dependencies=[Depends(get_current_active_superuser)])
 def list_users(session: SessionDep, current_user: CurrentUser,
-        page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query]) -> Any:
+        page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query) -> Any:
     entities, count = page_and_count_users(
         session, page_no, page_size, current_user.tenant_id)
 

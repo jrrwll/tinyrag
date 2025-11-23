@@ -50,8 +50,8 @@ def queue_stat() -> Any:
 
 
 @router.get("/queue-jobs", response_model=ApiResult[PageResult[Any]])
-def queue_stat(page_no: Annotated[int, settings.page_no_query],
-        page_size: Annotated[int, settings.page_size_query]) -> Any:
+def queue_stat(page_no: int = settings.page_no_query,
+        page_size: int = settings.page_size_query) -> Any:
     queue = RQManager().queue
 
     total = queue.count
