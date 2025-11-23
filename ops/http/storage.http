@@ -1,16 +1,16 @@
-GET {{url_prefix}}/storage/list
+GET {{URL_PREFIX}}/storage/list
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/storage?id=1
+GET {{URL_PREFIX}}/storage?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/storage?id=2
+GET {{URL_PREFIX}}/storage?id=2
 Authorization: Bearer {{auth_token}}
 
 ###
-POST {{url_prefix}}/storage
+POST {{URL_PREFIX}}/storage
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/storage
+POST {{URL_PREFIX}}/storage
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -42,11 +42,11 @@ Content-Type: application/json
 }
 
 ###
-GET {{url_prefix}}/storage/default
+GET {{URL_PREFIX}}/storage/default
 Authorization: Bearer {{auth_token}}
 
 ###
-POST {{url_prefix}}/storage/default
+POST {{URL_PREFIX}}/storage/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

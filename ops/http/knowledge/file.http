@@ -1,19 +1,19 @@
-GET {{url_prefix}}/file?id={{file_id}}
+GET {{URL_PREFIX}}/file?id={{file_id}}
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/file?id={{file_id_json_list}}
+GET {{URL_PREFIX}}/file?id={{file_id_json_list}}
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/file/upload
+GET {{URL_PREFIX}}/file/upload
 Authorization: Bearer {{auth_token}}
 
 ###
 # curl -F "file=@/path/to/file" http://127.0.0.1:8000/api/v1/file/upload?workspace_id=1
 # ../../sql/ddl_base.sql
 # ../../../workdir/uploads/quantangshi/poet.tang.0.json
-POST {{url_prefix}}/file/upload?workspace_id=1
+POST {{URL_PREFIX}}/file/upload?workspace_id=1
 Authorization: Bearer {{auth_token}}
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 

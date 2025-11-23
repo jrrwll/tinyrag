@@ -1,21 +1,21 @@
 ###
 # Model List
-GET {{url_prefix}}/model/list
+GET {{URL_PREFIX}}/model/list
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Get 1
-GET {{url_prefix}}/model?id=1
+GET {{URL_PREFIX}}/model?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Get 2
-GET {{url_prefix}}/model?id=2
+GET {{URL_PREFIX}}/model?id=2
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Create Ollama
-POST {{url_prefix}}/model
+POST {{URL_PREFIX}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 ###
 # Model Create TextEmbedding
-POST {{url_prefix}}/model
+POST {{URL_PREFIX}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -48,7 +48,7 @@ Content-Type: application/json
 
 ###
 # Model Update
-PUT {{url_prefix}}/model
+PUT {{URL_PREFIX}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -62,12 +62,12 @@ Content-Type: application/json
 
 ###
 # Model Update Enable
-POST {{url_prefix}}/model/update-enable?id=1
+POST {{URL_PREFIX}}/model/update-enable?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Test Run
-POST {{url_prefix}}/model/test-run
+POST {{URL_PREFIX}}/model/test-run
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -78,17 +78,17 @@ Content-Type: application/json
 
 ###
 # Model Default LLM
-GET {{url_prefix}}/model/default?model_type=llm
+GET {{URL_PREFIX}}/model/default?model_type=llm
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Default TextEmbedding
-GET {{url_prefix}}/model/default?model_type=text_embedding
+GET {{URL_PREFIX}}/model/default?model_type=text_embedding
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model Default LLM Setup
-POST {{url_prefix}}/model/default
+POST {{URL_PREFIX}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -99,7 +99,7 @@ Content-Type: application/json
 
 ###
 # Model Default TextEmbedding Setup
-POST {{url_prefix}}/model/default
+POST {{URL_PREFIX}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

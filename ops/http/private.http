@@ -1,5 +1,5 @@
-GET {{url_prefix}}/inner/test-log
+GET {{URL_PREFIX}}/inner/test-log
 
 ###
-GET {{url_prefix}}/inner/test-scheduled-task
+GET {{URL_PREFIX}}/inner/test-scheduled-task
 

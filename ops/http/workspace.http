@@ -1,12 +1,12 @@
-GET {{url_prefix}}/workspace/list
+GET {{URL_PREFIX}}/workspace/list
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/workspace?id=1
+GET {{URL_PREFIX}}/workspace?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-POST {{url_prefix}}/workspace
+POST {{URL_PREFIX}}/workspace
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ###
-PUT {{url_prefix}}/workspace
+PUT {{URL_PREFIX}}/workspace
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/workspace/config
+POST {{URL_PREFIX}}/workspace/config
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

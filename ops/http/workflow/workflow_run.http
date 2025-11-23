@@ -1,7 +1,7 @@
-GET {{url_prefix}}/workflow/run?id=1
+GET {{URL_PREFIX}}/workflow/run?id=1
 
 ###
-POST {{url_prefix}}/workflow/run
+POST {{URL_PREFIX}}/workflow/run
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/workflow/run/execute
+POST {{URL_PREFIX}}/workflow/run/execute
 Content-Type: application/json
 
 {

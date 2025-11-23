@@ -1,14 +1,14 @@
 ###
-GET {{url_prefix}}/knowledge/list?workspace_id=1
+GET {{URL_PREFIX}}/knowledge/list?workspace_id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-GET {{url_prefix}}/knowledge?id=1
+GET {{URL_PREFIX}}/knowledge?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
 # 全唐诗
-POST {{url_prefix}}/knowledge
+POST {{URL_PREFIX}}/knowledge
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ###
-PUT {{url_prefix}}/knowledge
+PUT {{URL_PREFIX}}/knowledge
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/config
+POST {{URL_PREFIX}}/knowledge/config
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/preview-chunk
+POST {{URL_PREFIX}}/knowledge/preview-chunk
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -62,7 +62,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/preview-chunk
+POST {{URL_PREFIX}}/knowledge/preview-chunk
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -76,7 +76,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/import
+POST {{URL_PREFIX}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -90,7 +90,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/import
+POST {{URL_PREFIX}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -104,11 +104,11 @@ Content-Type: application/json
 > {% client.global.set("task_id", response.body.data.id); %}
 
 ###
-GET {{url_prefix}}/knowledge/document/list?knowledge_id=1
+GET {{URL_PREFIX}}/knowledge/document/list?knowledge_id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-POST {{url_prefix}}/knowledge/conversation
+POST {{URL_PREFIX}}/knowledge/conversation
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -119,7 +119,7 @@ Content-Type: application/json
 > {% client.global.set("conversation_id", response.body.data.id); %}
 
 ###
-POST {{url_prefix}}/knowledge/chat
+POST {{URL_PREFIX}}/knowledge/chat
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -129,7 +129,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{url_prefix}}/knowledge/stream-chat
+POST {{URL_PREFIX}}/knowledge/stream-chat
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

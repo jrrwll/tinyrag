@@ -1,6 +1,6 @@
 ###
 # Access Token Create
-POST {{url_prefix}}/auth/access-token
+POST {{URL_PREFIX}}/auth/access-token
 Content-Type: application/x-www-form-urlencoded
 
 username=tinyrag@dreamcat.org&password=tinyrag
@@ -9,17 +9,17 @@ username=tinyrag@dreamcat.org&password=tinyrag
 
 ###
 # User List
-GET {{url_prefix}}/user/list
+GET {{URL_PREFIX}}/user/list
 Authorization: Bearer {{auth_token}}
 
 ###
 # User Get
-GET {{url_prefix}}/user?email=tinyrag@dreamcat.org
+GET {{URL_PREFIX}}/user?email=tinyrag@dreamcat.org
 Authorization: Bearer {{auth_token}}
 
 ###
 # User Create
-POST {{url_prefix}}/user
+POST {{URL_PREFIX}}/user
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

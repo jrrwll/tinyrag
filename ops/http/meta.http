@@ -1,19 +1,19 @@
 ###
 # Model LLM
-GET {{url_prefix}}/meta/model/providers?model_type=llm
+GET {{URL_PREFIX}}/meta/model/providers?model_type=llm
 Authorization: Bearer {{auth_token}}
 
 ###
 # Model TextEmbedding
-GET {{url_prefix}}/meta/model/providers?model_type=text_embedding
+GET {{URL_PREFIX}}/meta/model/providers?model_type=text_embedding
 Authorization: Bearer {{auth_token}}
 
 ###
 # VectorStore
-GET {{url_prefix}}/meta/vector-store/providers
+GET {{URL_PREFIX}}/meta/vector-store/providers
 Authorization: Bearer {{auth_token}}
 
 ###
 # Storage
-GET {{url_prefix}}/meta/storage/providers
+GET {{URL_PREFIX}}/meta/storage/providers
 Authorization: Bearer {{auth_token}}
