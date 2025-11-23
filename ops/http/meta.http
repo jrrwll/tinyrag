@@ -1,14 +1,19 @@
-GET http://{{origin}}{{api_prefix}}/meta/model/providers?model_type=llm
+###
+# Model LLM
+GET {{url_prefix}}/meta/model/providers?model_type=llm
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/meta/model/providers?model_type=text_embedding
+# Model TextEmbedding
+GET {{url_prefix}}/meta/model/providers?model_type=text_embedding
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/meta/vector-store/providers
+# VectorStore
+GET {{url_prefix}}/meta/vector-store/providers
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/meta/storage/providers
+# Storage
+GET {{url_prefix}}/meta/storage/providers
 Authorization: Bearer {{auth_token}}

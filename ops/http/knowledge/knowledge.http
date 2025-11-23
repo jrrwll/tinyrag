@@ -1,14 +1,14 @@
 ###
-GET http://{{origin}}{{api_prefix}}/knowledge/list?workspace_id=1
+GET {{url_prefix}}/knowledge/list?workspace_id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/knowledge?id=1
+GET {{url_prefix}}/knowledge?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
 # 全唐诗
-POST http://{{origin}}{{api_prefix}}/knowledge
+POST {{url_prefix}}/knowledge
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{origin}}{{api_prefix}}/knowledge
+PUT {{url_prefix}}/knowledge
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/config
+POST {{url_prefix}}/knowledge/config
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/preview-chunk
+POST {{url_prefix}}/knowledge/preview-chunk
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -62,7 +62,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/preview-chunk
+POST {{url_prefix}}/knowledge/preview-chunk
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -76,7 +76,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/import
+POST {{url_prefix}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -90,7 +90,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/import
+POST {{url_prefix}}/knowledge/import
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -104,11 +104,11 @@ Content-Type: application/json
 > {% client.global.set("task_id", response.body.data.id); %}
 
 ###
-GET http://{{origin}}{{api_prefix}}/knowledge/document/list?knowledge_id=1
+GET {{url_prefix}}/knowledge/document/list?knowledge_id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/conversation
+POST {{url_prefix}}/knowledge/conversation
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -119,7 +119,7 @@ Content-Type: application/json
 > {% client.global.set("conversation_id", response.body.data.id); %}
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/chat
+POST {{url_prefix}}/knowledge/chat
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -129,7 +129,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/knowledge/stream-chat
+POST {{url_prefix}}/knowledge/stream-chat
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

@@ -1,24 +1,24 @@
-GET http://{{origin}}{{api_prefix}}/vector-store/list
+GET {{url_prefix}}/vector-store/list
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store?id=1
+GET {{url_prefix}}/vector-store?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store?id=2
+GET {{url_prefix}}/vector-store?id=2
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store?id=3
+GET {{url_prefix}}/vector-store?id=3
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store?id=4
+GET {{url_prefix}}/vector-store?id=4
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/vector-store
+POST {{url_prefix}}/vector-store
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/vector-store
+POST {{url_prefix}}/vector-store
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/vector-store
+POST {{url_prefix}}/vector-store
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -61,7 +61,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/vector-store
+POST {{url_prefix}}/vector-store
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -78,11 +78,11 @@ Content-Type: application/json
 
 
 ###
-GET http://{{origin}}{{api_prefix}}/vector-store/default
+GET {{url_prefix}}/vector-store/default
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/vector-store/default
+POST {{url_prefix}}/vector-store/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

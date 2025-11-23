@@ -1,17 +1,21 @@
-GET http://{{origin}}{{api_prefix}}/model/list
+###
+# Model List
+GET {{url_prefix}}/model/list
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/model?id=1
+# Model Get 1
+GET {{url_prefix}}/model?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/model?id=2
+# Model Get 2
+GET {{url_prefix}}/model?id=2
 Authorization: Bearer {{auth_token}}
 
 ###
-# llm text_embedding
-POST http://{{origin}}{{api_prefix}}/model
+# Model Create Ollama
+POST {{url_prefix}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -27,7 +31,8 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/model
+# Model Create TextEmbedding
+POST {{url_prefix}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -42,7 +47,8 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{origin}}{{api_prefix}}/model
+# Model Update
+PUT {{url_prefix}}/model
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -55,11 +61,13 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/update-enable?id=1
+# Model Update Enable
+POST {{url_prefix}}/model/update-enable?id=1
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/test-run
+# Model Test Run
+POST {{url_prefix}}/model/test-run
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -69,15 +77,18 @@ Content-Type: application/json
 }
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default?model_type=llm
+# Model Default LLM
+GET {{url_prefix}}/model/default?model_type=llm
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://{{origin}}{{api_prefix}}/model/default?model_type=text_embedding
+# Model Default TextEmbedding
+GET {{url_prefix}}/model/default?model_type=text_embedding
 Authorization: Bearer {{auth_token}}
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/default
+# Model Default LLM Setup
+POST {{url_prefix}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -87,7 +98,8 @@ Content-Type: application/json
 }
 
 ###
-POST http://{{origin}}{{api_prefix}}/model/default
+# Model Default TextEmbedding Setup
+POST {{url_prefix}}/model/default
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

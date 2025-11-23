@@ -1,29 +1,29 @@
-GET http://{{origin}}{{api_prefix}}/workflow/list
+GET {{url_prefix}}/workflow/list
 
 ###
-GET http://{{origin}}{{api_prefix}}/workflow?id=1
+GET {{url_prefix}}/workflow?id=1
 
 ###
-GET http://{{origin}}{{api_prefix}}/workflow?id=2
+GET {{url_prefix}}/workflow?id=2
 
 ###
-POST http://{{origin}}{{api_prefix}}/workflow
+POST {{url_prefix}}/workflow
 Content-Type: application/json
 
 < ./workflow_demo1.json
 
 ###
-PUT http://{{origin}}{{api_prefix}}/workflow
+PUT {{url_prefix}}/workflow
 Content-Type: application/json
 
 < ./workflow_demo1.json
 
 
 ###
-POST http://{{origin}}{{api_prefix}}/workflow
+POST {{url_prefix}}/workflow
 Content-Type: application/json
 
 < ./workflow_demo2.json
 
 ###
-GET http://{{origin}}{{api_prefix}}/workflow/check_list?id=1
+GET {{url_prefix}}/workflow/check_list?id=1

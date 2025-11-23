@@ -1,5 +1,5 @@
-GET http://{{origin}}{{api_prefix}}/inner/test-log
+GET {{url_prefix}}/inner/test-log
 
 ###
-GET http://{{origin}}{{api_prefix}}/inner/test-scheduled-task
+GET {{url_prefix}}/inner/test-scheduled-task
 
